@@ -1,0 +1,57 @@
+[
+  {
+    "name": "Biscuits",
+    "url": "https://cdn-icons-png.flaticon.com/128/2289/2289872.png",
+    "productCount": 186
+  },
+  {
+    "name": "Cake",
+    "url": "https://cdn-icons-png.flaticon.com/128/6402/6402266.png",
+    "productCount": 37
+  },
+  {
+    "name": "Chocolate",
+    "url": "https://cdn-icons-png.flaticon.com/128/4080/4080314.png",
+    "productCount": 40
+  },
+  {
+    "name": "Flammables",
+    "url": "https://cdn-icons-png.flaticon.com/128/901/901855.png",
+    "productCount": 4
+  },
+  {
+    "name": "Jellies",
+    "url": "https://cdn-icons-png.flaticon.com/128/6402/6402319.png",
+    "productCount": 18
+  },
+  {
+    "name": "Juices",
+    "url": "https://cdn-icons-png.flaticon.com/128/13972/13972032.png",
+    "productCount": 5
+  },
+  {
+    "name": "Nicotine Hub",
+    "url": "https://cdn-icons-png.flaticon.com/128/595/595766.png",
+    "productCount": 22
+  },
+  {
+    "name": "Nimco",
+    "url": "https://cdn-icons-png.flaticon.com/128/676/676802.png",
+    "productCount": 30
+  },
+  {
+    "name": "Snacks",
+    "url": "https://cdn-icons-png.flaticon.com/128/2553/2553691.png",
+    "productCount": 102
+  },
+  {
+    "name": "Sour & Sweets",
+    "url": "https://cdn-icons-png.flaticon.com/128/1888/1888859.png",
+    "productCount": 164
+  },
+  {
+    "name": "Sweet Supari",
+    "url": "https://cdn-icons-png.flaticon.com/128/7909/7909666.png",
+    "productCount": 41
+  }
+]

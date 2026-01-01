@@ -1,0 +1,40 @@
+/* @font-face {
+  font-family:'mybodyfont';
+  src: url('/fonts/Sifon-Pro.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family:'myheaderfont';
+  src: url('/fonts/brasika-display-trial.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+} */
+
+@import "tailwindcss";
+/* 
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *)); */
+
+@theme{
+  --color-primary: #F0531C;
+  --color-secondary: #09332C;
+  --color-accents: #F7EDDA;
+  --font-sifonn: var(--font-siffon);
+  --font-brasika: var(--font-brasika);
+  --font-danson: var(--font-danson);
+}
+
+:root.bulk-mode, .bulk-mode {
+  --color-primary: #537B2F;
+  --color-secondary: #2F4B1A;
+  --color-accents: #E5F2D8;
+}
+
+.bulk-mode body {
+  background: radial-gradient(circle at 20% 20%, #E5F2D8, #F8FAFC 40%),
+              radial-gradient(circle at 80% 0%, #C6D9B5, transparent 35%),
+              #F8FAFC;
+  transition: background 200ms ease, color 200ms ease;
+}

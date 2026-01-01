@@ -1,0 +1,219 @@
+[
+  {
+    "name": "4U",
+    "image": "https://scontent.fkhi25-1.fna.fbcdn.net/v/t39.30808-6/298460339_609831157510809_5366939061529108219_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeFTu5p9ltTqWj1Ea1XpBxfGoSQ1MoQR3tyhJDUyhBHe3HLQ10SX9AfJbJRxpdAw-XN68pROGDULFrR13d1mq43o&_nc_ohc=iXoujDi7fD0Q7kNvwEpo9Od&_nc_oc=Admg4LO1aZkQIVyzySviYy1dk-w_HdcElAhudcHx_v3ga6_Evl0XTDAPWNF4sScftq0&_nc_zt=23&_nc_ht=scontent.fkhi25-1.fna&_nc_gid=1GmWsVxpQqTdUEZBwnzIyg&oh=00_AfjTJnLWXTZd353LLa8hRbhDWDBcxsTcgFv-rLXZJ7U0_A&oe=69309FEF",
+    "productCount": 16,
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "name": "ATP (Asmat)",
+    "image": "https://scontent.fkhi25-1.fna.fbcdn.net/v/t39.30808-6/539369759_1223569082906945_3204822972358503644_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeHj4_iDbgAz9pIInUrF2i2_L1WxZZKFnzcvVbFlkoWfNzub6fU--HqRdmZQl4AF-euhKXjjdLH6of9sy7mwbYsw&_nc_ohc=4ul9PBTHzQkQ7kNvwG-n1t7&_nc_oc=AdkcRr432DyHcif8xsNbXwIjKxuwyJiB_Oex0AtXlCuonm7wQ-0eKkxcUo5CaZgWuU0&_nc_zt=23&_nc_ht=scontent.fkhi25-1.fna&_nc_gid=IATrsRQ99I8m0CjsfH3OXg&oh=00_Afh5YksutOvWS8G8Z602vj-W9IoX8mAs6jgAIOSt7niaJw&oe=6930BA2A",
+    "productCount": 4,
+    "categories": [
+      "Nicotine Hub"
+    ]
+  },
+  {
+    "name": "Bisconni",
+    "image": "https://pictures.grocerapps.com/original/grocerapp-bisconni-5ec6574ddbe7d.jpeg",
+    "productCount": 49,
+    "categories": [
+      "Biscuits",
+      "Cake"
+    ]
+  },
+  {
+    "name": "Candyland",
+    "image": "https://media.licdn.com/dms/image/v2/C4E0BAQFHGTvngjBDzg/company-logo_200_200/company-logo_200_200/0/1631330700934?e=2147483647&v=beta&t=555VMHJPjBs_NF_JcZwKWpKOFBijbhni3mi9XNXmiAU",
+    "productCount": 45,
+    "categories": [
+      "Chocolate",
+      "Jellies",
+      "Sour & Sweets"
+    ]
+  },
+  {
+    "name": "Flammables",
+    "image": "",
+    "productCount": 4,
+    "categories": [
+      "Flammables"
+    ]
+  },
+  {
+    "name": "Gibs",
+    "image": "https://pbs.twimg.com/profile_images/1192010896928886789/k2v-myEp_400x400.jpg",
+    "productCount": 50,
+    "categories": [
+      "Biscuits",
+      "Cake",
+      "Chocolate",
+      "Sour & Sweets"
+    ]
+  },
+  {
+    "name": "GoldStreet",
+    "image": "",
+    "productCount": 2,
+    "categories": [
+      "Nicotine Hub"
+    ]
+  },
+  {
+    "name": "Hilal",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRu2EjX-RYhijZbSOyJTdKaQJN5gw9hzSfScA&s",
+    "productCount": 42,
+    "categories": [
+      "Cake",
+      "Jellies",
+      "Sour & Sweets"
+    ]
+  },
+  {
+    "name": "Innovative",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcfF6r_DpLO_Gn0GUCREK4RZYP2bX1Ftr2ow&s",
+    "productCount": 48,
+    "categories": [
+      "Biscuits",
+      "Chocolate"
+    ]
+  },
+  {
+    "name": "JoJo",
+    "image": "",
+    "productCount": 71,
+    "categories": [
+      "Chocolate",
+      "Sour & Sweets"
+    ]
+  },
+  {
+    "name": "Lazer",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_E4vRpQVdagiifEGRXHtoRVvdHyXMTHJs-A&s",
+    "productCount": 6,
+    "categories": [
+      "Chocolate",
+      "Sour & Sweets"
+    ]
+  },
+  {
+    "name": "Marleen",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQF5z_20HqlKdHWXnZwLg8TKeUNuVjFJULdIg&s",
+    "productCount": 23,
+    "categories": [
+      "Biscuits",
+      "Chocolate",
+      "Sour & Sweets"
+    ]
+  },
+  {
+    "name": "Mayfair",
+    "image": "https://media.licdn.com/dms/image/v2/C4E0BAQH6JQddKkT-Dw/company-logo_200_200/company-logo_200_200/0/1631348229976?e=2147483647&v=beta&t=QoGXOiYlmVyXuGyLDYgFpYPE8gBnDm0yD8FH9BAAWvM",
+    "productCount": 53,
+    "categories": [
+      "Biscuits",
+      "Cake",
+      "Jellies",
+      "Sour & Sweets"
+    ]
+  },
+  {
+    "name": "Mix Snacks",
+    "image": "",
+    "productCount": 56,
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "name": "PeakFreans",
+    "image": "https://qne.com.pk/cdn/shop/collections/Peek_freans_f1361e8e-af64-4fb5-8190-70fe4d0807d2.jpg?v=1627983974",
+    "productCount": 53,
+    "categories": [
+      "Biscuits",
+      "Cake"
+    ]
+  },
+  {
+    "name": "Philip Moris",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxoCENQHUdMhUnp56BDsYksYmAvj_Wlz4aXw&s",
+    "productCount": 3,
+    "categories": [
+      "Nicotine Hub"
+    ]
+  },
+  {
+    "name": "PTC",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDDfiuG8OmS160aZsawlL0o-hcNtLteIde0w&s",
+    "productCount": 13,
+    "categories": [
+      "Nicotine Hub"
+    ]
+  },
+  {
+    "name": "SH.Foods",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpzOFkhFMC9WSQDuOhn814PYV172Vdv1lZXw&s",
+    "productCount": 2,
+    "categories": [
+      "Nimco"
+    ]
+  },
+  {
+    "name": "SHAHI",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRcvohhqhb9bI4zffGX80LdhzNqkA9Y6b_8g&s",
+    "productCount": 24,
+    "categories": [
+      "Nimco"
+    ]
+  },
+  {
+    "name": "Shakarganj",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkyV5JVuWdTd0OuIMnZqWDvhz__OxcNqz_Yw&s",
+    "productCount": 5,
+    "categories": [
+      "Juices"
+    ]
+  },
+  {
+    "name": "SiHai",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDYv_sIw_SO8kUH-rcL6t2mjMZAMk0ARAFmQ&s",
+    "productCount": 5,
+    "categories": [
+      "Biscuits"
+    ]
+  },
+  {
+    "name": "Supari",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaJwqt71D8ASn2V_oly9qwFsxTQolzRXLxWg&s",
+    "productCount": 41,
+    "categories": [
+      "Sweet Supari"
+    ]
+  },
+  {
+    "name": "T.Foods",
+    "image": "",
+    "productCount": 4,
+    "categories": [
+      "Nimco"
+    ]
+  },
+  {
+    "name": "Winner Snacks",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQj5mwkV8DgbLqFcDAJiAvcsNvdmfgNAIqKew&s",
+    "productCount": 12,
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "name": "Zee",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQa01gCV8xZyyCP5TLTolxu6s9AKx_5-zrEEw&s",
+    "productCount": 14,
+    "categories": [
+      "Snacks"
+    ]
+  }
+]

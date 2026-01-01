@@ -1,0 +1,210 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+enum UserRole {
+  USER
+  EMPLOYEE
+  ADMIN
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  phoneNumber   String?
+  role          UserRole  @default(USER)
+  location      Location?
+  p2pVendorsCreated P2PVendor[] @relation("UserP2PVendors")
+  orders        Order[]
+  accounts      Account[]
+  sessions      Session[]
+  employee      Employee?
+  admin         Admin?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Location {
+  id         String   @id @default(cuid())
+  street     String?
+  building   String?
+  city       String?
+  placesauto String?
+  longitude  Float?
+  latitude   Float?
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id])
+}
+model Company {
+  id           Int       @id @default(autoincrement())
+  name         String    @unique
+  image        String?
+  productCount Int       @default(0)
+  products     Product[] @relation("CompanyProducts")
+  categories   Category[] @relation("CompanyCategories")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Category {
+  id           Int       @id @default(autoincrement())
+  name         String    @unique
+  url          String    @unique
+  productCount Int       @default(0)
+  companies    Company[] @relation("CompanyCategories")
+  products     Product[] @relation("CategoryProducts")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Product {
+  id            Int            @id @default(autoincrement())
+  name          String
+  company       String
+  companyId     Int?
+  companyRel    Company?       @relation("CompanyProducts", fields: [companyId], references: [id])
+  category      String
+  categoryId    Int?
+  categoryRel   Category?      @relation("CategoryProducts", fields: [categoryId], references: [id])
+  price         Float
+  originalPrice Float?
+  retailPrice   Float
+  consumerPrice Float
+  bulkPrice     Float
+  bulkLimit     Int?
+  image         String
+  description   String?
+  companyImage  String
+  orderProducts OrderProduct[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([companyId])
+  @@index([categoryId])
+}
+
+enum OrderStatus {
+  ACCEPTED
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+}
+
+model Order {
+  id            String        @id @default(cuid())
+  orderNumber   Int
+  accountEmail  String
+  phoneNumber   String
+  orderInfo     String
+  address       String
+  orderPerson   String
+  userId        String
+  p2pVendorId   Int?
+  status        OrderStatus   @default(ACCEPTED)
+  user          User          @relation(fields: [userId], references: [id])
+  p2pVendor     P2PVendor?    @relation(fields: [p2pVendorId], references: [id])
+  orderProducts OrderProduct[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model OrderProduct {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId Int
+  quantity  Int      @default(1)
+
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+model Employee {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employeeId  String   @unique
+  department  String?
+  position    String?
+  hireDate    DateTime @default(now())
+  salary      Float?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  adminId   String   @unique
+  level     Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model P2PVendor {
+  id          Int      @id @default(autoincrement())
+  name        String
+  address     String?
+  phoneNumber String
+  createdById String?
+  createdBy   User?    @relation("UserP2PVendors", fields: [createdById], references: [id])
+  orders      Order[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Optional: just for convenience, no direct relation needed
+model OrderHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
