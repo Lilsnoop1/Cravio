@@ -14,7 +14,7 @@ export default function MobileLocationDrawer({ isOpen, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-[9998] md:hidden flex">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative m-auto w-[94%] bg-white rounded-2xl shadow-2xl p-4">
+      <div className="relative m-auto w-[94%] bg-white rounded-2xl shadow-2xl p-4 overflow-visible">
         <div className="flex items-center justify-between mb-3">
           <p className="text-lg font-bold text-slate-900">Select your location</p>
           <button
@@ -25,7 +25,9 @@ export default function MobileLocationDrawer({ isOpen, onClose }: Props) {
             <X className="w-5 h-5 text-slate-700" />
           </button>
         </div>
-        <LocationSelector allowChange />
+        <div className="relative overflow-visible">
+          <LocationSelector allowChange />
+        </div>
       </div>
     </div>
   );

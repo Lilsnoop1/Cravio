@@ -189,7 +189,7 @@ const PlacesAutoComplete = ({setSelected,setAddress, setMapToOpen}:PlacesAutoCom
         placeholder="Search an Address"
         className="w-full"
       />
-      <ComboboxPopover className="z-200">
+      <ComboboxPopover className="!z-[9999]">
         <ComboboxList>
           {status==='OK' && data.map(({place_id,description})=>
           <ComboboxOption key={place_id} value={description}/>
