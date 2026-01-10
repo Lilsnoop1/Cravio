@@ -6,8 +6,8 @@ const Loading = () => {
       <Image
         src="/images/Cravio_Shopping_Bag_Icon_.png"
         alt="loading"
-        width={140}
-        height={140}
+        width={200}
+        height={200}
         className="animate-bounce"
         priority
       />

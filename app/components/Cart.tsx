@@ -17,7 +17,7 @@ const MAX_QUANTITY = 5000;
 const MIN_QUANTITY = 1;
 
 const Cart: React.FC = () => {
-  const { cartItems, updateQuantity, removeItem, addItem } = useCartContext();
+  const { cartItems, updateQuantity, removeItem, addItem, CartOpen } = useCartContext();
   const [subTotal, setSubTotal] = useState<number>(0);
   const router = useRouter();
   const pathname = usePathname();
@@ -103,7 +103,7 @@ const Cart: React.FC = () => {
   };
 
   return (
-    <aside className={`${cartItems.length === 0 ? 'hidden' : 'hidden md:flex'} md:flex-col sticky top-0 right-0 h-screen w-[420px] bg-white shadow-2xl z-50`}>
+    <aside className={`${cartItems.length === 0 || !CartOpen ? 'hidden' : 'hidden md:flex'} md:flex-col sticky top-0 right-0 h-screen w-[420px] bg-white shadow-2xl z-50`}>
       <div className="p-6 border-b border-slate-200 bg-accents">
         <div className="flex items-center justify-center gap-2 mb-4 bg-primary backdrop-blur-sm rounded-full px-4 py-2 w-fit mx-auto shadow-sm">
           <Clock className="w-4 h-4 text-amber-600" />

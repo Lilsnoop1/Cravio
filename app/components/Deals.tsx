@@ -10,8 +10,8 @@ import { useCartContext } from '../context/CartContext';
 export default function Deals({Name, range, index}:DealsCardProps) {
   const [scrollPosition, setScrollPosition] = useState(0);
   const {ProductFetch, loading} = useProduct();
-  const { cartItems } = useCartContext();
-  const hasCart = cartItems.length > 0;
+  const { cartItems, CartOpen } = useCartContext();
+  const isCartOpen = cartItems.length > 0 && CartOpen;
   
   const categorySingles = useMemo(() => {
     if (!ProductFetch) return [];
@@ -62,7 +62,7 @@ export default function Deals({Name, range, index}:DealsCardProps) {
         <div className="max-w-md lg:max-w-4xl md:max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="font-danson text-xl md:text-3xl font-bold text-slate-800">
+              <h2 className="font-sifonn text-xl md:text-3xl font-semibold text-slate-800">
                 {Name}
               </h2>
             </div>
@@ -76,17 +76,12 @@ export default function Deals({Name, range, index}:DealsCardProps) {
   }
 
   return (
-    <section className="py-4 px-5 sm:px-6 md:px-8 overflow-hidden">
-      <div className={`w-full max-w-screen-xl mx-auto ${hasCart ? "md:max-w-[calc(100vw-460px)] md:mx-0" : ""}`}>
-        <div className="flex items-center justify-between gap-3 mb-5 md:mb-6 rounded-lg bg-white shadow-sm px-4 py-3">
-          <div className="space-y-1">
-            <p className="uppercase text-[11px] tracking-[0.18em] text-slate-600 font-semibold">
-              Limited time picks
-            </p>
-            <h2 className="font-danson text-2xl md:text-3xl font-bold leading-tight text-slate-900">
-              {Name}
-            </h2>
-          </div>
+    <section className="py-4 px-5 sm:px-6 md:px-8 overflow-hidden" id={Name === "Hot Deals - On the Clock" ? "deals-section" : undefined}>
+      <div className={`w-full max-w-screen-xl mx-auto transition-all duration-300 ${isCartOpen ? "md:max-w-[calc(100vw-460px)] md:mx-0" : ""}`}>
+        <div className="flex items-center justify-between gap-3 mb-5 md:mb-6">
+          <h2 className="font-sifonn text-2xl md:text-3xl font-semibold text-slate-900">
+            {Name}
+          </h2>
           <button className="group flex items-center gap-2 text-slate-700 hover:text-amber-600 font-sifonn font-semibold transition-colors duration-300">
             <span className="text-sm md:text-base">View All</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />

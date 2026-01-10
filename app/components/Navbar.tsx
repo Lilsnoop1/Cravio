@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Menu, X, ChevronDown, Search } from "lucide-react";
 import { useLocation } from "../context/LocationContext";
+import { useCartContext } from "../context/CartContext";
 import MobileLocationDrawer from "./MobileLocationDrawer";
 
 const Navbar: React.FC = () => {
@@ -17,6 +18,7 @@ const Navbar: React.FC = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [locOpen, setLocOpen] = useState(false);
     const { selectedAddress } = useLocation();
+    const { cartItems, CartOpen, setCartOpen } = useCartContext();
 
   const shortAddress = selectedAddress
     ? selectedAddress.length > 20
@@ -100,14 +102,24 @@ const Navbar: React.FC = () => {
   return (
     <>
       {/* Main Navbar */}
-      <div className="flex flex-row justify-between py-3 px-5 items-center gap-5 w-full">
+      <div className="md:static fixed top-0 left-0 right-0 z-[10000] bg-white border-b border-slate-200 md:border-none md:relative">
+        <div className="flex flex-row justify-between py-3 px-5 items-center gap-5 w-full">
         <div className="flex items-center gap-3">
           <button
-            className="md:hidden p-2 rounded-full hover:bg-slate-100"
-            onClick={() => setMenuOpen(true)}
-            aria-label="Open menu"
+            className="md:hidden p-2 rounded-full hover:bg-slate-100 relative"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
           >
-            <Menu className="w-6 h-6 text-slate-800" />
+            <Menu 
+              className={`w-6 h-6 text-slate-800 transition-all duration-300 ${
+                menuOpen ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'
+              }`}
+            />
+            <X 
+              className={`w-6 h-6 text-slate-800 absolute top-2 left-2 transition-all duration-300 ${
+                menuOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-0'
+              }`}
+            />
           </button>
           {/* Hide logo on mobile per request; keep link space for desktop */}
           <Link href={"/"} className="hidden md:block">
@@ -144,13 +156,14 @@ const Navbar: React.FC = () => {
           </button>
         </div>
         <button
-          className="p-2 rounded-full hover:bg-slate-100"
+          className="md:hidden p-2 rounded-full hover:bg-slate-100"
           aria-label="Search"
           onClick={() => {
             const event = new CustomEvent("mobile-search-open");
             window.dispatchEvent(event);
           }}
         >
+          <Search className="w-6 h-6 text-slate-800" />
         </button>
         {session?<AccountInfo session={session} onSignOut={signOut}/>:
       <div className="flex flex-row gap-2 justify-end w-fit">
@@ -158,7 +171,12 @@ const Navbar: React.FC = () => {
             onClick={()=>{setIsOpen(true);setIsEmployee(false)}}
             >Login/Sign Up</button>
         </div>}
-        <div className="hidden md:block relative">
+        {cartItems.length > 0 && (
+          <button
+            onClick={() => setCartOpen(!CartOpen)}
+            className="hidden md:block relative p-2 hover:bg-slate-100 rounded-full transition-colors"
+            aria-label="Toggle cart"
+          >
             <div className="relative w-12 h-12">
                 <Image
                     src="/images/plastic-bag.png"
@@ -166,8 +184,11 @@ const Navbar: React.FC = () => {
                     fill
                 />
             </div>
-            <div className="rounded-full w-4 h-4 bg-primary absolute bottom-0 right-0 text-accents text-xs text-center">1</div>
-        </div>
+            <div className="rounded-full w-5 h-5 bg-primary absolute -top-1 -right-1 text-accents text-xs flex items-center justify-center font-bold">
+              {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+            </div>
+          </button>
+        )}
         {/* Employee Links */}
         {session && session.user.role === 'EMPLOYEE' && (
           <div className="hidden md:flex flex-row gap-4 ml-4">
@@ -182,6 +203,7 @@ const Navbar: React.FC = () => {
             }}/>
         </div> */}
 
+        </div>
       </div>
       {menuOpen && (
         <div className="fixed inset-0 z-[9998] md:hidden">

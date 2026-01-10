@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import type {
@@ -48,6 +48,8 @@ export default function CatalogAdminPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [productSearch, setProductSearch] = useState("");
+  const [displayedCount, setDisplayedCount] = useState(50);
+  const observerTarget = useRef<HTMLDivElement>(null);
 
   const [categoryForm, setCategoryForm] = useState<CategoryFormState>(emptyCategory);
   const [companyForm, setCompanyForm] = useState<CompanyFormState>(emptyCompany);
@@ -87,9 +89,41 @@ export default function CatalogAdminPage() {
 
   const filteredProducts = useMemo(() => {
     const term = productSearch.trim().toLowerCase();
-    if (!term) return products.slice(0, 50);
-    return products.filter((p) => p.name.toLowerCase().includes(term)).slice(0, 50);
+    if (!term) return products;
+    return products.filter((p) => p.name.toLowerCase().includes(term));
   }, [products, productSearch]);
+
+  const displayedProducts = useMemo(() => {
+    return filteredProducts.slice(0, displayedCount);
+  }, [filteredProducts, displayedCount]);
+
+  // Reset displayed count when search changes
+  useEffect(() => {
+    setDisplayedCount(50);
+  }, [productSearch]);
+
+  // Intersection Observer for lazy loading
+  useEffect(() => {
+    if (!observerTarget.current || displayedProducts.length >= filteredProducts.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setDisplayedCount((prev) => Math.min(prev + 50, filteredProducts.length));
+        }
+      },
+      { threshold: 0.1, rootMargin: '100px' }
+    );
+
+    const currentTarget = observerTarget.current;
+    observer.observe(currentTarget);
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [displayedProducts.length, filteredProducts.length]);
 
   const saveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -658,7 +692,7 @@ export default function CatalogAdminPage() {
               className="w-48 rounded border border-gray-200 px-3 py-2 text-sm"
             />
             <span className="text-xs text-gray-500">
-              Showing {filteredProducts.length} of {products.length}
+              Showing {displayedProducts.length} of {filteredProducts.length} {productSearch ? 'results' : 'products'}
             </span>
           </div>
         </div>
@@ -815,7 +849,7 @@ export default function CatalogAdminPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredProducts.map((product) => (
+              {displayedProducts.map((product) => (
                 <tr key={product.id}>
                   <td className="px-3 py-2 font-medium text-gray-900">{product.name}</td>
                   <td className="px-3 py-2 text-gray-700">{product.company}</td>
@@ -854,7 +888,7 @@ export default function CatalogAdminPage() {
                   </td>
                 </tr>
               ))}
-              {filteredProducts.length === 0 && (
+              {displayedProducts.length === 0 && (
                 <tr>
                   <td className="px-3 py-3 text-sm text-gray-500" colSpan={7}>
                     No products match this search.
@@ -863,6 +897,12 @@ export default function CatalogAdminPage() {
               )}
             </tbody>
           </table>
+          {/* Observer target for lazy loading */}
+          {displayedProducts.length < filteredProducts.length && (
+            <div ref={observerTarget} className="h-10 w-full flex items-center justify-center py-4">
+              <div className="text-sm text-gray-500">Loading more products...</div>
+            </div>
+          )}
         </div>
       </section>
     </div>

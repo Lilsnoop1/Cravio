@@ -88,7 +88,7 @@ export default function Categories() {
 
 
   return (
-    <section className="md:py-8 md:px-8 px-3 py-3">
+    <section id="categories" className="md:py-8 md:px-8 px-3 py-3">
       <div className="w-full mx-auto flex flex-col gap-6">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-slate-200">
@@ -132,11 +132,11 @@ export default function Categories() {
                       key={index}
                     >
                       <div className="group flex flex-col items-center gap-2 w-24 md:w-24">
-                        <div className="relative overflow-hidden rounded-2xl bg-slate-50 border border-slate-200 w-20 h-20 md:w-20 md:h-20 shadow-sm hover:shadow-md transition-all duration-300 flex items-center justify-center">
+                        <div className="relative overflow-hidden bg-slate-50 border border-slate-200 w-24 h-24 md:w-28 md:h-28 shadow-sm hover:shadow-md transition-all duration-300 flex items-center justify-center">
                           <img
                             src={category.url}
                             alt={category.name}
-                            className="w-14 h-14 md:w-16 md:h-16 object-contain group-hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         </div>

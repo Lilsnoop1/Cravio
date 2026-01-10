@@ -122,7 +122,7 @@ const MobileCartModal = ({ isOpen, onClose }: MobileCartModalProps) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 md:hidden">
+    <div className="fixed inset-0 z-[9998] md:hidden">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -130,7 +130,7 @@ const MobileCartModal = ({ isOpen, onClose }: MobileCartModalProps) => {
       />
 
       {/* Modal */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl max-h-[90vh] flex flex-col">
+      <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl max-h-[90vh] flex flex-col justify-center">
         {/* Header */}
         <div className="p-6 border-b border-slate-200 bg-accents flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -253,7 +253,7 @@ const MobileCartModal = ({ isOpen, onClose }: MobileCartModalProps) => {
 
         {/* Footer with Total and Checkout */}
         {cartItems.length > 0 && (
-          <div className="border-t border-slate-200 p-6 space-y-4 bg-white">
+          <div className="border-t border-slate-200 p-6 pb-20 space-y-4 bg-white">
               <div className="space-y-2.5 text-sm">
                 {session?.user?.role === "EMPLOYEE" && (
                   <div className="space-y-2">

@@ -2,9 +2,13 @@
 import React, { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Card from "./Card";
+import { useCartContext } from "../context/CartContext";
 
 
 const Carousel: React.FC = () => {
+  const { cartItems, CartOpen } = useCartContext();
+  const isCartOpen = cartItems.length > 0 && CartOpen;
+  
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "start",
@@ -37,15 +41,15 @@ const Carousel: React.FC = () => {
     title: `Snack ${i + 1}`,
   }));
 
-  const bannerHeight = "h-[320px] md:h-[380px] lg:h-[420px]";
+  const bannerHeight = "h-[200px] md:h-[380px] lg:h-[420px]";
 
   return (
     <div className="w-full py-10 md:py-12 px-4 sm:px-8 lg:px-14">
       <div className="flex flex-col lg:flex-row gap-6 items-stretch">
         {/* Carousel */}
-        <div className={`relative w-full lg:w-2/3 max-w-5xl ${bannerHeight}`}>
+        <div className={`relative w-full ${isCartOpen ? "lg:w-3/3" : "lg:w-2/3"} max-w-5xl ${bannerHeight}`}>
           <div className="overflow-hidden rounded-3xl h-full" ref={emblaRef}>
-            <div className="flex h-full">
+            <div className="flex h-full pl-1 pr-1">
               {cards.map((card, i) => (
                 <Card key={i} {...card} />
               ))}
@@ -60,7 +64,7 @@ const Carousel: React.FC = () => {
           </button>
 
           {/* Progress bars */}
-          <div className="flex justify-center gap-2 mt-6">
+          <div className=" hidden md:flex justify-center gap-2 mt-6">
             {scrollSnaps.map((_, i) => (
               <button
                 key={i}
@@ -74,9 +78,10 @@ const Carousel: React.FC = () => {
         </div>
 
         {/* Promo Banner */}
-        <div
-          className={`hidden w-full lg:w-1/3 rounded-2xl bg-primary text-accents p-6 shadow-md md:flex flex-col ${bannerHeight}`}
-        >
+        {!isCartOpen && (
+          <div
+            className={`hidden w-full lg:w-1/3 rounded-2xl bg-primary text-accents p-6 shadow-md md:flex flex-col ${bannerHeight}`}
+          >
           <div className="flex-1 flex items-center justify-center">
             <img
               src="/images/snacksimagebanner.jpeg"
@@ -94,11 +99,20 @@ const Carousel: React.FC = () => {
             <p className="text-sm opacity-80">
               Fresh picks, quick delivery, and exclusive deals every day.
             </p>
-            <button className="mt-1 inline-flex items-center justify-center rounded-full bg-accents text-primary px-4 py-2 text-sm font-semibold shadow hover:shadow-lg transition">
+            <button 
+              onClick={() => {
+                const dealsSection = document.getElementById("deals-section");
+                if (dealsSection) {
+                  dealsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+              }}
+              className="mt-1 inline-flex items-center justify-center rounded-full bg-accents text-primary px-4 py-2 text-sm font-semibold shadow hover:shadow-lg transition"
+            >
               Start shopping
             </button>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

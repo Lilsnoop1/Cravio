@@ -55,7 +55,7 @@ function SiteShell({ children }: LayoutProps) {
                         <Subnav />
                       </div>
                     <div className="flex">
-                      <div className="flex-1">{children}</div>
+                      <div className="flex-1 md:pt-0 pt-[56px]">{children}</div>
                       <Cart />
                     </div>
                     <MobileBottomNav />

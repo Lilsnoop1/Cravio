@@ -4,12 +4,14 @@ import { useState, useMemo, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Home, Search, UserCircle, ClipboardList, ShoppingBag } from "lucide-react";
 import { useCartContext } from "../context/CartContext";
+import { useSession } from "next-auth/react";
 import MobileCartModal from "./MobileCartModal";
 import MobileSearchDrawer from "./MobileSearchDrawer";
 
 const MobileBottomNav = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const { data: session } = useSession();
   const { cartItems } = useCartContext();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -32,15 +34,17 @@ const MobileBottomNav = () => {
   const navItems = [
     { key: "home", label: "Home", icon: <Home className="w-5 h-5" />, onClick: () => router.push("/") },
     { key: "search", label: "Search", icon: <Search className="w-5 h-5" />, onClick: () => setIsSearchOpen(true) },
-    { key: "profile", label: "Profile", icon: <UserCircle className="w-5 h-5" />, onClick: () => router.push("/account") },
-    { key: "orders", label: "Orders", icon: <ClipboardList className="w-5 h-5" />, onClick: () => router.push("/orders") },
+    ...(session ? [
+      { key: "profile", label: "Profile", icon: <UserCircle className="w-5 h-5" />, onClick: () => router.push("/account") },
+      { key: "orders", label: "Orders", icon: <ClipboardList className="w-5 h-5" />, onClick: () => router.push("/orders") },
+    ] : []),
     { key: "cart", label: "Cart", icon: <ShoppingBag className="w-5 h-5" />, onClick: () => setIsCartOpen(true) },
   ];
 
   return (
     <>
       <div className="fixed bottom-0 left-0 right-0 z-[9997] md:hidden bg-white border-t border-slate-200 shadow-lg">
-        <div className="grid grid-cols-5 text-center py-2">
+        <div className={`grid text-center py-2 ${session ? 'grid-cols-4' : 'grid-cols-3'}`}>
           {navItems.map((item) => (
             <button
               key={item.key}

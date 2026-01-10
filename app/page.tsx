@@ -2,6 +2,7 @@ import SearchBar from "./components/SearchBar"
 import Carousel from "./components/Carousel"
 import Categories from "./components/Categories"
 import Deals from "./components/Deals"
+import AllProductsGrid from "./components/AllProductsGrid"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 export default async function page ({searchParams}:{searchParams: Promise<{query?:string}>}){
@@ -27,6 +28,7 @@ export default async function page ({searchParams}:{searchParams: Promise<{query
             <Deals Name="Hot Deals - On the Clock"/>
             <Deals Name="New Arrivals" range={[250,300]}/>
             <Deals Name="Best Deals!" range={[100,150]}/>
+            <AllProductsGrid/>
         </main>
   )
 }
