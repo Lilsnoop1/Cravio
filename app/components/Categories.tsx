@@ -91,7 +91,7 @@ export default function Categories() {
     <section id="categories" className="md:py-8 md:px-8 px-3 py-3">
       <div className="w-full mx-auto flex flex-col gap-6">
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+        <div className="flex items-center justify-between pb-3">
           <div className="flex items-center gap-3">
             <div className="h-8 w-1.5 rounded-full bg-primary" />
             <h2 className="font-danson text-2xl md:text-3xl font-bold text-slate-900">
@@ -125,20 +125,19 @@ export default function Categories() {
             <div className="flex">
               {/* Categories Slide */}
               <div className="flex-[0_0_100%] min-w-0 px-1">
-                <div className="flex flex-wrap gap-2 md:gap-15 md:px-10">
+                <div className="flex flex-wrap gap-3 md:gap-5 md:px-10">
                   {visibleCategories?visibleCategories.map((category, index) => (
                     <Link
                       href={`/category/${category.name}`}
                       key={index}
                     >
                       <div className="group flex flex-col items-center gap-2 w-24 md:w-24">
-                        <div className="relative overflow-hidden bg-slate-50 border border-slate-200 w-24 h-24 md:w-28 md:h-28 shadow-sm hover:shadow-md transition-all duration-300 flex items-center justify-center">
+                        <div className="relative overflow-hidden w-24 h-24 md:w-28 md:h-28 rounded-2xl flex items-center justify-center">
                           <img
                             src={category.url}
                             alt={category.name}
                             className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         </div>
                         <div className="text-center">
                           <p className="font-sifonn text-sm md:text-base font-semibold text-slate-800 group-hover:text-primary transition-colors duration-300 leading-snug">
@@ -168,31 +167,22 @@ export default function Categories() {
 
               {/* Companies Slide */}
                 <div className="flex-[0_0_100%] min-w-0 px-1">
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 md:gap-2.5">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-3.5">
                     {visibleCompanies?visibleCompanies.map((company: Company, index:number) => (
                       <Link
                         href={`/companies/${company.name.toLowerCase().replace(/\s+/g, '-')}`}
                         key={index}
                         className="flex-shrink-0"
                       >
-                        <div className="group flex flex-col items-center gap-2 p-3 bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-slate-200 hover:border-amber-300">
-                          <div className="relative overflow-hidden rounded-xl bg-slate-100 w-16 h-16 md:w-18 md:h-18 shadow-sm">
+                        <div className="group flex flex-col items-center gap-2">
                             <img
                               src={company.image ?? "/images/dummyimage.png"}
                               alt={company.name}
-                              className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                            className="w-16 h-16 md:w-18 md:h-18 object-contain group-hover:scale-105 transition-transform duration-300"
                             />
-                          </div>
-                          <div className="text-center">
-                            <p className="font-sifonn text-sm md:text-base font-semibold text-slate-800 group-hover:text-primary transition-colors duration-300 line-clamp-2">
+                          <p className="font-sifonn text-sm md:text-base font-semibold text-slate-800 group-hover:text-primary transition-colors duration-300 text-center line-clamp-2">
                               {company.name}
                             </p>
-                            {!showAllCompanies && (
-                              <p className="text-[11px] md:text-xs text-muted-foreground mt-0.5">
-                              {company.productCount} products
-                              </p>
-                            )}
-                          </div>
                         </div>
                       </Link>
                     )):null}

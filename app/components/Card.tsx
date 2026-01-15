@@ -6,7 +6,7 @@ const Card = ({ image, title }: CardProps) => {
       <img
         src={image}
         alt={title}
-        className="h-full w-full object-cover rounded-3xl"
+        className="h-full w-full object-cover md:rounded-3xl"
       />
     </div>
   );

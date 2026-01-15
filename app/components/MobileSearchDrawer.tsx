@@ -21,6 +21,7 @@ export default function MobileSearchDrawer({ isOpen, onClose }: Props) {
   const [sortBy, setSortBy] = useState<SortBy>("none");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [showSortOptions, setShowSortOptions] = useState(false);
+  const [iconToggled, setIconToggled] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -28,7 +29,14 @@ export default function MobileSearchDrawer({ isOpen, onClose }: Props) {
       setSortBy("none");
       setSortOrder("asc");
       setShowSortOptions(false);
+      setIconToggled(false);
+      return;
     }
+
+    // ensure the search icon renders before morphing to X
+    setIconToggled(false);
+    const id = setTimeout(() => setIconToggled(true), 40);
+    return () => clearTimeout(id);
   }, [isOpen]);
 
   const results = useMemo(() => {
@@ -101,25 +109,34 @@ export default function MobileSearchDrawer({ isOpen, onClose }: Props) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9998] flex md:hidden">
+    <div className="fixed inset-0 z-[10010] flex md:hidden">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative ml-auto h-full w-full max-w-md bg-white shadow-2xl rounded-l-3xl flex flex-col">
         <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-200">
           <button
-            aria-label="Close search"
-            className="p-2 rounded-full hover:bg-slate-100"
-            onClick={onClose}
+            aria-label="Toggle search drawer"
+            className="p-2 rounded-full hover:bg-slate-100 transition-colors"
+            onClick={() => {
+              setIconToggled(false);
+              onClose();
+            }}
           >
-            <X className="w-5 h-5 text-slate-700" />
+            <span className="relative w-9 h-9 flex items-center justify-center">
+              <Search
+                className={`absolute w-5 h-5 text-slate-600 transition-all duration-200 ${iconToggled ? "opacity-0 -rotate-45 scale-75" : "opacity-100 rotate-0 scale-100"}`}
+              />
+              <X
+                className={`absolute w-5 h-5 text-slate-700 transition-all duration-200 ${iconToggled ? "opacity-100 rotate-0 scale-100" : "opacity-0 rotate-45 scale-75"}`}
+              />
+            </span>
           </button>
-          <div className="flex items-center gap-2 flex-1 bg-slate-100 rounded-full px-3 py-2">
-            <Search className="w-5 h-5 text-slate-500" />
+          <div className="flex items-center gap-2 flex-1 bg-white border border-slate-200 rounded-full px-3 py-2 shadow-sm">
             <input
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search the store"
-              className="flex-1 bg-transparent text-sm outline-none"
+              className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
             />
           </div>
           <button

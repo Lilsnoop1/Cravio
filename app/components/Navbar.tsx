@@ -5,7 +5,7 @@ import {signOut, useSession } from "next-auth/react"
 import AccountInfo from "./AccountInfo";
 import LocationSelector from "./LocationSelector";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X, ChevronDown, Search } from "lucide-react";
 import { useLocation } from "../context/LocationContext";
 import { useCartContext } from "../context/CartContext";
@@ -17,8 +17,22 @@ const Navbar: React.FC = () => {
     const [isSeeding, setIsSeeding] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [locOpen, setLocOpen] = useState(false);
+    const [mobileSearchActive, setMobileSearchActive] = useState(false);
     const { selectedAddress } = useLocation();
     const { cartItems, CartOpen, setCartOpen } = useCartContext();
+
+    useEffect(() => {
+      const handleOpen = () => setMobileSearchActive(true);
+      const handleClose = () => setMobileSearchActive(false);
+
+      window.addEventListener("mobile-search-open", handleOpen as EventListener);
+      window.addEventListener("mobile-search-close", handleClose as EventListener);
+
+      return () => {
+        window.removeEventListener("mobile-search-open", handleOpen as EventListener);
+        window.removeEventListener("mobile-search-close", handleClose as EventListener);
+      };
+    }, []);
 
   const shortAddress = selectedAddress
     ? selectedAddress.length > 20
@@ -156,14 +170,27 @@ const Navbar: React.FC = () => {
           </button>
         </div>
         <button
-          className="md:hidden p-2 rounded-full hover:bg-slate-100"
+          className="md:hidden p-2 rounded-full hover:bg-slate-100 relative"
           aria-label="Search"
           onClick={() => {
-            const event = new CustomEvent("mobile-search-open");
+            const next = !mobileSearchActive;
+            setMobileSearchActive(next);
+            const event = new CustomEvent(next ? "mobile-search-open" : "mobile-search-close");
             window.dispatchEvent(event);
           }}
         >
-          <Search className="w-6 h-6 text-slate-800" />
+          <span className="relative w-6 h-6 inline-flex items-center justify-center">
+            <Search
+              className={`absolute w-6 h-6 text-slate-800 transition-all duration-300 ${
+                mobileSearchActive ? "opacity-0 -rotate-45 scale-75" : "opacity-100 rotate-0 scale-100"
+              }`}
+            />
+            <X
+              className={`absolute w-6 h-6 text-slate-800 transition-all duration-300 ${
+                mobileSearchActive ? "opacity-100 rotate-0 scale-100" : "opacity-0 rotate-45 scale-75"
+              }`}
+            />
+          </span>
         </button>
         {session?<AccountInfo session={session} onSignOut={signOut}/>:
       <div className="flex flex-row gap-2 justify-end w-fit">
@@ -220,16 +247,20 @@ const Navbar: React.FC = () => {
               </button>
             </div>
             <div className="space-y-3">
-              <Link href="/account" className="flex items-center gap-3 text-slate-800 font-medium">
-                <span>My Account</span>
-              </Link>
-              <Link href="/user-info" className="flex items-center gap-3 text-slate-800 font-medium">
-                <span>Addresses</span>
-              </Link>
-              <Link href="/orders" className="flex items-center gap-3 text-slate-800 font-medium">
-                <span>Orders</span>
-              </Link>
-              <Link href="/help" className="flex items-center gap-3 text-slate-800 font-medium">
+              {session && (
+                <>
+                  <Link href="/account" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-slate-800 font-medium">
+                    <span>My Account</span>
+                  </Link>
+                  <Link href="/user-info" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-slate-800 font-medium">
+                    <span>Addresses</span>
+                  </Link>
+                  <Link href="/orders" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-slate-800 font-medium">
+                    <span>Orders</span>
+                  </Link>
+                </>
+              )}
+              <Link href="/help" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-slate-800 font-medium">
                 <span>Help Center</span>
               </Link>
             </div>

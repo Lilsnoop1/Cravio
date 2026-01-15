@@ -76,19 +76,15 @@ export default function Deals({Name, range, index}:DealsCardProps) {
   }
 
   return (
-    <section className="py-4 px-5 sm:px-6 md:px-8 overflow-hidden" id={Name === "Hot Deals - On the Clock" ? "deals-section" : undefined}>
+    <section className="py-4 px-1 sm:px-6 md:px-8 overflow-hidden" id={Name === "Hot Deals - On the Clock" ? "deals-section" : undefined}>
       <div className={`w-full max-w-screen-xl mx-auto transition-all duration-300 ${isCartOpen ? "md:max-w-[calc(100vw-460px)] md:mx-0" : ""}`}>
         <div className="flex items-center justify-between gap-3 mb-5 md:mb-6">
           <h2 className="font-sifonn text-2xl md:text-3xl font-semibold text-slate-900">
             {Name}
           </h2>
-          <button className="group flex items-center gap-2 text-slate-700 hover:text-amber-600 font-sifonn font-semibold transition-colors duration-300">
-            <span className="text-sm md:text-base">View All</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-          </button>
         </div>
 
-        <div className="relative group/carousel overflow-hidden w-full max-w-screen -mx-5 sm:-mx-6 md:-mx-8 px-5 sm:px-6 md:px-8">
+        <div className="relative group/carousel overflow-hidden max-w-screen w-full px-5 sm:px-6 md:px-8">
           <button
             onClick={() => scroll('left')}
             className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 opacity-0 group-hover/carousel:opacity-100 hover:scale-110"
@@ -99,7 +95,7 @@ export default function Deals({Name, range, index}:DealsCardProps) {
 
           <div
             id={"deals-container"+Name}
-            className="flex overflow-x-auto gap-3 sm:gap-4 pr-2 scrollbar-hide snap-x snap-mandatory w-full max-w-full min-w-0"
+            className="flex overflow-x-auto gap-3 sm:gap-4 pr-2 scrollbar-hide w-full max-w-full min-w-0"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {rangedProducts.map((deal: Product, index:number) => (
