@@ -139,12 +139,29 @@ export default function CatalogAdminPage() {
         ? `/api/category/${editingCategoryId}`
         : "/api/category";
 
+      let imageUrl = categoryForm.imageMode === "url" ? categoryForm.url.trim() : "";
+
+      if (categoryForm.imageMode === "upload" && categoryForm.imageFile) {
+        const uploadForm = new FormData();
+        uploadForm.append("file", categoryForm.imageFile);
+        const uploadRes = await fetch("/api/uploads", {
+          method: "POST",
+          body: uploadForm,
+        });
+        if (!uploadRes.ok) {
+          const error = await uploadRes.json().catch(() => ({}));
+          throw new Error(error.error || "Image upload failed");
+        }
+        const data = await uploadRes.json();
+        imageUrl = data.url;
+      }
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: categoryForm.name.trim(),
-          url: categoryForm.url.trim(),
+          url: imageUrl,
         }),
       });
 
@@ -410,7 +427,7 @@ export default function CatalogAdminPage() {
           </span>
         </div>
 
-        <form onSubmit={saveCategory} className="mt-4 grid gap-3 sm:grid-cols-3">
+        <form onSubmit={saveCategory} className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <input
             type="text"
             placeholder="Name"
@@ -421,12 +438,42 @@ export default function CatalogAdminPage() {
           />
           <input
             type="text"
-            placeholder="URL (optional)"
+            placeholder="Image URL"
             value={categoryForm.url}
             onChange={(e) => setCategoryForm({ ...categoryForm, url: e.target.value })}
             className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
+            disabled={categoryForm.imageMode === "upload"}
           />
-          <div className="flex gap-2">
+          <div className="flex items-center gap-3">
+            <label className="text-xs font-semibold text-gray-700">Image mode</label>
+            <select
+              value={categoryForm.imageMode}
+              onChange={(e) =>
+                setCategoryForm({
+                  ...categoryForm,
+                  imageMode: e.target.value as "url" | "upload",
+                  imageFile: null,
+                })
+              }
+              className="rounded border border-gray-200 px-3 py-2 text-sm"
+            >
+              <option value="url">URL</option>
+              <option value="upload">Upload</option>
+            </select>
+          </div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) =>
+              setCategoryForm({
+                ...categoryForm,
+                imageFile: e.target.files?.[0] || null,
+              })
+            }
+            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
+            disabled={categoryForm.imageMode !== "upload"}
+          />
+          <div className="flex gap-2 col-span-full">
             <button
               type="submit"
               disabled={saving}
@@ -470,7 +517,12 @@ export default function CatalogAdminPage() {
                       className="text-blue-600 hover:underline"
                       onClick={() => {
                         setEditingCategoryId(category.id);
-                        setCategoryForm({ name: category.name, url: category.url });
+                        setCategoryForm({
+                          name: category.name,
+                          url: category.url,
+                          imageMode: "url",
+                          imageFile: null,
+                        });
                       }}
                     >
                       Edit

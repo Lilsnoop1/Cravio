@@ -263,6 +263,8 @@ export interface CatalogProduct {
 export interface CategoryFormState {
   name: string;
   url: string;
+  imageMode?: "url" | "upload";
+  imageFile?: File | null;
 }
 
 export interface CompanyFormState {
