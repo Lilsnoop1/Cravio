@@ -61,7 +61,7 @@ export default function Categories() {
     if (typeof window !== "undefined" && window.innerWidth >= 768) {
       return CategoryFetched.slice(0, 12); // ~2 rows on desktop
     }
-    return CategoryFetched.slice(0, 8); // ~2 rows on mobile/tablet
+    return CategoryFetched.slice(0, 6); // ~2 rows on mobile/tablet
   };
 
   const getVisibleCompanies = () => {
