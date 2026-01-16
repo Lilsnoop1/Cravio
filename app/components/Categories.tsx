@@ -73,6 +73,93 @@ export default function Categories() {
     previousPathname.current = pathname;
   }, [pathname]);
 
+  // Handle pageshow event for bfcache restore (mobile swipe-back)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handlePageShow = (event: PageTransitionEvent) => {
+      // event.persisted is true when page is restored from bfcache
+      if (event.persisted && emblaApi && pathname === '/') {
+        const savedScrollTransform = sessionStorage.getItem("categories-scroll-transform");
+        const savedIndex = sessionStorage.getItem("categories-selected-index");
+        const savedShowAll = sessionStorage.getItem("categories-show-all");
+        
+        // Restore showAll state
+        if (savedShowAll === "true") {
+          setShowAll(true);
+        }
+        
+        // Restore scroll position if we have saved state
+        if (savedScrollTransform && savedIndex !== null) {
+          const index = parseInt(savedIndex, 10);
+          const shouldDisableTransitions = isNavigatingFromOtherPage.current;
+          
+          if (!isNaN(index) && index >= 0 && index < emblaApi.scrollSnapList().length) {
+            // Wait for Embla to be ready
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                const container = emblaApi.containerNode();
+                const viewport = container?.parentElement;
+                
+                // Only disable transitions if navigating from another page
+                if (shouldDisableTransitions) {
+                  if (container) {
+                    container.style.setProperty('transition', 'none', 'important');
+                    container.style.setProperty('transition-duration', '0ms', 'important');
+                  }
+                  if (viewport) {
+                    viewport.style.setProperty('transition', 'none', 'important');
+                    viewport.style.setProperty('transition-duration', '0ms', 'important');
+                  }
+                }
+                
+                // Restore position using scrollTo (listeners are already attached from main useEffect)
+                if (shouldDisableTransitions && container && savedScrollTransform) {
+                  container.style.transform = savedScrollTransform;
+                }
+                
+                // Use scrollTo to sync Embla's state
+                emblaApi.scrollTo(index, !shouldDisableTransitions);
+                
+                if (shouldDisableTransitions && container && savedScrollTransform) {
+                  container.style.transform = savedScrollTransform;
+                  requestAnimationFrame(() => {
+                    if (container) container.style.transform = savedScrollTransform;
+                  });
+                }
+                
+                // Sync state manually
+                setSelectedIndex(index);
+                
+                // Re-enable transitions if disabled
+                if (shouldDisableTransitions) {
+                  requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                      if (container) {
+                        container.style.removeProperty('transition');
+                        container.style.removeProperty('transition-duration');
+                      }
+                      if (viewport) {
+                        viewport.style.removeProperty('transition');
+                        viewport.style.removeProperty('transition-duration');
+                      }
+                    });
+                  });
+                }
+              });
+            });
+          }
+        }
+      }
+    };
+
+    window.addEventListener('pageshow', handlePageShow);
+    
+    return () => {
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, [emblaApi, pathname]);
+
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
   const scrollTo = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi]);
