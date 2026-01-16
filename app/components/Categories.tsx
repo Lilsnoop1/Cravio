@@ -37,12 +37,33 @@ export default function Categories() {
       sessionStorage.setItem("categories-show-all", String(showAll));
     }
   }, [showAll]);
+  
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: "start",
     slidesToScroll,
     watchDrag: false,
   });
+  
+  // Keep emblaApi ref in sync
+  useEffect(() => {
+    emblaApiRef.current = emblaApi;
+  }, [emblaApi]);
+  
+  // Save full state when showAll changes (after emblaApi is available)
+  useEffect(() => {
+    if (typeof window !== "undefined" && emblaApi && !isInitialMount.current) {
+      const container = emblaApi.containerNode();
+      const currentTransform = container?.style.transform || '';
+      const index = emblaApi.selectedScrollSnap();
+      
+      sessionStorage.setItem("categories-selected-index", String(index));
+      if (currentTransform) {
+        sessionStorage.setItem("categories-scroll-transform", currentTransform);
+      }
+    }
+  }, [showAll, emblaApi]);
+  
   const [selectedIndex, setSelectedIndex] = useState(() => {
     if (typeof window !== "undefined") {
       const saved = sessionStorage.getItem("categories-selected-index");
@@ -73,81 +94,107 @@ export default function Categories() {
     previousPathname.current = pathname;
   }, [pathname]);
 
+  // Store restore function and emblaApi in refs so they can be accessed when ready
+  const restoreFromBfcacheRef = useRef<(() => void) | null>(null);
+  const emblaApiRef = useRef<ReturnType<typeof useEmblaCarousel>[1] | null>(null);
+
   // Handle pageshow event for bfcache restore (mobile swipe-back)
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    // Disable browser scroll restoration
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
     const handlePageShow = (event: PageTransitionEvent) => {
       // event.persisted is true when page is restored from bfcache
-      if (event.persisted && emblaApi && pathname === '/') {
+      if (event.persisted && pathname === '/') {
         const savedScrollTransform = sessionStorage.getItem("categories-scroll-transform");
         const savedIndex = sessionStorage.getItem("categories-selected-index");
         const savedShowAll = sessionStorage.getItem("categories-show-all");
         
-        // Restore showAll state
+        // Restore showAll state immediately (doesn't depend on emblaApi)
         if (savedShowAll === "true") {
           setShowAll(true);
         }
         
-        // Restore scroll position if we have saved state
+        // Create restore function that will be called when emblaApi is ready
         if (savedScrollTransform && savedIndex !== null) {
           const index = parseInt(savedIndex, 10);
           const shouldDisableTransitions = isNavigatingFromOtherPage.current;
           
-          if (!isNaN(index) && index >= 0 && index < emblaApi.scrollSnapList().length) {
-            // Wait for Embla to be ready
-            requestAnimationFrame(() => {
+          if (!isNaN(index)) {
+            restoreFromBfcacheRef.current = () => {
+              const api = emblaApiRef.current;
+              if (!api) return;
+              
+              // Wait for Embla to be fully ready
               requestAnimationFrame(() => {
-                const container = emblaApi.containerNode();
-                const viewport = container?.parentElement;
-                
-                // Only disable transitions if navigating from another page
-                if (shouldDisableTransitions) {
-                  if (container) {
-                    container.style.setProperty('transition', 'none', 'important');
-                    container.style.setProperty('transition-duration', '0ms', 'important');
+                requestAnimationFrame(() => {
+                  const api = emblaApiRef.current;
+                  if (!api) return;
+                  
+                  const scrollSnaps = api.scrollSnapList();
+                  if (index < 0 || index >= scrollSnaps.length) return;
+                  
+                  const container = api.containerNode();
+                  const viewport = container?.parentElement;
+                  
+                  // Only disable transitions if navigating from another page
+                  if (shouldDisableTransitions) {
+                    if (container) {
+                      container.style.setProperty('transition', 'none', 'important');
+                      container.style.setProperty('transition-duration', '0ms', 'important');
+                    }
+                    if (viewport) {
+                      viewport.style.setProperty('transition', 'none', 'important');
+                      viewport.style.setProperty('transition-duration', '0ms', 'important');
+                    }
                   }
-                  if (viewport) {
-                    viewport.style.setProperty('transition', 'none', 'important');
-                    viewport.style.setProperty('transition-duration', '0ms', 'important');
+                  
+                  // Restore position using scrollTo
+                  if (shouldDisableTransitions && container && savedScrollTransform) {
+                    container.style.transform = savedScrollTransform;
                   }
-                }
-                
-                // Restore position using scrollTo (listeners are already attached from main useEffect)
-                if (shouldDisableTransitions && container && savedScrollTransform) {
-                  container.style.transform = savedScrollTransform;
-                }
-                
-                // Use scrollTo to sync Embla's state
-                emblaApi.scrollTo(index, !shouldDisableTransitions);
-                
-                if (shouldDisableTransitions && container && savedScrollTransform) {
-                  container.style.transform = savedScrollTransform;
-                  requestAnimationFrame(() => {
-                    if (container) container.style.transform = savedScrollTransform;
-                  });
-                }
-                
-                // Sync state manually
-                setSelectedIndex(index);
-                
-                // Re-enable transitions if disabled
-                if (shouldDisableTransitions) {
-                  requestAnimationFrame(() => {
+                  
+                  // Use scrollTo to sync Embla's state
+                  api.scrollTo(index, !shouldDisableTransitions);
+                  
+                  if (shouldDisableTransitions && container && savedScrollTransform) {
+                    container.style.transform = savedScrollTransform;
                     requestAnimationFrame(() => {
-                      if (container) {
-                        container.style.removeProperty('transition');
-                        container.style.removeProperty('transition-duration');
-                      }
-                      if (viewport) {
-                        viewport.style.removeProperty('transition');
-                        viewport.style.removeProperty('transition-duration');
-                      }
+                      if (container) container.style.transform = savedScrollTransform;
                     });
-                  });
-                }
+                  }
+                  
+                  // Sync state manually
+                  setSelectedIndex(index);
+                  
+                  // Re-enable transitions if disabled
+                  if (shouldDisableTransitions) {
+                    requestAnimationFrame(() => {
+                      requestAnimationFrame(() => {
+                        if (container) {
+                          container.style.removeProperty('transition');
+                          container.style.removeProperty('transition-duration');
+                        }
+                        if (viewport) {
+                          viewport.style.removeProperty('transition');
+                          viewport.style.removeProperty('transition-duration');
+                        }
+                      });
+                    });
+                  }
+                });
               });
-            });
+            };
+            
+            // Try to restore immediately if emblaApi is already ready
+            if (emblaApiRef.current) {
+              restoreFromBfcacheRef.current?.();
+              restoreFromBfcacheRef.current = null;
+            }
           }
         }
       }
@@ -158,50 +205,60 @@ export default function Categories() {
     return () => {
       window.removeEventListener('pageshow', handlePageShow);
     };
-  }, [emblaApi, pathname]);
+  }, [pathname]); // Remove emblaApi from dependencies - we'll check it in the restore function
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
   const scrollTo = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi]);
 
 
+  // Continuous saving function
+  const saveState = useCallback(() => {
+    if (typeof window === "undefined" || !emblaApi || isInitialMount.current) return;
+    
+    const container = emblaApi.containerNode();
+    const currentTransform = container?.style.transform || '';
+    const index = emblaApi.selectedScrollSnap();
+    
+    sessionStorage.setItem("categories-selected-index", String(index));
+    sessionStorage.setItem("categories-show-all", String(showAll));
+    if (currentTransform) {
+      sessionStorage.setItem("categories-scroll-transform", currentTransform);
+    }
+  }, [emblaApi, showAll]);
+
   useEffect(() => {
   if (!emblaApi) return;
+
+  // Call restore function if it exists (from bfcache restore)
+  if (restoreFromBfcacheRef.current) {
+    restoreFromBfcacheRef.current();
+    restoreFromBfcacheRef.current = null;
+  }
 
   const handleSelect = () => {
     const index = emblaApi.selectedScrollSnap();
     setSelectedIndex(index);
-    
-    // Save scroll position directly to sessionStorage (skip on initial mount)
-    if (typeof window !== "undefined" && !isInitialMount.current) {
-      const container = emblaApi.containerNode();
-      const currentTransform = container?.style.transform || '';
-      
-      sessionStorage.setItem("categories-selected-index", String(index));
-      if (currentTransform) {
-        sessionStorage.setItem("categories-scroll-transform", currentTransform);
-      }
-    }
-    
-    // Don't reset showAll when switching slides - keep it persistent
+    saveState(); // Save on select
   };
   
   const handleScroll = () => {
-    // Save scroll position during scroll for smoother restoration
-    if (typeof window !== "undefined" && !isInitialMount.current) {
-      const container = emblaApi.containerNode();
-      const currentTransform = container?.style.transform || '';
-      
-      if (currentTransform) {
-        sessionStorage.setItem("categories-scroll-transform", currentTransform);
-      }
-    }
+    saveState(); // Save during scroll
   };
   
   emblaApi.on("select", handleSelect);
   emblaApi.on("scroll", handleScroll);
 
   setScrollSnaps(emblaApi.scrollSnapList());
+  
+  // Continuous saving on visibility change (when tab becomes hidden/visible)
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'hidden') {
+      saveState();
+    }
+  };
+  
+  document.addEventListener('visibilitychange', handleVisibilityChange);
   
   // Restore saved scroll position directly on initial mount
   if (isInitialMount.current && typeof window !== "undefined") {
@@ -302,8 +359,9 @@ export default function Categories() {
   return () => {
     emblaApi.off("select", handleSelect);
     emblaApi.off("scroll", handleScroll);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
   };
-}, [emblaApi]);
+}, [emblaApi, saveState]);
 
 
   const getPageTitle = () => {
