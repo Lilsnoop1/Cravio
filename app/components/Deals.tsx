@@ -84,7 +84,7 @@ export default function Deals({Name, range, index}:DealsCardProps) {
           </h2>
         </div>
 
-        <div className="relative group/carousel overflow-hidden max-w-screen w-full px-5 sm:px-6 md:px-8">
+        <div className="relative group/carousel overflow-hidden max-w-screen w-full px-1 sm:px-6 md:px-8">
           <button
             onClick={() => scroll('left')}
             className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 opacity-0 group-hover/carousel:opacity-100 hover:scale-110"
