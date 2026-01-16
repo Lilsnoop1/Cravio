@@ -250,14 +250,14 @@ const Navbar: React.FC = () => {
               {session && (
                 <>
                   <Link href="/account" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-slate-800 font-medium">
-                    <span>My Account</span>
-                  </Link>
+                <span>My Account</span>
+              </Link>
                   <Link href="/user-info" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-slate-800 font-medium">
-                    <span>Addresses</span>
-                  </Link>
+                <span>Addresses</span>
+              </Link>
                   <Link href="/orders" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-slate-800 font-medium">
-                    <span>Orders</span>
-                  </Link>
+                <span>Orders</span>
+              </Link>
                 </>
               )}
               <Link href="/help" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-slate-800 font-medium">

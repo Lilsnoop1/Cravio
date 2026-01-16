@@ -79,10 +79,10 @@ export default function CategoryPage({ params }: { params: Promise<{ categoryNam
   }
 
   return (
-    <section className="py-8 px-4 sm:px-6">
+    <section className="py-8 pb-24 px-4 sm:px-6">
       <div className="w-full max-w-6xl mx-auto">
         <div className="sticky top-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 bg-white/80 backdrop-blur-md">
-          <h1 className="text-3xl font-bold font-brasika">
+          <h1 className="text-3xl font-bold font-sifonn">
             Category: {decodedCategoryName}
           </h1>
         </div>
