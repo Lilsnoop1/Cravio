@@ -59,7 +59,7 @@ export default function Categories() {
     if (!CategoryFetched) return [];
     if (showAllCategories) return CategoryFetched;
     if (typeof window !== "undefined" && window.innerWidth >= 768) {
-      return CategoryFetched.slice(0, 12); // ~2 rows on desktop
+      return CategoryFetched.slice(0, 8); // ~2 rows on desktop
     }
     return CategoryFetched.slice(0, 6); // ~2 rows on mobile/tablet
   };
@@ -125,7 +125,7 @@ export default function Categories() {
             <div className="flex">
               {/* Categories Slide */}
               <div className="flex-[0_0_100%] min-w-0 px-1">
-                <div className="flex flex-wrap gap-3 md:gap-5 md:px-10">
+                <div className="flex flex-wrap gap-3 md:gap-10 md:px-10">
                   {visibleCategories?visibleCategories.map((category, index) => (
                     <Link
                       href={`/category/${category.name}`}

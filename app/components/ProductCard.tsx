@@ -37,11 +37,6 @@ const ProductCard = ({ product, dest }: { product: Product; dest: string }) => {
                 setIsOpen(true);
               }}
             />
-            {product.bulkPrice && (
-              <div className="absolute top-1 left-1 sm:top-1.5 sm:left-1.5 rounded-md bg-amber-800 border border-amber-900 text-amber-50 font-sifonn text-[10px] sm:text-[11px] font-bold px-2 py-1 shadow-sm">
-                Bulk: Rs {product.bulkPrice}
-              </div>
-            )}
           </div>
           <button
             className={`absolute bottom-0.5 right-0.5 sm:bottom-1 sm:right-1 ${isSlider ? 'w-6 h-6' : 'w-5 h-5 sm:w-6 sm:h-6'} bg-white rounded-full shadow-md flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all duration-300 transform hover:scale-110`}
@@ -67,6 +62,11 @@ const ProductCard = ({ product, dest }: { product: Product; dest: string }) => {
           <h3 className={`font-sifonn ${isSlider ? 'text-[11px]' : 'text-sm sm:text-[15px]'} font-semibold text-slate-800 line-clamp-2 min-h-[1.5rem] sm:min-h-[1.8rem]`}>
             {product.name}
           </h3>
+          {product.bulkPrice && (
+            <p className={`font-sifonn ${isSlider ? 'text-sm' : 'text-base sm:text-lg'} font-bold text-amber-800`}>
+              Bulk: Rs {product.bulkPrice}
+            </p>
+          )}
         </div>
       </div>
     </div>

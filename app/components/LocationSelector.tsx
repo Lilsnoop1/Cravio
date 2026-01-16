@@ -1,11 +1,10 @@
 "use client"
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {useLoadScript, GoogleMap, Marker} from "@react-google-maps/api"
 import usePlacesAutocomplete, {getGeocode, getLatLng} from "use-places-autocomplete";
 import {Combobox, ComboboxInput, ComboboxPopover, ComboboxList, ComboboxOption} from "@reach/combobox"
 import { useLocation } from "../context/LocationContext";
 import "@reach/combobox/styles.css"
-import { useMemo,useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useUserInfo } from "../context/UserInfoContext";
 import Loading from "./Loading";
@@ -14,6 +13,7 @@ import type {
   LocationSelectorProps,
   PlacesAutoCompleteProps,
 } from "../Data/database";
+import { Locate } from "lucide-react";
 
 const KARACHI_BOUNDS = {
   // Use 'north', 'south', 'east', 'west' keys at the top level
@@ -44,7 +44,13 @@ function Map({ allowChange = false }: LocationSelectorProps = {}) {
   const {selectedAddress, setSelectedAddress} = useLocation();
   const {setCity,setBuilding,setStreet} = useUserInfo();
   const {data:session} = useSession();
+  const [isMobile, setIsMobile] = useState(false);
+  const [locating, setLocating] = useState(false);
   useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+
     const fetchSavedLocation = async () => {
       const userId =
         typeof session?.user === "object" && session?.user !== null && "id" in session.user
@@ -92,6 +98,7 @@ function Map({ allowChange = false }: LocationSelectorProps = {}) {
     };
 
     fetchSavedLocation();
+    return () => window.removeEventListener("resize", onResize);
   }, [session, setSelectedAddress, setCity, setBuilding, setStreet]);
   const onMapClick = async (e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
@@ -115,15 +122,14 @@ function Map({ allowChange = false }: LocationSelectorProps = {}) {
 
   // Define a stable map container style
   const mapContainerStyle = useMemo(() => ({
-    width: '400px',
-    position: 'absolute' as const,
-    left: '0',
+    width: '100%',
+    position: 'relative' as const,
     zIndex: '100',
-    height: '400px', // FIX: Give the map a defined height
-    borderRadius: '0.75rem', // Tailwind's rounded-xl
-    border: '1px solid #e2e8f0', // Tailwind's border-slate-300
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)', // Tailwind's shadow-md
-  }), []);
+    height: isMobile ? '320px' : '400px',
+    borderRadius: '0.75rem',
+    border: '1px solid #e2e8f0',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
+  }), [isMobile]);
 
   // Show search input only if allowChange is true OR no address is selected
   const showSearch = allowChange || !selectedAddress;
@@ -135,23 +141,69 @@ function Map({ allowChange = false }: LocationSelectorProps = {}) {
       {showSearch && (
         <div>
           <PlacesAutoComplete setSelected={setSelected} setMapToOpen={setMapOpen} setAddress={setAddress} />
+          <button
+            type="button"
+            onClick={async () => {
+              if (!navigator.geolocation) {
+                alert("Geolocation not supported");
+                return;
+              }
+              setLocating(true);
+              navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                  const latLng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                  setSelected(latLng);
+                  setMapOpen(true);
+                  try {
+                    const results = await getGeocode({ location: latLng });
+                    const fullAddress = results[0]?.formatted_address || "Address not found";
+                    setAddress(fullAddress);
+                    setSelectedAddress(fullAddress);
+                  } catch (err) {
+                    console.error("Reverse geocode failed", err);
+                  } finally {
+                    setLocating(false);
+                  }
+                },
+                (err) => {
+                  console.error("Geolocation error", err);
+                  setLocating(false);
+                  alert("Unable to fetch current location");
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+              );
+            }}
+            className="mt-2 inline-flex items-center gap-2 justify-center w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            disabled={locating}
+          >
+            <Locate className="text-primary"/>
+            {locating ? "Locating..." : "Use current location"}
+          </button>
         </div>
       )}
       <AddressDisplay address={selectedAddress || address} />
       {mapOpen?<button className="px-5 cursor-pointer py-2 hover:bg-secondary hover:text-accents w-full font-sifonn rounded-md bg-primary text-accents text-xs md:text-lg" onClick={()=>{setSelectedAddress(address ?? "");setMapOpen(false)}}>Confirm Delivery Address</button>:null}
 
       {/* Google Map */}
-      {mapOpen?<div className="w-full">
-        <GoogleMap 
-          zoom={14} // Adjusted zoom level for better initial view
-          center={selected || center} // Center on selected location or default
-          mapContainerStyle={mapContainerStyle}
-          options={{ disableDefaultUI: true, zoomControl: true }}
-          onClick={onMapClick}
-        >
-          {selected && <Marker position={selected} />}
-        </GoogleMap>
-      </div>:null}
+      {mapOpen ? (
+        <div className="w-full">
+          <GoogleMap 
+            zoom={14}
+            center={selected || center}
+            mapContainerStyle={mapContainerStyle}
+            options={{ disableDefaultUI: true, zoomControl: true }}
+            onClick={onMapClick}
+          >
+            {selected && (
+              <Marker
+                position={selected}
+                draggable
+                onDragEnd={(e: google.maps.MapMouseEvent) => onMapClick(e)}
+              />
+            )}
+          </GoogleMap>
+        </div>
+      ) : null}
     </div>
   )
 }

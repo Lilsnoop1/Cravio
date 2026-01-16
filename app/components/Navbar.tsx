@@ -6,7 +6,7 @@ import AccountInfo from "./AccountInfo";
 import LocationSelector from "./LocationSelector";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Menu, X, ChevronDown, Search } from "lucide-react";
+import { Menu, X, ChevronDown, Search, MapPin } from "lucide-react";
 import { useLocation } from "../context/LocationContext";
 import { useCartContext } from "../context/CartContext";
 import MobileLocationDrawer from "./MobileLocationDrawer";
@@ -145,17 +145,18 @@ const Navbar: React.FC = () => {
           {/* <button onClick={seedDatabase} className="bg-primary text-accents px-4 py-2 rounded-md">Seed Database</button> */}
         </div>
         
-        {/* Location Selector for Desktop */}
-        <div className="hidden md:flex md:relative w-100 flex-row bg-accents py-1 px-1 md:py-2 md:px-2 gap-5 items-center md:px-5 justify-center items-center rounded-lg">
-            <div className="relative w-5 h-5 md:w-9 md:h-7">
-                <Image
-                src="/images/location-pin (1).png"
-                alt="Cravio Location"
-                fill
-                />
-            </div>
-            <LocationSelector/>
-        </div>
+        {/* Location Selector trigger (desktop opens modal like mobile) */}
+        <button
+          onClick={() => setLocOpen(true)}
+          className="hidden md:flex items-center gap-4 border border-slate-200 bg-white py-2 px-3 rounded-lg hover:border-primary/60 hover:bg-accents/60 transition"
+        >
+          <MapPin className="text-primary"/>
+          <div className="flex flex-col items-start leading-tight w-[200px]">
+            <span className="text-[11px] text-slate-500">Deliver to</span>
+            <span className="text-sm font-semibold text-slate-800 line-clamp-1 max-w-[180px]">{shortAddress}</span>
+          </div>
+          <ChevronDown className="w-4 h-4 text-slate-700" />
+        </button>
         {/* Mobile deliver to compact button */}
         <div className="md:hidden flex-1 flex justify-center">
           <button
