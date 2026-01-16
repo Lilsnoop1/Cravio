@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
@@ -24,6 +23,7 @@ import { CategoryProvider } from "../context/categoriesContext";
 import { CompaniesProvider } from "../context/fetchCompanies";
 import { VendorProvider } from "../context/VendorContext";
 import VendorModal from "./VendorModal";
+import { useEffect, useRef } from "react";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -38,6 +38,40 @@ const ADMIN_LINKS = [
 ];
 
 function SiteShell({ children }: LayoutProps) {
+  const ScrollRestorer = () => {
+    const pathname = usePathname();
+    const ticking = useRef(false);
+
+    useEffect(() => {
+      if (typeof window === "undefined") return;
+      const saved = sessionStorage.getItem(`scroll:${pathname}`);
+      if (saved) {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, Number(saved));
+        });
+      }
+    }, [pathname]);
+
+    useEffect(() => {
+      if (typeof window === "undefined") return;
+      const onScroll = () => {
+        if (ticking.current) return;
+        ticking.current = true;
+        requestAnimationFrame(() => {
+          sessionStorage.setItem(`scroll:${pathname}`, String(window.scrollY));
+          ticking.current = false;
+        });
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      return () => {
+        window.removeEventListener("scroll", onScroll);
+        sessionStorage.setItem(`scroll:${pathname}`, String(window.scrollY));
+      };
+    }, [pathname]);
+
+    return null;
+  };
+
   return (
     <ProductsProvider>
       <CategoryProvider>
@@ -48,6 +82,7 @@ function SiteShell({ children }: LayoutProps) {
                 <CartProvider>
                   <LocationProvider>
                     <UserInfoProvider>
+                      <ScrollRestorer />
                       <div className="bg-slate-50 border-b border-slate-200 shadow-sm">
                         <Headband />
                         <BulkToast />
