@@ -44,7 +44,7 @@ const Carousel: React.FC = () => {
   const bannerHeight = "h-[200px] md:h-[380px] lg:h-[420px]";
 
   return (
-    <div className="w-full py-10 md:py-12 px-1 sm:px-8 lg:px-14">
+    <div className="w-full py-5 md:py-12 px-1 sm:px-8 lg:px-14">
       <div className="flex flex-col lg:flex-row gap-6 items-stretch">
         {/* Carousel */}
         <div className={`relative w-full ${isCartOpen ? "lg:w-3/3" : "lg:w-2/3"} max-w-5xl ${bannerHeight}`}>

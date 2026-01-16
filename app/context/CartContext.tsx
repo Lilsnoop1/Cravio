@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useState, createContext, useEffect, useMemo } from "react";
+import React, { useContext, useState, createContext, useEffect, useMemo, useRef } from "react";
 import { Product } from "../Data/database";
 
 export type CartItem = {
@@ -37,6 +37,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     default: [],
   });
   const [activeVendorId, setActiveVendorId] = useState<string | null>(null);
+  const [banner, setBanner] = useState<string | null>(null);
+  const bannerTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const currentKey = activeVendorId ?? "default";
   const cartItems = vendorCarts[currentKey] ?? [];
@@ -121,6 +123,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         : [...list, { product, quantity: clampQuantity(quantity) }];
       return { ...prev, [key]: nextList };
     });
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setBanner(product.name);
+      if (bannerTimeout.current) clearTimeout(bannerTimeout.current);
+      bannerTimeout.current = setTimeout(() => setBanner(null), 3000);
+    }
   };
 
   const updateQuantity = (productId: Product["id"], quantity: number) => {
@@ -170,7 +177,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     [CartOpen, cartItems, consumerSubtotal, bulkEligible, activeVendorId, addItem, updateQuantity, removeItem, ensureVendorCart, setCartOpen, clearCart]
   );
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+      {banner ? (
+        <div className="fixed bottom-16 left-0 right-0 z-[10015] px-3 md:hidden">
+          <div className="mx-auto max-w-md rounded-full bg-slate-900 text-white shadow-lg shadow-black/20 px-4 py-2.5 flex items-center justify-between">
+            <span className="text-sm font-semibold truncate pr-3">
+              Added to cart: {banner}
+            </span>
+            <button
+              onClick={() => setBanner(null)}
+              className="ml-2 text-xs font-semibold text-primary bg-white rounded-full px-3 py-1"
+            >
+              View cart
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </CartContext.Provider>
+  );
 }
 
 export const useCartContext = () => {

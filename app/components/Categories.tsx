@@ -61,7 +61,7 @@ export default function Categories() {
     if (typeof window !== "undefined" && window.innerWidth >= 768) {
       return CategoryFetched.slice(0, 8); // ~2 rows on desktop
     }
-    return CategoryFetched.slice(0, 6); // ~2 rows on mobile/tablet
+    return CategoryFetched.slice(0, 4); // ~2 rows on mobile/tablet
   };
 
   const getVisibleCompanies = () => {
@@ -88,34 +88,23 @@ export default function Categories() {
 
 
   return (
-    <section id="categories" className="md:py-8 md:px-8 px-3 py-3">
-      <div className="w-full mx-auto flex flex-col gap-6">
+    <section id="categories" className="md:py-8 md:px-8 px-1 pr-2 py-1">
+      <div className="w-full mx-auto flex flex-col md:gap-6 gap-2">
         {/* Header */}
-        <div className="flex items-center justify-between pb-3">
+        <div className="flex items-center justify-between md:pb-3 pb-1">
           <div className="flex items-center gap-3">
             <div className="h-8 w-1.5 rounded-full bg-primary" />
             <h2 className="font-danson text-2xl md:text-3xl font-bold text-slate-900">
               {getPageTitle()}
             </h2>
           </div>
-          {selectedIndex === 0 && !showAllCategories && (
-            <button 
-              onClick={() => setShowAllCategories(true)}
-              className="group flex items-center gap-1 text-slate-700 hover:text-amber-600 font-sifonn font-semibold transition-colors duration-300"
-            >
-              <span className="text-sm md:text-base">View All ({CategoryFetched?.length})</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-            </button>
-          )}
-          {selectedIndex === 1 && !showAllCompanies && (
-            <button 
-              onClick={() => setShowAllCompanies(true)}
-              className="group flex items-center gap-2 text-slate-700 hover:text-amber-600 font-sifonn font-semibold transition-colors duration-300"
-            >
-              <span className="text-sm md:text-base">View All ({companies?.length})</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-            </button>
-          )}
+          <button 
+            onClick={() => scrollTo(selectedIndex === 0 ? 1 : 0)}
+            className="group flex items-center gap-1 text-slate-700 hover:text-amber-600 font-sifonn font-semibold transition-colors duration-300"
+          >
+            <span className="text-sm md:text-base">{selectedIndex === 0 ? "See brands" : "See categories"}</span>
+            <ArrowRight className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${selectedIndex === 1 ? "-scale-x-100" : ""}`} />
+          </button>
         </div>
 
         {/* Carousel Container */}
@@ -201,15 +190,26 @@ export default function Categories() {
             </div>
           </div>
 
-          {/* Hint arrow toggle */}
-          <div className="flex justify-end mt-3">
-            <button
-              onClick={() => scrollTo(selectedIndex === 0 ? 1 : 0)}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-semibold text-slate-700 hover:border-amber-400 hover:text-amber-600 transition"
-            >
-              {selectedIndex === 0 ? "See brands" : "See categories"}
-              <ArrowRight className={`w-4 h-4 transition-transform ${selectedIndex === 1 ? "-scale-x-100" : ""}`} />
-            </button>
+          {/* Bottom view-all */}
+          <div className="flex justify-center md:mt-6">
+            {selectedIndex === 0 && !showAllCategories && (
+              <button 
+                onClick={() => setShowAllCategories(true)}
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-amber-400 hover:text-amber-600 transition"
+              >
+                View All ({CategoryFetched?.length})
+                <ArrowRight className="w-4 h-4 rotate-90" />
+              </button>
+            )}
+            {selectedIndex === 1 && !showAllCompanies && (
+              <button 
+                onClick={() => setShowAllCompanies(true)}
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-amber-400 hover:text-amber-600 transition"
+              >
+                View All ({companies?.length})
+                <ArrowRight className="w-4 h-4 rotate-90" />
+              </button>
+            )}
           </div>
         </div>
       </div>

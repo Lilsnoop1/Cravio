@@ -25,9 +25,9 @@ const ProductCard = ({ product, dest }: { product: Product; dest: string }) => {
     <div
       className={`group h-full ${isSlider ? "flex-shrink-0 snap-start min-w-[110px] sm:min-w-[160px] max-w-[170px]" : "w-full"}`}
     >
-      <div className={`bg-white rounded-lg ${isSlider ? 'p-1.5' : 'p-1.5 sm:p-2'} h-full shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1`}>
+      <div className={`bg-white rounded-lg ${isSlider ? 'p-1.5' : 'p-1.5 sm:p-2'} h-full shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col`}>
         <div className={`relative ${isSlider ? 'mb-2' : 'mb-1.5 sm:mb-2'}`}>
-          <div className="relative overflow-hidden rounded-md bg-slate-100 aspect-square w-full">
+          <div className="relative overflow-hidden rounded-md bg-slate-100 aspect-[5/4] md:aspect-square w-full">
             <img
               src={product.image}
               alt={product.name}

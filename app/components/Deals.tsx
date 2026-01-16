@@ -7,28 +7,31 @@ import Loading from './Loading';
 import { useProduct } from '../context/ProductsContext';
 import { useCartContext } from '../context/CartContext';
 
-export default function Deals({Name, range, index}:DealsCardProps) {
+export default function Deals({Name, range, index, filterCategory}:DealsCardProps) {
   const [scrollPosition, setScrollPosition] = useState(0);
   const {ProductFetch, loading} = useProduct();
   const { cartItems, CartOpen } = useCartContext();
   const isCartOpen = cartItems.length > 0 && CartOpen;
   
-  const categorySingles = useMemo(() => {
-    if (!ProductFetch) return [];
-    const seen = new Set<string>();
-    const selected: Product[] = [];
-    for (const product of ProductFetch) {
-      if (!product.image) continue;
-      if (seen.has(product.category)) continue;
-      seen.add(product.category);
-      selected.push(product);
-    }
-    return selected;
-  }, [ProductFetch]);
-
   const rangedProducts = useMemo(() => {
     if (!ProductFetch) return [];
-    const source = ProductFetch.filter((p: Product) => p.image);
+    let source = ProductFetch.filter((p: Product) => p.image);
+    if (filterCategory) {
+      source = source.filter((p) => p.category === filterCategory);
+    }
+    if (Name === "Hot Deals - On the Clock") {
+      const sorted = source
+        .map((p) => {
+          const base = p.consumerPrice ?? p.price ?? 0;
+          const original = p.originalPrice ?? p.retailPrice ?? base;
+          const discount = original > base ? (original - base) / original : 0;
+          return { product: p, discount };
+        })
+        .filter((p) => p.discount > 0)
+        .sort((a, b) => b.discount - a.discount)
+        .map((p) => p.product);
+      return sorted.slice(0, 40);
+    }
     if (range && range.length === 2) {
       const [start, end] = range;
       return source.slice(start, end);
@@ -36,8 +39,8 @@ export default function Deals({Name, range, index}:DealsCardProps) {
     if (typeof index === "number") {
       return source.slice(index, index + 1);
     }
-    return categorySingles;
-  }, [ProductFetch, range, index, categorySingles]);
+    return source;
+  }, [ProductFetch, range, index, Name]);
 
   const scroll = (direction: 'left' | 'right') => {
     const container = document.getElementById(`deals-container${Name}`);
@@ -76,7 +79,7 @@ export default function Deals({Name, range, index}:DealsCardProps) {
   }
 
   return (
-    <section className="py-4 px-1 sm:px-6 md:px-8 overflow-hidden" id={Name === "Hot Deals - On the Clock" ? "deals-section" : undefined}>
+    <section className="py-0 px-1 sm:px-6 md:px-8 overflow-hidden" id={Name === "Hot Deals - On the Clock" ? "deals-section" : undefined}>
       <div className={`w-full max-w-screen-xl mx-auto transition-all duration-300 ${isCartOpen ? "md:max-w-[calc(100vw-460px)] md:mx-0" : ""}`}>
         <div className="flex items-center justify-between gap-3 mb-5 md:mb-6">
           <h2 className="font-sifonn text-2xl md:text-3xl font-semibold text-slate-900">
@@ -84,7 +87,7 @@ export default function Deals({Name, range, index}:DealsCardProps) {
           </h2>
         </div>
 
-        <div className="relative group/carousel overflow-hidden max-w-screen w-full px-1 sm:px-6 md:px-8">
+        <div className="relative group/carousel overflow-hidden max-w-screen w-full px-1 py-5 sm:px-6 md:px-8">
           <button
             onClick={() => scroll('left')}
             className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 items-center justify-center bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 opacity-0 group-hover/carousel:opacity-100 hover:scale-110"

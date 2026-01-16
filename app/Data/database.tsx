@@ -49,6 +49,7 @@ export interface DealsCardProps {
   Name: string;
   range?: [number, number];
   index?: number;
+  filterCategory?: string;
 }
 
 export interface CardProps {
