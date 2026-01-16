@@ -97,19 +97,25 @@ export default function Categories() {
   // Store restore function and emblaApi in refs so they can be accessed when ready
   const restoreFromBfcacheRef = useRef<(() => void) | null>(null);
   const emblaApiRef = useRef<ReturnType<typeof useEmblaCarousel>[1] | null>(null);
+  const hasRestoredFromBfcacheRef = useRef(false);
 
   // Handle pageshow event for bfcache restore (mobile swipe-back)
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Disable browser scroll restoration
+    // Disable browser scroll restoration (only once)
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
     }
 
     const handlePageShow = (event: PageTransitionEvent) => {
       // event.persisted is true when page is restored from bfcache
-      if (event.persisted && pathname === '/') {
+      // Check pathname directly to avoid needing it in dependency array
+      const currentPath = typeof window !== "undefined" ? window.location.pathname : '';
+      if (event.persisted && currentPath === '/') {
+        // Reset restore flag on each pageshow (new bfcache restore)
+        hasRestoredFromBfcacheRef.current = false;
+        
         const savedScrollTransform = sessionStorage.getItem("categories-scroll-transform");
         const savedIndex = sessionStorage.getItem("categories-selected-index");
         const savedShowAll = sessionStorage.getItem("categories-show-all");
@@ -126,10 +132,16 @@ export default function Categories() {
           
           if (!isNaN(index)) {
             restoreFromBfcacheRef.current = () => {
+              // Idempotent guard: only restore once per bfcache restore
+              if (hasRestoredFromBfcacheRef.current) return;
+              
               const api = emblaApiRef.current;
               if (!api) return;
               
-              // Wait for Embla to be fully ready
+              // Mark as restored before attempting restoration
+              hasRestoredFromBfcacheRef.current = true;
+              
+              // Wait for Embla to be fully ready (double RAF for mobile Safari)
               requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                   const api = emblaApiRef.current;
@@ -205,7 +217,7 @@ export default function Categories() {
     return () => {
       window.removeEventListener('pageshow', handlePageShow);
     };
-  }, [pathname]); // Remove emblaApi from dependencies - we'll check it in the restore function
+  }, []); // Empty deps - attach pageshow listener only once
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
