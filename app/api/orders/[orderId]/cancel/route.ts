@@ -59,7 +59,7 @@ export async function POST(
       });
       resend.emails
         .send({
-          from: "Cravio <craviopk.com>",
+          from: "Cravio <orders@craviopk.com>",
           to: updated.accountEmail,
           subject: email.subject,
           html: email.html,

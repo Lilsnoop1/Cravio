@@ -83,7 +83,7 @@ export async function PATCH(
         });
         resend.emails
           .send({
-            from: "Cravio <craviopk@gmail.com>",
+            from: "Cravio <orders@craviopk.com>",
             to: updatedOrder.accountEmail,
             subject: email.subject,
             html: email.html,
@@ -96,7 +96,7 @@ export async function PATCH(
         });
         resend.emails
           .send({
-            from: "Cravio <craviopk.com>",
+            from: "Cravio <orders@craviopk.com>",
             to: updatedOrder.accountEmail,
             subject: email.subject,
             html: email.html,

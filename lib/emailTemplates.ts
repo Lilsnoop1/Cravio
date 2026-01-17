@@ -144,3 +144,75 @@ export function buildOrderEmail({
 
 export type OrderEmailPayload = Parameters<typeof buildOrderEmail>[0];
 
+export function buildLoginEmail({
+  userName,
+  userEmail,
+  loginTime,
+}: {
+  userName?: string | null;
+  userEmail: string;
+  loginTime: Date | string;
+}) {
+  const displayName = userName || "User";
+  const loginTimeFormatted = new Date(loginTime).toLocaleString();
+
+  return {
+    subject: "Welcome back to Cravio!",
+    html: `
+    <div style="background:${bg};padding:24px;font-family:Inter,Arial,sans-serif;color:${textColor};">
+      <div style="max-width:640px;margin:0 auto;background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;">
+        <div style="padding:20px;border-bottom:1px solid #e2e8f0;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+          <div style="font-size:24px;font-weight:700;color:#fff;margin-bottom:8px;">
+            Welcome back, ${displayName}!
+          </div>
+          <div style="font-size:14px;color:rgba(255,255,255,0.9);">
+            You've successfully logged into your Cravio account
+          </div>
+        </div>
+
+        <div style="padding:20px;">
+          <p style="margin:0 0 12px;font-size:14px;color:${textColor};">
+            Hello ${displayName},
+          </p>
+          
+          <p style="margin:0 0 16px;font-size:14px;color:${muted};line-height:1.6;">
+            We're excited to have you back! You've successfully logged into your Cravio account.
+          </p>
+
+          <div style="margin:20px 0;padding:16px;border:1px solid #e2e8f0;border-radius:12px;background:${bg};">
+            <div style="font-size:12px;color:${muted};margin-bottom:4px;">Login Details</div>
+            <div style="font-size:14px;font-weight:600;color:${textColor};margin-bottom:8px;">
+              ${userEmail}
+            </div>
+            <div style="font-size:12px;color:${muted};">
+              Signed in at: ${loginTimeFormatted}
+            </div>
+          </div>
+
+          <p style="margin:16px 0 12px;font-size:14px;color:${muted};line-height:1.6;">
+            If this wasn't you, please secure your account immediately by changing your password.
+          </p>
+
+          <div style="margin:24px 0;padding:16px;background:${bg};border-radius:12px;border-left:4px solid ${brandColor};">
+            <div style="font-size:14px;font-weight:600;color:${textColor};margin-bottom:8px;">
+              What's next?
+            </div>
+            <ul style="margin:0;padding-left:20px;font-size:13px;color:${muted};line-height:1.8;">
+              <li>Browse our delicious snacks and sweets</li>
+              <li>Place orders for quick delivery (15-30 mins)</li>
+              <li>Track your orders in real-time</li>
+              <li>Manage your account settings</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="padding:16px 20px;background:${bg};border-top:1px solid #e2e8f0;font-size:12px;color:${muted};text-align:center;">
+          Need help? Reply to this email or WhatsApp us at +92 314 394 2767.
+        </div>
+      </div>
+    </div>
+    `,
+  };
+}
+
+export type LoginEmailPayload = Parameters<typeof buildLoginEmail>[0];

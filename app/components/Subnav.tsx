@@ -14,7 +14,7 @@ const Subnav: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-auto py-3 px-3 hidden md:flex flex-row bg-secondary gap-3">
+    <div className="subnav w-full h-auto py-3 px-3 hidden md:flex flex-row bg-secondary gap-3">
         <button
           onClick={scrollToCategories}
           className="flex flex-row gap-2 px-2 py-2 items-center hover:opacity-80 transition-opacity"

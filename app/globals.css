@@ -26,9 +26,13 @@
   --font-danson: var(--font-danson);
 }
 
-html, body {
-  overflow-x: hidden;
+/* Mobile only */
+@media (max-width: 767px) {
+  body {
+    overflow-x: hidden;
+  }
 }
+
 
 :root.bulk-mode, .bulk-mode {
   --color-primary: #537B2F;

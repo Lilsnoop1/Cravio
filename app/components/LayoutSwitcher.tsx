@@ -89,8 +89,8 @@ function SiteShell({ children }: LayoutProps) {
                         <Navbar />
                         <Subnav />
                       </div>
-                    <div className="flex">
-                      <div className="flex-1 md:pt-0 pt-[56px]">{children}</div>
+                    <div className="flex overflow-visible">
+                      <div className="flex-1 md:pt-0 pt-[56px] max-w-5xl min-w-0">{children}</div>
                       <Cart />
                     </div>
                     <MobileBottomNav />

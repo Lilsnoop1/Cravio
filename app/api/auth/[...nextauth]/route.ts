@@ -2,6 +2,8 @@ import NextAuth, { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
+import { resend } from "@/lib/resend"
+import { buildLoginEmail } from "@/lib/emailTemplates"
 import "next-auth";
 import type { AuthSessionUser, AuthUserProfile } from "@/app/Data/database";
 
@@ -53,6 +55,23 @@ export const authOptions: NextAuthOptions = {
         tokenWithRole.id = typedUser.id;      // Prisma user ID
         tokenWithRole.role = typedUser.role;  // User role
         tokenWithRole.accessToken = account?.access_token || null;
+
+        // Send login email on successful authentication
+        if (process.env.RESEND_API_KEY && user.email) {
+          const email = buildLoginEmail({
+            userName: user.name,
+            userEmail: user.email,
+            loginTime: new Date(),
+          });
+          resend.emails
+            .send({
+              from: "Cravio <orders@craviopk.com>",
+              to: user.email,
+              subject: email.subject,
+              html: email.html,
+            })
+            .catch((err) => console.error("Resend login email failed", err));
+        }
       }
       return token
     },

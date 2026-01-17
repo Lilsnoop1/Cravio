@@ -112,7 +112,7 @@ export async function POST(req: Request) {
         type: "PLACED",
       });
       resend.emails.send({
-        from: "Cravio <craviopk.com>",
+        from: "Cravio <orders@craviopk.com>",
         to: accountEmail,
         subject: email.subject,
         html: email.html,
