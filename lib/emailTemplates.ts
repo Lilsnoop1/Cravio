@@ -8,7 +8,7 @@ const muted = "#475569";
 const bg = "#f8fafc";
 
 function formatCurrency(value: number) {
-  return `$${value.toFixed(2)}`;
+  return `Rs ${value.toFixed(2)}`;
 }
 
 function orderTotals(orderProducts: OrderProductItem[]) {

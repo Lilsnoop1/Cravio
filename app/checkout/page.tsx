@@ -3,7 +3,7 @@ import { useCartContext } from "../context/CartContext";
 import { useLocation } from '../context/LocationContext';
 import { useUserInfo } from '../context/UserInfoContext';
 import { useEffect, useMemo, useState } from 'react';
-import { MapPin, CreditCard, Banknote, ArrowLeft, Clock, Package } from 'lucide-react';
+import { MapPin, CreditCard, Banknote, ArrowLeft, Clock, Package, X, AlertCircle } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -11,14 +11,16 @@ import { useVendorContext } from "../context/VendorContext";
 
 const CheckoutPage = () => {
   const { cartItems, clearCart } = useCartContext();
-  const { selectedAddress, coordinates } = useLocation();
-  const { phoneNumber, city, building, street } = useUserInfo();
+  const { selectedAddress, coordinates, setSelectedAddress, setCoordinates } = useLocation();
+  const { phoneNumber, city, building, street, setPhoneNumber, setCity, setBuilding, setStreet } = useUserInfo();
   const { data: session, status } = useSession();
   const router = useRouter();
   const [subTotal, setSubTotal] = useState<number>(0);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'visa' | 'cod'>('visa');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bulkEligible, setBulkEligible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoadingUserData, setIsLoadingUserData] = useState(true);
   const { vendor, setOpenVendorModal } = useVendorContext();
   const role = (session?.user as { role?: string } | undefined)?.role;
   const isEmployee = role === "EMPLOYEE";
@@ -47,8 +49,53 @@ const CheckoutPage = () => {
     if (status === "loading") return;
     if (!session?.user) {
       router.push("/");
+      return;
     }
-  }, [session, status, router]);
+
+    // Load user and location data
+    const loadUserData = async () => {
+      if (!session?.user?.id) return;
+      setIsLoadingUserData(true);
+
+      try {
+        // Load user data (phone number)
+        const userRes = await fetch("/api/user");
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          if (userData?.phoneNumber) {
+            setPhoneNumber(userData.phoneNumber);
+          }
+        }
+
+        // Load location data
+        const locationRes = await fetch(`/api/location?userId=${session.user.id}`);
+        if (locationRes.ok) {
+          const locationData = await locationRes.json();
+          if (locationData.placesauto) {
+            setSelectedAddress(locationData.placesauto);
+          }
+          if (locationData.city) {
+            setCity(locationData.city);
+          }
+          if (locationData.building) {
+            setBuilding(locationData.building);
+          }
+          if (locationData.street) {
+            setStreet(locationData.street);
+          }
+          if (locationData.latitude && locationData.longitude) {
+            setCoordinates({ lat: locationData.latitude, lng: locationData.longitude });
+          }
+        }
+      } catch (err) {
+        console.error("Error loading user data:", err);
+      } finally {
+        setIsLoadingUserData(false);
+      }
+    };
+
+    loadUserData();
+  }, [session, status, router, setPhoneNumber, setCity, setBuilding, setStreet, setSelectedAddress, setCoordinates]);
 
   const total = subTotal;
 
@@ -77,7 +124,7 @@ const CheckoutPage = () => {
 
     if (role !== "EMPLOYEE") {
       if (!bulkEligible && consumerSubtotal < 3000) {
-        alert("Minimum order amount is Rs 3000 for consumer pricing.");
+        setErrorMessage("Minimum order amount is Rs 3000 for consumer pricing. Please add more items to your cart.");
         return;
       }
     }
@@ -416,6 +463,53 @@ const CheckoutPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Mobile Error Modal */}
+      {errorMessage && (
+        <div className="fixed inset-0 z-[10000] md:hidden">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setErrorMessage(null)}
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl p-6 max-w-md mx-auto">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="p-2 bg-red-100 rounded-full flex-shrink-0">
+                <AlertCircle className="w-6 h-6 text-red-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-slate-800 mb-2">Order Cannot Be Placed</h3>
+                <p className="text-sm text-slate-600">{errorMessage}</p>
+              </div>
+              <button
+                onClick={() => setErrorMessage(null)}
+                className="p-2 hover:bg-slate-100 rounded-full transition-colors flex-shrink-0"
+              >
+                <X className="w-5 h-5 text-slate-600" />
+              </button>
+            </div>
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+              <p className="text-sm text-amber-800">
+                <strong>Current total:</strong> Rs {consumerSubtotal.toFixed(2)}
+              </p>
+              <p className="text-sm text-amber-800 mt-1">
+                <strong>Minimum required:</strong> Rs 3,000.00
+              </p>
+              <p className="text-xs text-amber-700 mt-2">
+                You need to add items worth Rs {(3000 - consumerSubtotal).toFixed(2)} more to place your order.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setErrorMessage(null);
+                router.push('/');
+              }}
+              className="w-full bg-primary text-white font-bold py-3 rounded-xl hover:bg-primary/90 transition-colors"
+            >
+              Continue Shopping
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

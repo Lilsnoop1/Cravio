@@ -15,7 +15,7 @@ import { LoginModal } from "./LoginModal";
 import ProductModal from "./ProductModal";
 import { ProductModalProvider } from "../context/ProductModalContext";
 import { LoginModalProvider } from "../context/LoginModalContext";
-import { CartProvider } from "../context/CartContext";
+import { CartProvider, useCartContext } from "../context/CartContext";
 import { LocationProvider } from "../context/LocationContext";
 import { UserInfoProvider } from "../context/UserInfoContext";
 import { ProductsProvider } from "../context/ProductsContext";
@@ -36,6 +36,26 @@ const ADMIN_LINKS = [
   { href: "/admin/employees", label: "Employees", roles: ["ADMIN"] },
   { href: "/admin/p2p", label: "P2P", roles: ["ADMIN"] },
 ];
+
+function ContentLayout({ children }: LayoutProps) {
+  const { CartOpen, cartItems } = useCartContext();
+  const isCartOpenOnDesktop = CartOpen && cartItems.length > 0;
+
+  return (
+    <>
+      <div className="bg-slate-50 border-b border-slate-200 shadow-sm">
+        <Headband />
+        <BulkToast />
+        <Navbar />
+        <Subnav />
+      </div>
+      <div className="flex overflow-visible">
+        <div className={`flex-1 md:pt-0 pt-[56px] min-w-0 ${isCartOpenOnDesktop ? 'md:max-w-5xl' : ''}`}>{children}</div>
+        <Cart />
+      </div>
+    </>
+  );
+}
 
 function SiteShell({ children }: LayoutProps) {
   const ScrollRestorer = () => {
@@ -83,17 +103,10 @@ function SiteShell({ children }: LayoutProps) {
                   <LocationProvider>
                     <UserInfoProvider>
                       <ScrollRestorer />
-                      <div className="bg-slate-50 border-b border-slate-200 shadow-sm">
-                        <Headband />
-                        <BulkToast />
-                        <Navbar />
-                        <Subnav />
-                      </div>
-                    <div className="flex overflow-visible">
-                      <div className="flex-1 md:pt-0 pt-[56px] max-w-5xl min-w-0">{children}</div>
-                      <Cart />
-                    </div>
-                    <MobileBottomNav />
+                      <ContentLayout>
+                        {children}
+                      </ContentLayout>
+                      <MobileBottomNav />
                       <PendingOrdersBanner />
                       <LoginModal />
                       <VendorModal />
