@@ -38,11 +38,20 @@ export default function Categories() {
     }
   }, [showAll]);
   
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: "start",
     slidesToScroll,
-    watchDrag: false,
+    watchDrag: isMobile,
   });
   
   // Keep emblaApi ref in sync
@@ -377,7 +386,7 @@ export default function Categories() {
 
 
   const getPageTitle = () => {
-    return selectedIndex === 0 ? 'All categories' : 'Our Brands';
+    return selectedIndex === 0 ? 'All categories' : 'Shop By Brands';
   };
 
   const getVisibleCategories = () => {
@@ -566,7 +575,7 @@ export default function Categories() {
                       href={`/category/${category.name}`}
                       key={index}
                     >
-                      <div className="group flex flex-col items-center gap-2 w-24 md:w-24">
+                      <div className="group flex flex-col items-center gap-2 w-20 md:w-24">
                         <div className="relative overflow-hidden w-24 h-24 md:w-28 md:h-28 rounded-2xl flex items-center justify-center">
                           <img
                             src={category.url}

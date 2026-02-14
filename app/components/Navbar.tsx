@@ -35,8 +35,8 @@ const Navbar: React.FC = () => {
     }, []);
 
   const shortAddress = selectedAddress
-    ? selectedAddress.length > 20
-      ? `${selectedAddress.slice(0, 20)}...`
+    ? selectedAddress.length > 35
+      ? `${selectedAddress.slice(0, 35)}...`
       : selectedAddress
     : "Set location";
 
@@ -117,10 +117,12 @@ const Navbar: React.FC = () => {
     <>
       {/* Main Navbar */}
       <div className="md:static fixed top-0 left-0 right-0 z-[10000] bg-white border-b border-slate-200 md:border-none md:relative">
-        <div className="flex flex-row justify-between py-3 px-5 items-center gap-5 w-full">
-        <div className="flex items-center gap-3">
+
+        {/* ===== MOBILE NAVBAR (< md) ===== */}
+        <div className="flex md:hidden flex-row items-center py-3 px-2 gap-0 w-full">
+          {/* Burger */}
           <button
-            className="md:hidden p-2 rounded-full hover:bg-slate-100 relative"
+            className="shrink-0 p-1 rounded-full hover:bg-slate-100 relative"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
           >
@@ -135,103 +137,103 @@ const Navbar: React.FC = () => {
               }`}
             />
           </button>
-          {/* Hide logo on mobile per request; keep link space for desktop */}
-          <Link href={"/"} className="hidden md:block">
-            <div className="flex flex-row md:gap-5 gap-2 w-fit flex-none ">
+
+          {/* Mobile deliver to — fills entire middle */}
+          <button
+            onClick={() => setLocOpen(true)}
+            className="flex-1 min-w-0 flex items-center justify-center gap-1 px-2 py-2"
+          >
+            <div className="flex flex-col items-center leading-tight min-w-0">
+              <span className="text-[11px] text-slate-500">Deliver to</span>
+              <span className="text-[0.8rem] font-semibold text-slate-800 truncate max-w-full block">{selectedAddress || "Set location"}</span>
+            </div>
+            <ChevronDown className="w-4 h-4 text-slate-700 shrink-0" />
+          </button>
+
+          {/* Search */}
+          <button
+            className="shrink-0 p-1 rounded-full hover:bg-slate-100 relative"
+            aria-label="Search"
+            onClick={() => {
+              const next = !mobileSearchActive;
+              setMobileSearchActive(next);
+              const event = new CustomEvent(next ? "mobile-search-open" : "mobile-search-close");
+              window.dispatchEvent(event);
+            }}
+          >
+            <span className="relative w-6 h-6 inline-flex items-center justify-center">
+              <Search
+                className={`absolute w-6 h-6 text-slate-800 transition-all duration-300 ${
+                  mobileSearchActive ? "opacity-0 -rotate-45 scale-75" : "opacity-100 rotate-0 scale-100"
+                }`}
+              />
+              <X
+                className={`absolute w-6 h-6 text-slate-800 transition-all duration-300 ${
+                  mobileSearchActive ? "opacity-100 rotate-0 scale-100" : "opacity-0 rotate-45 scale-75"
+                }`}
+              />
+            </span>
+          </button>
+        </div>
+
+        {/* ===== DESKTOP NAVBAR (md+) ===== */}
+        <div className="hidden md:flex flex-row justify-between py-3 px-5 items-center gap-5 w-full">
+          <Link href={"/"}>
+            <div className="flex flex-row md:gap-5 gap-2 w-fit flex-none">
               <img src="/images/Cravio_Logo.png" className="w-15 sm:w-20 h-auto rounded-sm md:rounded-lg lg:rounded-xl"/>
               <p className="self-center font-brasika text-primary hidden sm:text-sm md:block md:text-lg lg:text-2xl">Cravio</p>
             </div>
           </Link>
-          {/* <button onClick={seedDatabase} className="bg-primary text-accents px-4 py-2 rounded-md">Seed Database</button> */}
-        </div>
-        
-        {/* Location Selector trigger (desktop opens modal like mobile) */}
-        <button
-          onClick={() => setLocOpen(true)}
-          className="hidden md:flex items-center gap-4 border border-slate-200 bg-white py-2 px-3 rounded-lg hover:border-primary/60 hover:bg-accents/60 transition"
-        >
-          <MapPin className="text-primary"/>
-          <div className="flex flex-col items-start leading-tight w-[200px]">
-            <span className="text-[11px] text-slate-500">Deliver to</span>
-            <span className="text-sm font-semibold text-slate-800 line-clamp-1 max-w-[180px]">{shortAddress}</span>
-          </div>
-          <ChevronDown className="w-4 h-4 text-slate-700" />
-        </button>
-        {/* Mobile deliver to compact button */}
-        <div className="md:hidden flex-1 flex justify-center">
+
+          {/* Desktop Location Selector trigger */}
           <button
             onClick={() => setLocOpen(true)}
-            className="flex items-center gap-2 px-3 py-2"
+            className="flex items-center gap-4 border border-slate-200 bg-white py-2 px-3 rounded-lg hover:border-primary/60 hover:bg-accents/60 transition"
           >
-            <div className="flex flex-col items-start leading-tight">
+            <MapPin className="text-primary"/>
+            <div className="flex flex-col items-start leading-tight w-[240px]">
               <span className="text-[11px] text-slate-500">Deliver to</span>
-              <span className="text-[0.75rem] font-semibold text-slate-800">{shortAddress}</span>
+              <span className="text-sm font-semibold text-slate-800 line-clamp-1 max-w-full">{shortAddress}</span>
             </div>
             <ChevronDown className="w-4 h-4 text-slate-700" />
           </button>
-        </div>
-        <button
-          className="md:hidden p-2 rounded-full hover:bg-slate-100 relative"
-          aria-label="Search"
-          onClick={() => {
-            const next = !mobileSearchActive;
-            setMobileSearchActive(next);
-            const event = new CustomEvent(next ? "mobile-search-open" : "mobile-search-close");
-            window.dispatchEvent(event);
-          }}
-        >
-          <span className="relative w-6 h-6 inline-flex items-center justify-center">
-            <Search
-              className={`absolute w-6 h-6 text-slate-800 transition-all duration-300 ${
-                mobileSearchActive ? "opacity-0 -rotate-45 scale-75" : "opacity-100 rotate-0 scale-100"
-              }`}
-            />
-            <X
-              className={`absolute w-6 h-6 text-slate-800 transition-all duration-300 ${
-                mobileSearchActive ? "opacity-100 rotate-0 scale-100" : "opacity-0 rotate-45 scale-75"
-              }`}
-            />
-          </span>
-        </button>
-        {session?<AccountInfo session={session} onSignOut={signOut}/>:
-      <div className="flex flex-row gap-2 justify-end w-fit">
-            <button className="hidden md:inline-flex px-10 cursor-pointer md:px-30 py-2 hover:bg-secondary hover:text-accents w-full font-sifonn rounded-md bg-primary text-accents text-xs md:text-lg"
+
+          {session?<AccountInfo session={session} onSignOut={signOut}/>:
+          <div className="flex flex-row gap-2 justify-end w-fit">
+            <button className="px-10 cursor-pointer md:px-30 py-2 hover:bg-secondary hover:text-accents w-full font-sifonn rounded-md bg-primary text-accents text-xs md:text-lg"
             onClick={()=>{setIsOpen(true);setIsEmployee(false)}}
             >Login/Sign Up</button>
-        </div>}
-        {cartItems.length > 0 && (
-          <button
-            onClick={() => setCartOpen(!CartOpen)}
-            className="hidden md:block relative p-2 hover:bg-slate-100 rounded-full transition-colors"
-            aria-label="Toggle cart"
-          >
-            <div className="relative w-12 h-12">
+          </div>}
+
+          {cartItems.length > 0 && (
+            <button
+              onClick={() => setCartOpen(!CartOpen)}
+              className="relative p-2 hover:bg-slate-100 rounded-full transition-colors"
+              aria-label="Toggle cart"
+            >
+              <div className="relative w-12 h-12">
                 <Image
                     src="/images/plastic-bag.png"
                     alt="cart"
                     fill
                 />
-            </div>
-            <div className="rounded-full w-5 h-5 bg-primary absolute -top-1 -right-1 text-accents text-xs flex items-center justify-center font-bold">
-              {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-            </div>
-          </button>
-        )}
-        {/* Employee Links */}
-        {session && session.user.role === 'EMPLOYEE' && (
-          <div className="hidden md:flex flex-row gap-4 ml-4">
-            <Link href="/admin/orders" className="text-accents bg-primary p-4 hover:text-amber-300 font-sifonn text-sm">
-              Manage Orders
-            </Link>
-          </div>
-        )}
+              </div>
+              <div className="rounded-full w-5 h-5 bg-primary absolute -top-1 -right-1 text-accents text-xs flex items-center justify-center font-bold">
+                {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+              </div>
+            </button>
+          )}
 
-        {/* <div className="block md:hidden">
-            <Bars3Icon className="h-5 w-5" onClick={()=>{console.log("hello");
-            }}/>
-        </div> */}
-
+          {/* Employee Links */}
+          {session && session.user.role === 'EMPLOYEE' && (
+            <div className="flex flex-row gap-4 ml-4">
+              <Link href="/admin/orders" className="text-accents bg-primary p-4 hover:text-amber-300 font-sifonn text-sm">
+                Manage Orders
+              </Link>
+            </div>
+          )}
         </div>
+
       </div>
       {menuOpen && (
         <div className="fixed inset-0 z-[9998] md:hidden">

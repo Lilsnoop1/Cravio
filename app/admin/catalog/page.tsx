@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { MoreVertical, Plus } from "lucide-react";
+import CatalogEditModal from "@/app/components/CatalogEditModal";
 import type {
   CatalogCategory as Category,
   CatalogCompany as Company,
@@ -15,7 +17,7 @@ import type {
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "An unexpected error occurred";
 
-const emptyCategory: CategoryFormState = { name: "", url: "" };
+const emptyCategory: CategoryFormState = { name: "", url: "", imageMode: "url", imageFile: null };
 const emptyCompany: CompanyFormState = {
   name: "",
   image: "",
@@ -58,6 +60,13 @@ export default function CatalogAdminPage() {
   const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null);
   const [editingCompanyId, setEditingCompanyId] = useState<number | null>(null);
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
+
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<"category" | "company" | "product" | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -173,6 +182,8 @@ export default function CatalogAdminPage() {
       await loadData();
       setCategoryForm(emptyCategory);
       setEditingCategoryId(null);
+      setModalOpen(false);
+      setSelectedCategory(null);
     } catch (err: unknown) {
       alert(getErrorMessage(err));
     } finally {
@@ -254,6 +265,8 @@ export default function CatalogAdminPage() {
       await loadData();
       setCompanyForm(emptyCompany);
       setEditingCompanyId(null);
+      setModalOpen(false);
+      setSelectedCompany(null);
     } catch (err: unknown) {
       alert(getErrorMessage(err));
     } finally {
@@ -274,6 +287,8 @@ export default function CatalogAdminPage() {
         throw new Error(error.error || "Failed to delete company");
       }
       await loadData();
+      setModalOpen(false);
+      setSelectedCompany(null);
     } catch (err: unknown) {
       alert(getErrorMessage(err));
     } finally {
@@ -352,6 +367,8 @@ export default function CatalogAdminPage() {
       await loadData();
       setProductForm(emptyProduct);
       setEditingProductId(null);
+      setModalOpen(false);
+      setSelectedProduct(null);
     } catch (err: unknown) {
       alert(getErrorMessage(err));
     } finally {
@@ -372,10 +389,103 @@ export default function CatalogAdminPage() {
         throw new Error(error.error || "Failed to delete product");
       }
       await loadData();
+      setModalOpen(false);
+      setSelectedProduct(null);
     } catch (err: unknown) {
       alert(getErrorMessage(err));
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Modal handlers
+  const openModalForAdd = (type: "category" | "company" | "product") => {
+    setModalType(type);
+    setSelectedCategory(null);
+    setSelectedCompany(null);
+    setSelectedProduct(null);
+    setEditingCategoryId(null);
+    setEditingCompanyId(null);
+    setEditingProductId(null);
+    if (type === "category") {
+      setCategoryForm(emptyCategory);
+    } else if (type === "company") {
+      setCompanyForm(emptyCompany);
+    } else {
+      setProductForm(emptyProduct);
+    }
+    setModalOpen(true);
+  };
+
+  const openModalForEdit = (
+    type: "category" | "company" | "product",
+    item: Category | Company | Product
+  ) => {
+    setModalType(type);
+    if (type === "category") {
+      const cat = item as Category;
+      setSelectedCategory(cat);
+      setEditingCategoryId(cat.id);
+      setCategoryForm({
+        name: cat.name,
+        url: cat.url,
+        imageMode: "url",
+        imageFile: null,
+      });
+    } else if (type === "company") {
+      const comp = item as Company;
+      setSelectedCompany(comp);
+      setEditingCompanyId(comp.id);
+      const selectedCategoryIds = (comp.categories || [])
+        .map((catName) => categories.find((c) => c.name === catName)?.id)
+        .filter((id): id is number => Boolean(id));
+      setCompanyForm({
+        name: comp.name,
+        image: comp.image || "",
+        categoryIds: selectedCategoryIds,
+        productCount: comp.productCount.toString(),
+        imageMode: "url",
+        imageFile: null,
+      });
+    } else {
+      const prod = item as Product;
+      setSelectedProduct(prod);
+      setEditingProductId(prod.id);
+      setProductForm({
+        name: prod.name,
+        companyId: prod.companyId?.toString() || "",
+        categoryId: prod.categoryId?.toString() || "",
+        retailPrice: prod.retailPrice.toString(),
+        consumerPrice: prod.consumerPrice.toString(),
+        bulkPrice: prod.bulkPrice.toString(),
+        bulkLimit: prod.bulkLimit?.toString() || "",
+        image: prod.image,
+        description: prod.description || "",
+        imageMode: "url",
+        imageFile: null,
+      });
+    }
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setModalType(null);
+    setSelectedCategory(null);
+    setSelectedCompany(null);
+    setSelectedProduct(null);
+    setEditingCategoryId(null);
+    setEditingCompanyId(null);
+    setEditingProductId(null);
+  };
+
+  const handleModalDelete = () => {
+    if (modalType === "category" && selectedCategory) {
+      deleteCategory(selectedCategory.id);
+    } else if (modalType === "company" && selectedCompany) {
+      deleteCompany(selectedCompany.id);
+    } else if (modalType === "product" && selectedProduct) {
+      deleteProduct(selectedProduct.id);
     }
   };
 
@@ -427,74 +537,15 @@ export default function CatalogAdminPage() {
           </span>
         </div>
 
-        <form onSubmit={saveCategory} className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <input
-            type="text"
-            placeholder="Name"
-            value={categoryForm.name}
-            onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Image URL"
-            value={categoryForm.url}
-            onChange={(e) => setCategoryForm({ ...categoryForm, url: e.target.value })}
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-            disabled={categoryForm.imageMode === "upload"}
-          />
-          <div className="flex items-center gap-3">
-            <label className="text-xs font-semibold text-gray-700">Image mode</label>
-            <select
-              value={categoryForm.imageMode}
-              onChange={(e) =>
-                setCategoryForm({
-                  ...categoryForm,
-                  imageMode: e.target.value as "url" | "upload",
-                  imageFile: null,
-                })
-              }
-              className="rounded border border-gray-200 px-3 py-2 text-sm"
-            >
-              <option value="url">URL</option>
-              <option value="upload">Upload</option>
-            </select>
-          </div>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) =>
-              setCategoryForm({
-                ...categoryForm,
-                imageFile: e.target.files?.[0] || null,
-              })
-            }
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-            disabled={categoryForm.imageMode !== "upload"}
-          />
-          <div className="flex gap-2 col-span-full">
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:opacity-60"
-            >
-              {editingCategoryId ? "Update" : "Add"} category
-            </button>
-            {editingCategoryId && (
-              <button
-                type="button"
-                onClick={() => {
-                  setEditingCategoryId(null);
-                  setCategoryForm(emptyCategory);
-                }}
-                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-            )}
-          </div>
-        </form>
+        <div className="mt-4">
+          <button
+            onClick={() => openModalForAdd("category")}
+            className="flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800"
+          >
+            <Plus className="w-4 h-4" />
+            Add Category
+          </button>
+        </div>
 
         <div className="mt-4 overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
@@ -508,30 +559,22 @@ export default function CatalogAdminPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {categories.map((category) => (
-                <tr key={category.id}>
-                  <td className="px-3 py-2">{category.name}</td>
+                <tr
+                  key={category.id}
+                  className={`hover:bg-gray-50 transition-colors ${
+                    selectedCategory?.id === category.id ? "bg-blue-50" : ""
+                  }`}
+                >
+                  <td className="px-3 py-2 font-medium">{category.name}</td>
                   <td className="px-3 py-2 text-gray-600">{category.url}</td>
                   <td className="px-3 py-2 text-gray-600">{category.productCount}</td>
-                  <td className="px-3 py-2 text-right space-x-2">
+                  <td className="px-3 py-2 text-right">
                     <button
-                      className="text-blue-600 hover:underline"
-                      onClick={() => {
-                        setEditingCategoryId(category.id);
-                        setCategoryForm({
-                          name: category.name,
-                          url: category.url,
-                          imageMode: "url",
-                          imageFile: null,
-                        });
-                      }}
+                      className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
+                      onClick={() => openModalForEdit("category", category)}
+                      aria-label="Actions"
                     >
-                      Edit
-                    </button>
-                    <button
-                      className="text-red-600 hover:underline"
-                      onClick={() => deleteCategory(category.id)}
-                    >
-                      Delete
+                      <MoreVertical className="w-4 h-4 text-gray-600" />
                     </button>
                   </td>
                 </tr>
@@ -562,110 +605,15 @@ export default function CatalogAdminPage() {
           </span>
         </div>
 
-        <form onSubmit={saveCompany} className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <input
-            type="text"
-            placeholder="Name"
-            value={companyForm.name}
-            onChange={(e) => setCompanyForm({ ...companyForm, name: e.target.value })}
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Image URL (optional)"
-            value={companyForm.image}
-            onChange={(e) => setCompanyForm({ ...companyForm, image: e.target.value })}
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-            disabled={companyForm.imageMode === "upload"}
-          />
-          <div className="flex items-center gap-3">
-            <label className="text-xs font-semibold text-gray-700">Image mode</label>
-            <select
-              value={companyForm.imageMode}
-              onChange={(e) =>
-                setCompanyForm({
-                  ...companyForm,
-                  imageMode: e.target.value as "url" | "upload",
-                  imageFile: null,
-                })
-              }
-              className="rounded border border-gray-200 px-3 py-2 text-sm"
-            >
-              <option value="url">URL</option>
-              <option value="upload">Upload</option>
-            </select>
-          </div>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) =>
-              setCompanyForm({
-                ...companyForm,
-                imageFile: e.target.files?.[0] || null,
-              })
-            }
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-            disabled={companyForm.imageMode !== "upload"}
-          />
-          <input
-            type="number"
-            min={0}
-            placeholder="Product count (optional)"
-            value={companyForm.productCount}
-            onChange={(e) => setCompanyForm({ ...companyForm, productCount: e.target.value })}
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-          />
-          <div className="rounded border border-gray-200 px-3 py-2">
-            <p className="mb-2 text-xs font-semibold text-gray-700">Categories</p>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => {
-                const checked = companyForm.categoryIds.includes(category.id);
-                return (
-                  <label key={category.id} className="flex items-center gap-1 text-xs text-gray-700">
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => {
-                        setCompanyForm((prev) => ({
-                          ...prev,
-                          categoryIds: checked
-                            ? prev.categoryIds.filter((id) => id !== category.id)
-                            : [...prev.categoryIds, category.id],
-                        }));
-                      }}
-                    />
-                    {category.name}
-                  </label>
-                );
-              })}
-              {categories.length === 0 && (
-                <span className="text-xs text-gray-500">Create a category first.</span>
-              )}
-            </div>
-          </div>
-          <div className="flex gap-2 sm:col-span-2 lg:col-span-4">
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:opacity-60"
-            >
-              {editingCompanyId ? "Update" : "Add"} company
-            </button>
-            {editingCompanyId && (
-              <button
-                type="button"
-                onClick={() => {
-                  setEditingCompanyId(null);
-                  setCompanyForm(emptyCompany);
-                }}
-                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-            )}
-          </div>
-        </form>
+        <div className="mt-4">
+          <button
+            onClick={() => openModalForAdd("company")}
+            className="flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800"
+          >
+            <Plus className="w-4 h-4" />
+            Add Company
+          </button>
+        </div>
 
         <div className="mt-4 overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
@@ -679,37 +627,24 @@ export default function CatalogAdminPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {companies.map((company) => (
-                <tr key={company.id}>
+                <tr
+                  key={company.id}
+                  className={`hover:bg-gray-50 transition-colors ${
+                    selectedCompany?.id === company.id ? "bg-blue-50" : ""
+                  }`}
+                >
                   <td className="px-3 py-2 font-medium text-gray-900">{company.name}</td>
                   <td className="px-3 py-2 text-gray-600">
                     {(company.categories || []).join(", ") || "—"}
                   </td>
                   <td className="px-3 py-2 text-gray-600">{company.productCount}</td>
-                  <td className="px-3 py-2 text-right space-x-2">
+                  <td className="px-3 py-2 text-right">
                     <button
-                      className="text-blue-600 hover:underline"
-                      onClick={() => {
-                        setEditingCompanyId(company.id);
-                        const selectedCategoryIds = (company.categories || [])
-                          .map((catName) => categories.find((c) => c.name === catName)?.id)
-                          .filter((id): id is number => Boolean(id));
-                        setCompanyForm({
-                          name: company.name,
-                          image: company.image || "",
-                          categoryIds: selectedCategoryIds,
-                          productCount: company.productCount.toString(),
-                          imageMode: "url",
-                          imageFile: null,
-                        });
-                      }}
+                      className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
+                      onClick={() => openModalForEdit("company", company)}
+                      aria-label="Actions"
                     >
-                      Edit
-                    </button>
-                    <button
-                      className="text-red-600 hover:underline"
-                      onClick={() => deleteCompany(company.id)}
-                    >
-                      Delete
+                      <MoreVertical className="w-4 h-4 text-gray-600" />
                     </button>
                   </td>
                 </tr>
@@ -749,143 +684,15 @@ export default function CatalogAdminPage() {
           </div>
         </div>
 
-        <form onSubmit={saveProduct} className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <input
-            type="text"
-            placeholder="Name"
-            value={productForm.name}
-            onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-            required
-          />
-          <select
-            value={productForm.companyId}
-            onChange={(e) => setProductForm({ ...productForm, companyId: e.target.value })}
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-            required
+        <div className="mt-4">
+          <button
+            onClick={() => openModalForAdd("product")}
+            className="flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800"
           >
-            <option value="">Select company</option>
-            {companies.map((company) => (
-              <option key={company.id} value={company.id}>
-                {company.name}
-              </option>
-            ))}
-          </select>
-          <select
-            value={productForm.categoryId}
-            onChange={(e) => setProductForm({ ...productForm, categoryId: e.target.value })}
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-            required
-          >
-            <option value="">Select category</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-          <input
-            type="text"
-            placeholder="Image URL (optional)"
-            value={productForm.image}
-            onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-            disabled={productForm.imageMode === "upload"}
-          />
-          <div className="flex items-center gap-3">
-            <label className="text-xs font-semibold text-gray-700">Image mode</label>
-            <select
-              value={productForm.imageMode}
-              onChange={(e) =>
-                setProductForm({
-                  ...productForm,
-                  imageMode: e.target.value as "url" | "upload",
-                  imageFile: null,
-                })
-              }
-              className="rounded border border-gray-200 px-3 py-2 text-sm"
-            >
-              <option value="url">URL</option>
-              <option value="upload">Upload</option>
-            </select>
-          </div>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) =>
-              setProductForm({
-                ...productForm,
-                imageFile: e.target.files?.[0] || null,
-              })
-            }
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-            disabled={productForm.imageMode !== "upload"}
-          />
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Retail price"
-            value={productForm.retailPrice}
-            onChange={(e) => setProductForm({ ...productForm, retailPrice: e.target.value })}
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-            required
-          />
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Consumer price"
-            value={productForm.consumerPrice}
-            onChange={(e) => setProductForm({ ...productForm, consumerPrice: e.target.value })}
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-            required
-          />
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Bulk price"
-            value={productForm.bulkPrice}
-            onChange={(e) => setProductForm({ ...productForm, bulkPrice: e.target.value })}
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-            required
-          />
-          <input
-            type="number"
-            step="1"
-            min="0"
-            placeholder="Bulk limit (optional)"
-            value={productForm.bulkLimit}
-            onChange={(e) => setProductForm({ ...productForm, bulkLimit: e.target.value })}
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm"
-          />
-          <textarea
-            placeholder="Description (optional)"
-            value={productForm.description}
-            onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm sm:col-span-2 lg:col-span-4"
-            rows={2}
-          />
-          <div className="flex gap-2 sm:col-span-2 lg:col-span-4">
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:opacity-60"
-            >
-              {editingProductId ? "Update" : "Add"} product
-            </button>
-            {editingProductId && (
-              <button
-                type="button"
-                onClick={() => {
-                  setEditingProductId(null);
-                  setProductForm(emptyProduct);
-                }}
-                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-            )}
-          </div>
-        </form>
+            <Plus className="w-4 h-4" />
+            Add Product
+          </button>
+        </div>
 
         <div className="mt-4 overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
@@ -902,40 +709,25 @@ export default function CatalogAdminPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {displayedProducts.map((product) => (
-                <tr key={product.id}>
+                <tr
+                  key={product.id}
+                  className={`hover:bg-gray-50 transition-colors ${
+                    selectedProduct?.id === product.id ? "bg-blue-50" : ""
+                  }`}
+                >
                   <td className="px-3 py-2 font-medium text-gray-900">{product.name}</td>
                   <td className="px-3 py-2 text-gray-700">{product.company}</td>
                   <td className="px-3 py-2 text-gray-700">{product.category}</td>
                   <td className="px-3 py-2 text-gray-700">Rs {product.consumerPrice}</td>
                   <td className="px-3 py-2 text-gray-700">Rs {product.retailPrice}</td>
                   <td className="px-3 py-2 text-gray-700">Rs {product.bulkPrice}</td>
-                  <td className="px-3 py-2 text-right space-x-2">
+                  <td className="px-3 py-2 text-right">
                     <button
-                      className="text-blue-600 hover:underline"
-                      onClick={() => {
-                        setEditingProductId(product.id);
-                        setProductForm({
-                          name: product.name,
-                          companyId: product.companyId?.toString() || "",
-                          categoryId: product.categoryId?.toString() || "",
-                          retailPrice: product.retailPrice.toString(),
-                          consumerPrice: product.consumerPrice.toString(),
-                          bulkPrice: product.bulkPrice.toString(),
-                          bulkLimit: product.bulkLimit?.toString() || "",
-                          image: product.image,
-                          description: product.description || "",
-                          imageMode: "url",
-                          imageFile: null,
-                        });
-                      }}
+                      className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
+                      onClick={() => openModalForEdit("product", product)}
+                      aria-label="Actions"
                     >
-                      Edit
-                    </button>
-                    <button
-                      className="text-red-600 hover:underline"
-                      onClick={() => deleteProduct(product.id)}
-                    >
-                      Delete
+                      <MoreVertical className="w-4 h-4 text-gray-600" />
                     </button>
                   </td>
                 </tr>
@@ -957,6 +749,31 @@ export default function CatalogAdminPage() {
           )}
         </div>
       </section>
+
+      {/* Edit Modal */}
+      <CatalogEditModal
+        isOpen={modalOpen}
+        onClose={handleModalClose}
+        type={modalType}
+        categoryData={selectedCategory}
+        companyData={selectedCompany}
+        productData={selectedProduct}
+        categoryForm={categoryForm}
+        companyForm={companyForm}
+        productForm={productForm}
+        onCategoryFormChange={setCategoryForm}
+        onCompanyFormChange={setCompanyForm}
+        onProductFormChange={setProductForm}
+        onSave={(e) => {
+          if (modalType === "category") saveCategory(e);
+          else if (modalType === "company") saveCompany(e);
+          else if (modalType === "product") saveProduct(e);
+        }}
+        onDelete={handleModalDelete}
+        saving={saving}
+        categories={categories}
+        companies={companies}
+      />
     </div>
   );
 }

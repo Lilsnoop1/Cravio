@@ -37,7 +37,7 @@ export default function AllProductsGrid() {
   }
 
   return (
-    <section className="py-4 px-0 sm:px-4 md:px-8">
+    <section className="py-4 px-0 sm:px-4 md:px-8 pb-24">
       <div className="w-full max-w-screen-xl mx-auto space-y-8">
         {grouped.map(({ category }) => (
           <Deals key={category} Name={category} filterCategory={category} />

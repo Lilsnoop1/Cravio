@@ -1,4 +1,3 @@
- 
 "use client";
 import { useCartContext } from "../context/CartContext";
 import { useRouter } from "next/navigation";
@@ -8,7 +7,7 @@ import { useUserInfo } from "../context/UserInfoContext";
 import { useLoginModal } from "@/app/context/LoginModalContext";
 import { useVendorContext } from "../context/VendorContext";
 import { useEffect, useMemo, useState } from "react";
-import { X, Plus, Minus, Trash2, Clock, ShoppingBag } from "lucide-react";
+import { ArrowLeft, X, Plus, Minus, CheckCircle, Truck, ShoppingBag } from "lucide-react";
 import type { MobileCartModalProps } from "../Data/database";
 import type { Vendor } from "../Data/database";
 
@@ -28,6 +27,7 @@ const MobileCartModal = ({ isOpen, onClose }: MobileCartModalProps) => {
   const role = (session?.user as { role?: string } | undefined)?.role;
   const isEmployee = role === "EMPLOYEE";
   const [subTotal, setSubTotal] = useState<number>(0);
+
   const consumerSubtotal = useMemo(
     () =>
       cartItems.reduce(
@@ -43,6 +43,17 @@ const MobileCartModal = ({ isOpen, onClose }: MobileCartModalProps) => {
 
   const itemCount = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
+    [cartItems]
+  );
+
+  // Calculate original total (before discounts) for savings display
+  const originalTotal = useMemo(
+    () =>
+      cartItems.reduce(
+        (sum, item) =>
+          sum + (item.product.price ?? item.product.consumerPrice ?? 0) * item.quantity,
+        0
+      ),
     [cartItems]
   );
 
@@ -82,6 +93,18 @@ const MobileCartModal = ({ isOpen, onClose }: MobileCartModalProps) => {
     }
   }, [session, isEmployee]);
 
+  // Lock body scroll when cart is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   const handleSelectVendor = (id: string) => {
     if (!id) {
       setVendor(null);
@@ -90,7 +113,7 @@ const MobileCartModal = ({ isOpen, onClose }: MobileCartModalProps) => {
     }
     const selected = vendors.find((v) => String(v.id) === id);
     if (selected) {
-      setVendor({...selected, address: selected.address ?? ""});
+      setVendor({ ...selected, address: selected.address ?? "" });
       setActiveVendorId(String(selected.id));
       ensureVendorCart(String(selected.id));
     }
@@ -114,200 +137,271 @@ const MobileCartModal = ({ isOpen, onClose }: MobileCartModalProps) => {
 
   if (!isOpen) return null;
 
-  const handleQuantityInput = (id: string, raw: string) => {
-    const value = parseInt(raw, 10);
-    if (Number.isNaN(value)) return;
-    const next = Math.min(Math.max(value, MIN_QUANTITY), MAX_QUANTITY);
-    updateQuantity(Number(id), next);
+  const savings = originalTotal - subTotal;
+
+  const getItemPrice = (item: typeof cartItems[0]) => {
+    return (bulkEligible || isEmployee)
+      ? item.product.bulkPrice ?? item.product.price
+      : item.product.consumerPrice ?? item.product.price;
+  };
+
+  const getOriginalPrice = (item: typeof cartItems[0]) => {
+    return item.product.price ?? item.product.consumerPrice ?? 0;
+  };
+
+  const getDiscount = (item: typeof cartItems[0]) => {
+    const original = getOriginalPrice(item);
+    const sale = getItemPrice(item);
+    if (original > sale && original > 0) {
+      return Math.round(((original - sale) / original) * 100);
+    }
+    return 0;
   };
 
   return (
-    <div className="fixed inset-0 z-[9998] md:hidden">
+    <div className="fixed inset-0 z-[10001] md:hidden">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Modal */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl max-h-[90vh] flex flex-col justify-center">
+      {/* Full-screen modal */}
+      <div className="absolute inset-0 bg-white flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b border-slate-200 bg-accents flex items-center justify-between">
+        <div className="flex items-center justify-between px-4 py-4 border-b border-slate-100 bg-white sticky top-0 z-10">
           <div className="flex items-center gap-3">
-            <ShoppingBag className="w-6 h-6 text-primary" />
-            <h2 className="text-2xl font-bold text-primary font-brasika">Your Cart</h2>
-            {cartItems.length > 0 && (
-              <span className="bg-primary text-accents rounded-full px-3 py-1 text-sm font-bold">
-                {itemCount}
-              </span>
-            )}
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+            >
+              <ArrowLeft className="w-6 h-6 text-slate-800" />
+            </button>
+            <h2 className="text-xl font-bold text-slate-900 font-sifonn">Cart</h2>
           </div>
           <button
             onClick={onClose}
             className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+            aria-label="Close cart"
           >
             <X className="w-6 h-6 text-slate-600" />
           </button>
         </div>
 
-        {/* Delivery Time */}
-        <div className="px-6 py-3 bg-primary/10 border-b border-slate-200">
-          <div className="flex items-center justify-center gap-2 bg-primary backdrop-blur-sm rounded-full px-4 py-2 w-fit mx-auto shadow-sm">
-            <Clock className="w-4 h-4 text-amber-600" />
-            <span className="text-sm font-semibold text-accents font-sifonn">
-              Standard Delivery (15 - 30 mins)
-            </span>
+        {/* Fulfillment bar */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="w-5 h-5 text-primary" />
+            <div>
+              <p className="text-sm font-semibold text-slate-800">Cravio Grocery</p>
+              <p className="text-xs text-slate-500">Fulfilled by Cravio</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-xs font-semibold text-slate-700">Standard delivery</p>
+            <p className="text-xs text-slate-500">
+              {new Date(Date.now() + 86400000).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </p>
           </div>
         </div>
 
-        {/* Cart Items */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50">
-          {cartItems.length === 0 ? (
-            <div className="text-center py-12">
-              <ShoppingBag className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <p className="text-slate-600 font-medium">Your cart is empty</p>
-              <p className="text-sm text-slate-500 mt-2">Add items to get started</p>
-            </div>
-          ) : (
-            cartItems.map((item, index: number) => (
-              <div
-                key={`${item.product.id}-${index}`}
-                className="flex gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-100"
-              >
-                <div className="relative overflow-hidden rounded-lg w-20 h-20 flex-shrink-0">
-                  <img
-                    src={item.product.image}
-                    alt={item.product.name}
-                    className="w-full h-full object-cover"
+        {/* Progress bars */}
+        {cartItems.length > 0 && (
+          <div className="border-b border-slate-100 divide-y divide-slate-100">
+            {/* Minimum order bar */}
+            <div className="flex items-center gap-3 px-4 py-3">
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-slate-800 mb-1.5">
+                  {subTotal >= 3000 || isEmployee
+                    ? "Yay! You can now place your order"
+                    : `Add Rs ${(3000 - subTotal).toFixed(0)} more for minimum order`}
+                </p>
+                <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all duration-500"
+                    style={{
+                      width: `${Math.min(100, (subTotal / 3000) * 100)}%`,
+                    }}
                   />
                 </div>
-                <div className="flex-1 flex flex-col justify-between min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <h3 className="font-semibold text-slate-800 mb-1 truncate text-sm">
-                        {item.product.name}
-                      </h3>
-                      <p className="text-amber-600 font-bold">
-                        Rs {(
-                          (isEmployee || bulkEligible)
-                            ? item.product.bulkPrice ?? item.product.price
-                            : item.product.consumerPrice ?? item.product.price
-                        ).toFixed(2)}{" "}
-                        <span className="text-xs text-slate-500 font-normal">
-                          {(isEmployee || bulkEligible) ? "bulk" : "consumer"}
-                        </span>
-                      </p>
-                      {!isEmployee && (
-                        <p className="text-xs text-slate-500">
-                          Consumer: Rs {(item.product.consumerPrice ?? item.product.price).toFixed(2)} · Bulk: Rs {(item.product.bulkPrice ?? item.product.retailPrice ?? item.product.price).toFixed(2)}
-                        </p>
-                      )}
-                      <p className="text-xs text-slate-500">
-                        Line total (applied): Rs {(
-                          ((isEmployee || bulkEligible
-                            ? item.product.bulkPrice ?? item.product.price
-                            : item.product.consumerPrice ?? item.product.price)) *
-                          item.quantity
-                        ).toFixed(2)}
-                      </p>
-                    </div>
-                    <button
-                      className="p-2 hover:bg-red-50 rounded-full transition-colors"
-                      onClick={() => removeItem(item.product.id)}
-                      aria-label="Remove item"
-                    >
-                      <Trash2 className="w-4 h-4 text-slate-400 hover:text-red-500 transition-colors" />
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-3 mt-2">
-                    <div className="flex items-center gap-2 bg-slate-100 rounded-full px-3 py-1.5">
-                      <button
-                        className="p-0.5 hover:bg-white rounded-full transition-colors"
-                        onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                        aria-label="Decrease quantity"
-                      >
-                        <Minus className="w-3.5 h-3.5 text-slate-600" />
-                      </button>
-                      <input
-                        type="number"
-                        min={MIN_QUANTITY}
-                        max={MAX_QUANTITY}
-                        value={item.quantity}
-                        onChange={(e) => handleQuantityInput(String(item.product.id), e.target.value)}
-                        className="w-16 text-center text-sm font-semibold text-slate-700 bg-transparent border border-slate-200 rounded-md px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary"
-                      />
-                      <button
-                        className="p-0.5 hover:bg-white rounded-full transition-colors"
-                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                        aria-label="Increase quantity"
-                      >
-                        <Plus className="w-3.5 h-3.5 text-slate-600" />
-                      </button>
-                    </div>
+              </div>
+              <Truck className="w-6 h-6 text-primary shrink-0" />
+            </div>
+
+            {/* Bulk pricing bar */}
+            {!isEmployee && (
+              <div className="flex items-center gap-3 px-4 py-3">
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-slate-800 mb-1.5">
+                    {consumerSubtotal >= 20000
+                      ? "Bulk pricing unlocked!"
+                      : `Add Rs ${(20000 - consumerSubtotal).toLocaleString()} more for bulk pricing`}
+                  </p>
+                  <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-amber-500 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${Math.min(100, (consumerSubtotal / 20000) * 100)}%`,
+                      }}
+                    />
                   </div>
                 </div>
+                <span className="text-lg shrink-0">💰</span>
               </div>
-            ))
+            )}
+          </div>
+        )}
+
+        {/* Cart Items — scrollable */}
+        <div className="flex-1 overflow-y-auto">
+          {cartItems.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full py-16">
+              <ShoppingBag className="w-16 h-16 text-slate-300 mb-4" />
+              <p className="text-slate-600 font-semibold">Your cart is empty</p>
+              <p className="text-sm text-slate-400 mt-1">Add items to get started</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {cartItems.map((item, index) => {
+                const salePrice = getItemPrice(item);
+                const origPrice = getOriginalPrice(item);
+                const discount = getDiscount(item);
+
+                return (
+                  <div
+                    key={`${item.product.id}-${index}`}
+                    className="flex items-center gap-3 px-4 py-4"
+                  >
+                    {/* Product image */}
+                    <div className="w-16 h-16 rounded-xl border border-slate-200 overflow-hidden flex-shrink-0 bg-white p-1">
+                      <img
+                        src={item.product.image}
+                        alt={item.product.name}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+
+                    {/* Name + Price */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 leading-tight">
+                        {item.product.name}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-sm font-bold text-slate-900">
+                          Rs. {salePrice.toLocaleString()}
+                        </span>
+                        {origPrice > salePrice && (
+                          <span className="text-xs text-slate-400 line-through">
+                            Rs. {origPrice.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Discount badge + Quantity controls */}
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      {discount > 0 && (
+                        <span className="bg-primary text-accents text-[10px] font-bold px-2 py-0.5 rounded-md">
+                          {discount}% OFF
+                        </span>
+                      )}
+                      <div className="flex items-center border border-primary rounded-lg overflow-hidden">
+                        <button
+                          className="px-2.5 py-1.5 text-primary hover:bg-primary/10 transition-colors"
+                          onClick={() =>
+                            item.quantity <= 1
+                              ? removeItem(item.product.id)
+                              : updateQuantity(item.product.id, item.quantity - 1)
+                          }
+                        >
+                          <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="px-3 py-1.5 text-sm font-bold text-slate-800 min-w-[32px] text-center">
+                          {item.quantity}
+                        </span>
+                        <button
+                          className="px-2.5 py-1.5 text-primary hover:bg-primary/10 transition-colors"
+                          onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
 
-        {/* Footer with Total and Checkout */}
-        {cartItems.length > 0 && (
-          <div className="border-t border-slate-200 p-6 pb-20 space-y-4 bg-white">
-              <div className="space-y-2.5 text-sm">
-                {session?.user?.role === "EMPLOYEE" && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-700 font-semibold">Vendor</span>
-                      <button
-                        className="text-sm text-primary hover:underline"
-                        onClick={() => {
-                          setOpenVendorModal(true);
-                          onClose();
-                        }}
-                      >
-                        + New vendor
-                      </button>
-                    </div>
-                    <select
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                      value={vendor?.id ? String(vendor.id) : ""}
-                      onChange={(e) => handleSelectVendor(e.target.value)}
-                    >
-                      <option value="">Select vendor</option>
-                      {vendors.map((v) => (
-                        <option key={v.id} value={String(v.id)}>
-                          {v.name} • {v.phoneNumber}
-                        </option>
-                      ))}
-                    </select>
-                    {!vendor && (
-                      <p className="text-xs text-red-600">
-                        Select or create a vendor before checkout.
-                      </p>
-                    )}
-                  </div>
-                )}
-                <div className="flex justify-between text-slate-600">
-                  <span>Subtotal</span>
-                  <span className="font-medium">Rs {subTotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between font-bold text-lg text-slate-800 pt-3 border-t border-slate-200">
-                  <span>Total</span>
-                  <span className="text-amber-600">Rs {subTotal.toFixed(2)}</span>
-                </div>
-                <p className="text-xs text-slate-500">
-                  {bulkEligible
-                    ? "Bulk pricing applied (order ≥ Rs 20,000)."
-                    : "Consumer pricing. Bulk applies automatically at Rs 20,000+. Minimum order Rs 3000."}
-                </p>
-              </div>
-            <button
-              onClick={handleCheckout}
-              className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 font-sifonn"
+        {/* Vendor selector for employees */}
+        {isEmployee && cartItems.length > 0 && (
+          <div className="px-4 py-3 border-t border-slate-100 bg-white">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-slate-700 font-semibold">Vendor</span>
+              <button
+                className="text-sm text-primary hover:underline"
+                onClick={() => {
+                  setOpenVendorModal(true);
+                  onClose();
+                }}
+              >
+                + New vendor
+              </button>
+            </div>
+            <select
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              value={vendor?.id ? String(vendor.id) : ""}
+              onChange={(e) => handleSelectVendor(e.target.value)}
             >
-              Proceed to Checkout
-            </button>
+              <option value="">Select vendor</option>
+              {vendors.map((v) => (
+                <option key={v.id} value={String(v.id)}>
+                  {v.name} • {v.phoneNumber}
+                </option>
+              ))}
+            </select>
+            {!vendor && (
+              <p className="text-xs text-red-600 mt-1">
+                Select or create a vendor before checkout.
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Sticky Footer */}
+        {cartItems.length > 0 && (
+          <div className="border-t border-slate-200 bg-white px-4 py-4 pb-6 safe-area-bottom">
+            <div className="flex items-center justify-between">
+              {/* Left: total + item count + savings */}
+              <div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xl font-bold text-slate-900">
+                    Rs. {subTotal.toLocaleString()}
+                  </span>
+                  <span className="text-sm text-slate-500">
+                    {itemCount} {itemCount === 1 ? "Item" : "Items"}
+                  </span>
+                </div>
+                {savings > 0 && (
+                  <p className="text-xs text-primary font-semibold mt-0.5">
+                    You&apos;ve saved Rs. {savings.toLocaleString()}
+                  </p>
+                )}
+              </div>
+
+              {/* Right: Checkout button */}
+              <button
+                onClick={handleCheckout}
+                className="bg-primary hover:bg-primary/90 text-accents font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 font-sifonn text-sm"
+              >
+                CHECKOUT
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -316,4 +410,3 @@ const MobileCartModal = ({ isOpen, onClose }: MobileCartModalProps) => {
 };
 
 export default MobileCartModal;
-

@@ -7,6 +7,7 @@ import { useCartContext } from "../context/CartContext";
 import { useSession } from "next-auth/react";
 import MobileCartModal from "./MobileCartModal";
 import MobileSearchDrawer from "./MobileSearchDrawer";
+import { useLoginModal } from "../context/LoginModalContext";
 
 const MobileBottomNav = () => {
   const router = useRouter();
@@ -15,6 +16,7 @@ const MobileBottomNav = () => {
   const { cartItems } = useCartContext();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { setIsOpen, setIsEmployee } = useLoginModal();
 
   // listen for navbar trigger
   useEffect(() => {
@@ -28,6 +30,15 @@ const MobileBottomNav = () => {
     };
   }, []);
 
+  // listen for "View cart" banner tap
+  useEffect(() => {
+    const handleCartOpen = () => setIsCartOpen(true);
+    window.addEventListener("mobile-cart-open", handleCartOpen as EventListener);
+    return () => {
+      window.removeEventListener("mobile-cart-open", handleCartOpen as EventListener);
+    };
+  }, []);
+
   const itemCount = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
     [cartItems]
@@ -38,10 +49,26 @@ const MobileBottomNav = () => {
 
   const navItems = [
     { key: "home", label: "Home", icon: <Home className="w-5 h-5" />, onClick: () => router.push("/") },
-    ...(session ? [
-      { key: "profile", label: "Profile", icon: <UserCircle className="w-5 h-5" />, onClick: () => router.push("/account") },
-      { key: "orders", label: "Orders", icon: <ClipboardList className="w-5 h-5" />, onClick: () => router.push("/orders") },
-    ] : []),
+    {
+      key: "profile",
+      label: "Profile",
+      icon: <UserCircle className="w-5 h-5" />,
+      onClick: () => {
+        if (session) return router.push("/account");
+        setIsEmployee(false);
+        setIsOpen(true);
+      },
+    },
+    {
+      key: "orders",
+      label: "Orders",
+      icon: <ClipboardList className="w-5 h-5" />,
+      onClick: () => {
+        if (session) return router.push("/orders");
+        setIsEmployee(false);
+        setIsOpen(true);
+      },
+    },
     { key: "cart", label: "Cart", icon: <ShoppingBag className="w-5 h-5" />, onClick: () => setIsCartOpen(true) },
   ];
 
@@ -54,7 +81,7 @@ const MobileBottomNav = () => {
   return (
     <>
       <div className="fixed bottom-0 left-0 right-0 z-[9997] md:hidden bg-white border-t border-slate-200 shadow-lg">
-        <div className={`grid text-center py-2 ${session ? 'grid-cols-4' : 'grid-cols-2'}`}>
+        <div className="grid grid-cols-4 text-center py-2">
           {navItems.map((item) => (
             <button
               key={item.key}

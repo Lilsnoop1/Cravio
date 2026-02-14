@@ -187,7 +187,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               Added to cart: {banner}
             </span>
             <button
-              onClick={() => setBanner(null)}
+              onClick={() => {
+                setBanner(null);
+                window.dispatchEvent(new CustomEvent("mobile-cart-open"));
+              }}
               className="ml-2 text-xs font-semibold text-primary bg-white rounded-full px-3 py-1"
             >
               View cart

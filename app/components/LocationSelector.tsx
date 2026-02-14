@@ -41,7 +41,7 @@ function Map({ allowChange = false }: LocationSelectorProps = {}) {
   const [selected, setSelected] = useState<{ lat: number; lng: number } | null>(null);
   const [address, setAddress] = useState<string | null>(null);
   const [mapOpen,setMapOpen] = useState<boolean>(false);
-  const {selectedAddress, setSelectedAddress} = useLocation();
+  const {selectedAddress, setSelectedAddress, setCoordinates} = useLocation();
   const {setCity,setBuilding,setStreet} = useUserInfo();
   const {data:session} = useSession();
   const [isMobile, setIsMobile] = useState(false);
@@ -104,6 +104,7 @@ function Map({ allowChange = false }: LocationSelectorProps = {}) {
     if (e.latLng) {
       const latLng = { lat: e.latLng.lat(), lng: e.latLng.lng() };
       setSelected(latLng); // Set the marker
+      setCoordinates(latLng);
 
       try {
         // Perform Reverse Geocoding
@@ -112,6 +113,7 @@ function Map({ allowChange = false }: LocationSelectorProps = {}) {
         // Use the formatted address from the first result
         const fullAddress = results[0]?.formatted_address || "Address not found";
         setAddress(fullAddress);
+        setSelectedAddress(fullAddress);
         
       } catch (error) {
         console.error("Error during reverse geocoding:", error);
@@ -153,6 +155,7 @@ function Map({ allowChange = false }: LocationSelectorProps = {}) {
                 async (pos) => {
                   const latLng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                   setSelected(latLng);
+                  setCoordinates(latLng);
                   setMapOpen(true);
                   try {
                     const results = await getGeocode({ location: latLng });
@@ -182,7 +185,7 @@ function Map({ allowChange = false }: LocationSelectorProps = {}) {
         </div>
       )}
       <AddressDisplay address={selectedAddress || address} />
-      {mapOpen?<button className="px-5 cursor-pointer py-2 hover:bg-secondary hover:text-accents w-full font-sifonn rounded-md bg-primary text-accents text-xs md:text-lg" onClick={()=>{setSelectedAddress(address ?? "");setMapOpen(false)}}>Confirm Delivery Address</button>:null}
+      {mapOpen?<button className="px-5 cursor-pointer py-2 hover:bg-secondary hover:text-accents w-full font-sifonn rounded-md bg-primary text-accents text-xs md:text-lg" onClick={()=>{setSelectedAddress(address ?? ""); if(selected){setCoordinates(selected)}; setMapOpen(false)}}>Confirm Delivery Address</button>:null}
 
       {/* Google Map */}
       {mapOpen ? (
@@ -241,7 +244,7 @@ const PlacesAutoComplete = ({setSelected,setAddress, setMapToOpen}:PlacesAutoCom
         placeholder="Search an Address"
         className="w-full"
       />
-      <ComboboxPopover className="!z-[9999]">
+      <ComboboxPopover className="!z-[10020] bg-white shadow-lg">
         <ComboboxList>
           {status==='OK' && data.map(({place_id,description})=>
           <ComboboxOption key={place_id} value={description}/>
@@ -256,7 +259,7 @@ const AddressDisplay = ({ address }: AddressDisplayProps) => {
   if (!address) return null;
 
   return (
-    <div className="p-1 md:p-3 bg-blue-50 border border-blue-200 rounded-md text-sm">
+    <div className="p-1 md:p-3 text-sm">
       <p className="font-semibold text-blue-800">Selected Address:</p>
       <p className="text-blue-700">{address}</p>
     </div>

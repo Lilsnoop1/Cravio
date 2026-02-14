@@ -11,7 +11,7 @@ const Carousel: React.FC = () => {
   
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
-    align: "start",
+    align: "center",
     slidesToScroll: 1,
   });
 
@@ -21,6 +21,21 @@ const Carousel: React.FC = () => {
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
   const scrollTo = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi]);
+
+  // Auto-slide every 3 seconds
+  useEffect(() => {
+    if (!emblaApi) return;
+    const interval = setInterval(() => {
+      emblaApi.scrollNext();
+    }, 3000);
+    // Pause on pointer interaction
+    const stop = () => clearInterval(interval);
+    emblaApi.on("pointerDown", stop);
+    return () => {
+      clearInterval(interval);
+      emblaApi.off("pointerDown", stop);
+    };
+  }, [emblaApi]);
 
   useEffect(() => {
   if (!emblaApi) return;
@@ -44,12 +59,12 @@ const Carousel: React.FC = () => {
   const bannerHeight = "h-[200px] md:h-[380px] lg:h-[420px]";
 
   return (
-    <div className="w-full py-5 md:py-12 px-1 sm:px-8 lg:px-14">
-      <div className="flex flex-col lg:flex-row gap-6 items-stretch">
+    <div className="w-full pt-2 mt-4 pb-4 md:py-12 px-1 sm:px-8 lg:px-14">
+      <div className="flex flex-col lg:flex-row gap-4 md:gap-6 items-stretch">
         {/* Carousel */}
         <div className={`relative w-full ${isCartOpen ? "lg:w-3/3" : "lg:w-2/3"} max-w-5xl ${bannerHeight}`}>
           <div className="overflow-hidden rounded-none h-full" ref={emblaRef}>
-            <div className="flex h-full pl-1 pr-1">
+            <div className="flex h-full">
               {cards.map((card, i) => (
                 <Card key={i} {...card} />
               ))}

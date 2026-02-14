@@ -81,15 +81,13 @@ export default function CategoryPage({ params }: { params: Promise<{ categoryNam
   return (
     <section className="py-8 pb-24 px-4 sm:px-6">
       <div className="w-full max-w-6xl mx-auto">
-        <div className="sticky top-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 bg-white/80 backdrop-blur-md">
-          <h1 className="text-3xl font-bold font-sifonn">
-            Category: {decodedCategoryName}
-          </h1>
-        </div>
+        <h1 className="text-3xl font-bold font-sifonn mb-4">
+          Category: {decodedCategoryName}
+        </h1>
 
         {companiesForCategory.length > 0 && (
-          <div className="mt-4 mb-6">
-            <div className="flex flex-wrap items-center gap-2 overflow-x-auto scrollbar-hide -mx-4 sm:-mx-6 px-4 sm:px-6">
+          <div className="sticky top-16 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 pb-4 pt-4 bg-white/80 backdrop-blur-md">
+            <div className="flex flex-wrap items-center gap-2 overflow-x-auto scrollbar-hide">
               <button
                 onClick={() => setSelectedCompany("All")}
                 className={`flex-shrink-0 px-4 py-2 rounded-full border text-sm font-semibold transition ${
