@@ -180,6 +180,11 @@ export async function POST(request: Request) {
           },
           update: { localSaleId: sale.id },
         });
+        // receiptId is unique: clear it from any other sale that had this receipt (e.g. re-push or barcode reuse)
+        await prisma.localSale.updateMany({
+          where: { receiptId: receipt.id, id: { not: sale.id } },
+          data: { receiptId: null },
+        });
         await prisma.localSale.update({
           where: { id: sale.id },
           data: { receiptId: receipt.id },
