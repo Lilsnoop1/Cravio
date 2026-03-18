@@ -64,7 +64,13 @@ export const ModelName = {
   Employee: 'Employee',
   Admin: 'Admin',
   P2PVendor: 'P2PVendor',
-  OrderHistory: 'OrderHistory'
+  OrderHistory: 'OrderHistory',
+  Receipt: 'Receipt',
+  LocalSale: 'LocalSale',
+  LocalSaleItem: 'LocalSaleItem',
+  LedgerEntry: 'LedgerEntry',
+  LocalPurchase: 'LocalPurchase',
+  LocalPurchaseItem: 'LocalPurchaseItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -128,6 +134,7 @@ export const CategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
   url: 'url',
+  image: 'image',
   productCount: 'productCount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -152,6 +159,9 @@ export const ProductScalarFieldEnum = {
   image: 'image',
   description: 'description',
   companyImage: 'companyImage',
+  barcode: 'barcode',
+  costPrice: 'costPrice',
+  profitMargin: 'profitMargin',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -275,6 +285,90 @@ export const OrderHistoryScalarFieldEnum = {
 } as const
 
 export type OrderHistoryScalarFieldEnum = (typeof OrderHistoryScalarFieldEnum)[keyof typeof OrderHistoryScalarFieldEnum]
+
+
+export const ReceiptScalarFieldEnum = {
+  id: 'id',
+  barcode: 'barcode',
+  localSaleId: 'localSaleId',
+  netTotal: 'netTotal',
+  grossTotal: 'grossTotal',
+  discountTotal: 'discountTotal',
+  saleType: 'saleType',
+  createdAt: 'createdAt'
+} as const
+
+export type ReceiptScalarFieldEnum = (typeof ReceiptScalarFieldEnum)[keyof typeof ReceiptScalarFieldEnum]
+
+
+export const LocalSaleScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  vendorName: 'vendorName',
+  ledgerEntryId: 'ledgerEntryId',
+  receiptId: 'receiptId',
+  saleType: 'saleType',
+  discountTotal: 'discountTotal',
+  grossTotal: 'grossTotal',
+  netTotal: 'netTotal',
+  createdAt: 'createdAt'
+} as const
+
+export type LocalSaleScalarFieldEnum = (typeof LocalSaleScalarFieldEnum)[keyof typeof LocalSaleScalarFieldEnum]
+
+
+export const LocalSaleItemScalarFieldEnum = {
+  id: 'id',
+  localSaleId: 'localSaleId',
+  receiptId: 'receiptId',
+  productId: 'productId',
+  name: 'name',
+  unitPrice: 'unitPrice',
+  discount: 'discount',
+  quantity: 'quantity',
+  lineTotal: 'lineTotal'
+} as const
+
+export type LocalSaleItemScalarFieldEnum = (typeof LocalSaleItemScalarFieldEnum)[keyof typeof LocalSaleItemScalarFieldEnum]
+
+
+export const LedgerEntryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  phoneNumber: 'phoneNumber',
+  address: 'address',
+  entryType: 'entryType',
+  balance: 'balance',
+  due: 'due',
+  createdAt: 'createdAt'
+} as const
+
+export type LedgerEntryScalarFieldEnum = (typeof LedgerEntryScalarFieldEnum)[keyof typeof LedgerEntryScalarFieldEnum]
+
+
+export const LocalPurchaseScalarFieldEnum = {
+  id: 'id',
+  vendorId: 'vendorId',
+  vendorName: 'vendorName',
+  ledgerEntryId: 'ledgerEntryId',
+  totalAmount: 'totalAmount',
+  createdAt: 'createdAt'
+} as const
+
+export type LocalPurchaseScalarFieldEnum = (typeof LocalPurchaseScalarFieldEnum)[keyof typeof LocalPurchaseScalarFieldEnum]
+
+
+export const LocalPurchaseItemScalarFieldEnum = {
+  id: 'id',
+  localPurchaseId: 'localPurchaseId',
+  productId: 'productId',
+  name: 'name',
+  unitCost: 'unitCost',
+  quantity: 'quantity',
+  lineTotal: 'lineTotal'
+} as const
+
+export type LocalPurchaseItemScalarFieldEnum = (typeof LocalPurchaseItemScalarFieldEnum)[keyof typeof LocalPurchaseItemScalarFieldEnum]
 
 
 export const SortOrder = {

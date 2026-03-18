@@ -62,6 +62,7 @@ export async function PATCH(
     const body = (await request.json()) as {
       name?: string;
       url?: string;
+      image?: string | null;
       productCount?: number | string;
     };
     const data: Prisma.CategoryUpdateInput = {};
@@ -72,6 +73,10 @@ export async function PATCH(
 
     if (body.url !== undefined) {
       data.url = body.url ? String(body.url) : undefined;
+    }
+
+    if (body.image !== undefined) {
+      data.image = body.image ? String(body.image).trim() : null;
     }
 
     if (body.productCount !== undefined) {

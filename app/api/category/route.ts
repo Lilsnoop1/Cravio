@@ -12,6 +12,7 @@ type SessionWithRole = Session & { user: { id?: string; role?: string } };
 type CategoryInput = {
   name: string;
   url?: string;
+  image?: string | null;
   productCount?: number;
 };
 
@@ -81,11 +82,13 @@ export async function POST(request: Request) {
             where: { name: category.name },
             update: {
               url: category.url,
+              image: category.image ?? undefined,
               productCount: category.productCount || 0,
             },
             create: {
               name: category.name,
               url: category.url,
+              image: category.image ?? undefined,
               productCount: category.productCount || 0,
             },
           })
@@ -133,11 +136,13 @@ export async function POST(request: Request) {
           where: { name: category.name },
           update: {
             url: category.url,
+            image: category.image ?? undefined,
             productCount: category.productCount || 0,
           },
           create: {
             name: category.name,
             url: category.url,
+            image: category.image ?? undefined,
             productCount: category.productCount || 0,
           },
         })

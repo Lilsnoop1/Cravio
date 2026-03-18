@@ -171,6 +171,7 @@ export default function CatalogAdminPage() {
         body: JSON.stringify({
           name: categoryForm.name.trim(),
           url: imageUrl,
+          image: imageUrl || undefined,
         }),
       });
 

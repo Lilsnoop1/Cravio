@@ -87,3 +87,33 @@ export type P2PVendor = Prisma.P2PVendorModel
  * 
  */
 export type OrderHistory = Prisma.OrderHistoryModel
+/**
+ * Model Receipt
+ * 
+ */
+export type Receipt = Prisma.ReceiptModel
+/**
+ * Model LocalSale
+ * 
+ */
+export type LocalSale = Prisma.LocalSaleModel
+/**
+ * Model LocalSaleItem
+ * 
+ */
+export type LocalSaleItem = Prisma.LocalSaleItemModel
+/**
+ * Model LedgerEntry
+ * 
+ */
+export type LedgerEntry = Prisma.LedgerEntryModel
+/**
+ * Model LocalPurchase
+ * 
+ */
+export type LocalPurchase = Prisma.LocalPurchaseModel
+/**
+ * Model LocalPurchaseItem
+ * 
+ */
+export type LocalPurchaseItem = Prisma.LocalPurchaseItemModel

@@ -58,6 +58,7 @@ model Category {
   id           Int       @id @default(autoincrement())
   name         String    @unique
   url          String    @unique
+  image        String?
   productCount Int       @default(0)
   companies    Company[] @relation("CompanyCategories")
   products     Product[] @relation("CategoryProducts")
@@ -83,9 +84,14 @@ model Product {
   image         String
   description   String?
   companyImage  String
-  orderProducts OrderProduct[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  barcode       String?
+  costPrice     Float?
+  profitMargin  Float?
+  orderProducts    OrderProduct[]
+  localSaleItems   LocalSaleItem[]
+  localPurchaseItems LocalPurchaseItem[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 
   @@index([companyId])
   @@index([categoryId])
@@ -207,4 +213,87 @@ model OrderHistory {
   userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+}
+
+// POS local data: synced from CravioPos for backup/consistency
+model Receipt {
+  id             Int              @id @default(autoincrement())
+  barcode        String           @unique
+  localSaleId    Int              @unique
+  localSale      LocalSale        @relation("ReceiptForSale", fields: [localSaleId], references: [id], onDelete: Cascade)
+  netTotal       Float            @default(0)
+  grossTotal     Float            @default(0)
+  discountTotal  Float            @default(0)
+  saleType       String           @default("POS")
+  createdAt      DateTime         @default(now())
+  items          LocalSaleItem[]
+  saleReferencingReceipt LocalSale? @relation("SalePointsToReceipt")
+}
+
+model LocalSale {
+  id             Int              @id @default(autoincrement())
+  vendorId       Int?
+  vendorName     String?
+  ledgerEntryId  Int?
+  ledgerEntry    LedgerEntry?     @relation(fields: [ledgerEntryId], references: [id], onDelete: SetNull)
+  receiptId      Int?             @unique
+  receipt        Receipt?         @relation("SalePointsToReceipt", fields: [receiptId], references: [id], onDelete: SetNull)
+  receiptForSale Receipt?         @relation("ReceiptForSale")
+  saleType       String           @default("POS")
+  discountTotal  Float            @default(0)
+  grossTotal     Float            @default(0)
+  netTotal       Float            @default(0)
+  createdAt      DateTime         @default(now())
+  items          LocalSaleItem[]
+}
+
+model LocalSaleItem {
+  id          Int       @id @default(autoincrement())
+  localSaleId Int
+  localSale   LocalSale @relation(fields: [localSaleId], references: [id], onDelete: Cascade)
+  receiptId   Int?
+  receipt     Receipt?  @relation(fields: [receiptId], references: [id], onDelete: SetNull)
+  productId   Int?
+  product     Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name        String
+  unitPrice   Float     @default(0)
+  discount    Float     @default(0)
+  quantity    Int       @default(0)
+  lineTotal   Float     @default(0)
+}
+
+model LedgerEntry {
+  id             Int             @id @default(autoincrement())
+  name           String
+  phoneNumber    String
+  address        String?
+  entryType      String          @default("RECEIVABLE")
+  balance        Float           @default(0)
+  due            Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  localSales     LocalSale[]
+  localPurchases LocalPurchase[]
+}
+
+model LocalPurchase {
+  id             Int                @id @default(autoincrement())
+  vendorId       Int?
+  vendorName     String?
+  ledgerEntryId Int?
+  ledgerEntry    LedgerEntry?       @relation(fields: [ledgerEntryId], references: [id], onDelete: SetNull)
+  totalAmount    Float              @default(0)
+  createdAt      DateTime          @default(now())
+  items          LocalPurchaseItem[]
+}
+
+model LocalPurchaseItem {
+  id              Int           @id @default(autoincrement())
+  localPurchaseId Int
+  localPurchase   LocalPurchase @relation(fields: [localPurchaseId], references: [id], onDelete: Cascade)
+  productId       Int?
+  product         Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name            String
+  unitCost        Float         @default(0)
+  quantity        Int           @default(0)
+  lineTotal       Float         @default(0)
 }
