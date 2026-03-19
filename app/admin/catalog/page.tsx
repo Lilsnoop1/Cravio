@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { MoreVertical, Plus } from "lucide-react";
+import { Filter, MoreVertical, Plus } from "lucide-react";
 import CatalogEditModal from "@/app/components/CatalogEditModal";
 import type {
   CatalogCategory as Category,
@@ -16,6 +16,32 @@ import type {
 
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "An unexpected error occurred";
+
+export interface ProductFilters {
+  companyNames: string[];
+  categoryNames: string[];
+  retailMin: number | "";
+  retailMax: number | "";
+  bulkMin: number | "";
+  bulkMax: number | "";
+  consumerMin: number | "";
+  consumerMax: number | "";
+  quantityMin: number | "";
+  quantityMax: number | "";
+}
+
+const emptyProductFilters = (): ProductFilters => ({
+  companyNames: [],
+  categoryNames: [],
+  retailMin: "",
+  retailMax: "",
+  bulkMin: "",
+  bulkMax: "",
+  consumerMin: "",
+  consumerMax: "",
+  quantityMin: "",
+  quantityMax: "",
+});
 
 const emptyCategory: CategoryFormState = { name: "", url: "", imageMode: "url", imageFile: null };
 const emptyCompany: CompanyFormState = {
@@ -40,6 +66,12 @@ const emptyProduct: ProductFormState = {
   imageFile: null,
 };
 
+function filterBySearch<T>(items: T[], search: string, getText: (item: T) => string): T[] {
+  const term = search.trim().toLowerCase();
+  if (!term) return items;
+  return items.filter((item) => getText(item).toLowerCase().includes(term));
+}
+
 export default function CatalogAdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -49,9 +81,15 @@ export default function CatalogAdminPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [categorySearch, setCategorySearch] = useState("");
+  const [companySearch, setCompanySearch] = useState("");
   const [productSearch, setProductSearch] = useState("");
   const [displayedCount, setDisplayedCount] = useState(50);
   const observerTarget = useRef<HTMLDivElement>(null);
+
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [appliedProductFilters, setAppliedProductFilters] = useState<ProductFilters | null>(null);
+  const [draftProductFilters, setDraftProductFilters] = useState<ProductFilters>(emptyProductFilters());
 
   const [categoryForm, setCategoryForm] = useState<CategoryFormState>(emptyCategory);
   const [companyForm, setCompanyForm] = useState<CompanyFormState>(emptyCompany);
@@ -68,14 +106,15 @@ export default function CatalogAdminPage() {
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
+  const isAdmin = session?.user?.role === "ADMIN";
   useEffect(() => {
     if (status === "loading") return;
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || !isAdmin) {
       router.push("/");
       return;
     }
     void loadData();
-  }, [session, status, router]);
+  }, [status, isAdmin, router]);
 
   const loadData = async () => {
     try {
@@ -96,20 +135,53 @@ export default function CatalogAdminPage() {
     }
   };
 
+  const filteredCategories = useMemo(
+    () => filterBySearch(categories, categorySearch, (c) => c.name),
+    [categories, categorySearch]
+  );
+
+  const filteredCompanies = useMemo(
+    () => filterBySearch(companies, companySearch, (c) => c.name + " " + (c.categories ?? []).join(" ")),
+    [companies, companySearch]
+  );
+
   const filteredProducts = useMemo(() => {
+    let list = products;
     const term = productSearch.trim().toLowerCase();
-    if (!term) return products;
-    return products.filter((p) => p.name.toLowerCase().includes(term));
-  }, [products, productSearch]);
+    if (term) {
+      list = list.filter((p) => (p.name ?? "").toLowerCase().includes(term));
+    }
+    const f = appliedProductFilters;
+    if (f) {
+      if (f.companyNames.length > 0) {
+        const set = new Set(f.companyNames.map((n) => n.toLowerCase()));
+        list = list.filter((p) => set.has((p.company ?? "").toLowerCase()));
+      }
+      if (f.categoryNames.length > 0) {
+        const set = new Set(f.categoryNames.map((n) => n.toLowerCase()));
+        list = list.filter((p) => set.has((p.category ?? "").toLowerCase()));
+      }
+      if (f.retailMin !== "") list = list.filter((p) => p.retailPrice >= (f.retailMin as number));
+      if (f.retailMax !== "") list = list.filter((p) => p.retailPrice <= (f.retailMax as number));
+      if (f.bulkMin !== "") list = list.filter((p) => p.bulkPrice >= (f.bulkMin as number));
+      if (f.bulkMax !== "") list = list.filter((p) => p.bulkPrice <= (f.bulkMax as number));
+      if (f.consumerMin !== "") list = list.filter((p) => p.consumerPrice >= (f.consumerMin as number));
+      if (f.consumerMax !== "") list = list.filter((p) => p.consumerPrice <= (f.consumerMax as number));
+    }
+    return list;
+  }, [products, productSearch, appliedProductFilters]);
 
   const displayedProducts = useMemo(() => {
     return filteredProducts.slice(0, displayedCount);
   }, [filteredProducts, displayedCount]);
 
-  // Reset displayed count when search changes
+  const categoryNames = useMemo(() => [...new Set(categories.map((c) => c.name))].sort(), [categories]);
+  const companyNames = useMemo(() => [...new Set(companies.map((c) => c.name))].sort(), [companies]);
+
+  // Reset displayed count when search or filters change
   useEffect(() => {
     setDisplayedCount(50);
-  }, [productSearch]);
+  }, [productSearch, appliedProductFilters]);
 
   // Intersection Observer for lazy loading
   useEffect(() => {
@@ -180,7 +252,14 @@ export default function CatalogAdminPage() {
         throw new Error(error.error || "Failed to save category");
       }
 
-      await loadData();
+      const data = await res.json();
+      if (editingCategoryId) {
+        const updated = data as Category;
+        setCategories((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      } else {
+        const created = Array.isArray(data.categories) ? data.categories[0] : data;
+        if (created) setCategories((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
+      }
       setCategoryForm(emptyCategory);
       setEditingCategoryId(null);
       setModalOpen(false);
@@ -204,7 +283,7 @@ export default function CatalogAdminPage() {
         const error = await res.json().catch(() => ({}));
         throw new Error(error.error || "Failed to delete category");
       }
-      await loadData();
+      setCategories((prev) => prev.filter((c) => c.id !== id));
     } catch (err: unknown) {
       alert(getErrorMessage(err));
     } finally {
@@ -263,7 +342,22 @@ export default function CatalogAdminPage() {
         throw new Error(error.error || "Failed to save company");
       }
 
-      await loadData();
+      const data = await res.json();
+      const categoryNamesFromForm = (companyForm.categoryIds ?? [])
+        .map((id) => categories.find((c) => c.id === id)?.name)
+        .filter(Boolean) as string[];
+      if (editingCompanyId) {
+        const updated = { ...data, categories: categoryNamesFromForm };
+        setCompanies((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      } else {
+        const created = Array.isArray(data.companies) ? data.companies[0] : data;
+        if (created)
+          setCompanies((prev) =>
+            [...prev, { ...created, categories: categoryNamesFromForm }].sort((a, b) =>
+              a.name.localeCompare(b.name)
+            )
+          );
+      }
       setCompanyForm(emptyCompany);
       setEditingCompanyId(null);
       setModalOpen(false);
@@ -287,7 +381,7 @@ export default function CatalogAdminPage() {
         const error = await res.json().catch(() => ({}));
         throw new Error(error.error || "Failed to delete company");
       }
-      await loadData();
+      setCompanies((prev) => prev.filter((c) => c.id !== id));
       setModalOpen(false);
       setSelectedCompany(null);
     } catch (err: unknown) {
@@ -365,7 +459,13 @@ export default function CatalogAdminPage() {
         throw new Error(error.error || "Failed to save product");
       }
 
-      await loadData();
+      const data = await res.json();
+      const productPayload = Array.isArray(data.products) ? data.products[0] : data;
+      if (editingProductId) {
+        setProducts((prev) => prev.map((p) => (p.id === productPayload.id ? productPayload : p)));
+      } else if (productPayload) {
+        setProducts((prev) => [...prev, productPayload].sort((a, b) => a.name.localeCompare(b.name)));
+      }
       setProductForm(emptyProduct);
       setEditingProductId(null);
       setModalOpen(false);
@@ -389,7 +489,7 @@ export default function CatalogAdminPage() {
         const error = await res.json().catch(() => ({}));
         throw new Error(error.error || "Failed to delete product");
       }
-      await loadData();
+      setProducts((prev) => prev.filter((p) => p.id !== id));
       setModalOpen(false);
       setSelectedProduct(null);
     } catch (err: unknown) {
@@ -508,68 +608,75 @@ export default function CatalogAdminPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-6 sm:space-y-8 p-3 sm:p-0">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Catalog</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Catalog</h1>
+          <p className="text-xs sm:text-sm text-gray-500">
             Create, edit, or delete products, categories, and companies.
           </p>
         </div>
         <button
-          onClick={() => loadData()}
-          className="self-start rounded-lg border border-gray-200 bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+          onClick={() => void loadData()}
+          className="w-full sm:w-auto rounded-lg border border-gray-200 bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
         >
           Refresh
         </button>
       </div>
 
       {/* Categories */}
-      <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <section className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Categories</h2>
-            <p className="text-sm text-gray-500">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Categories</h2>
+            <p className="text-xs sm:text-sm text-gray-500">
               Add a new category or edit an existing one.
             </p>
           </div>
           <span className="text-xs text-gray-500">
-            {categories.length} total
+            {filteredCategories.length} of {categories.length}
           </span>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+          <input
+            type="text"
+            placeholder="Search categories..."
+            value={categorySearch}
+            onChange={(e) => setCategorySearch(e.target.value)}
+            className="w-full sm:w-56 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400"
+          />
           <button
             onClick={() => openModalForAdd("category")}
-            className="flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800"
+            className="flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 w-full sm:w-auto"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 shrink-0" />
             Add Category
           </button>
         </div>
 
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-4 overflow-x-auto -mx-3 sm:mx-0">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-3 py-2 text-left font-semibold text-gray-600">Name</th>
-                <th className="px-3 py-2 text-left font-semibold text-gray-600">URL</th>
-                <th className="px-3 py-2 text-left font-semibold text-gray-600">Products</th>
-                <th className="px-3 py-2 text-right font-semibold text-gray-600">Actions</th>
+                <th className="px-2 sm:px-3 py-2 text-left font-semibold text-gray-600">Name</th>
+                <th className="px-2 sm:px-3 py-2 text-left font-semibold text-gray-600 hidden sm:table-cell">URL</th>
+                <th className="px-2 sm:px-3 py-2 text-left font-semibold text-gray-600">Products</th>
+                <th className="px-2 sm:px-3 py-2 text-right font-semibold text-gray-600">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {categories.map((category) => (
+              {filteredCategories.map((category) => (
                 <tr
                   key={category.id}
                   className={`hover:bg-gray-50 transition-colors ${
                     selectedCategory?.id === category.id ? "bg-blue-50" : ""
                   }`}
                 >
-                  <td className="px-3 py-2 font-medium">{category.name}</td>
-                  <td className="px-3 py-2 text-gray-600">{category.url}</td>
-                  <td className="px-3 py-2 text-gray-600">{category.productCount}</td>
-                  <td className="px-3 py-2 text-right">
+                  <td className="px-2 sm:px-3 py-2 font-medium">{category.name}</td>
+                  <td className="px-2 sm:px-3 py-2 text-gray-600 hidden sm:table-cell">{category.url}</td>
+                  <td className="px-2 sm:px-3 py-2 text-gray-600">{category.productCount}</td>
+                  <td className="px-2 sm:px-3 py-2 text-right">
                     <button
                       className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
                       onClick={() => openModalForEdit("category", category)}
@@ -580,10 +687,10 @@ export default function CatalogAdminPage() {
                   </td>
                 </tr>
               ))}
-              {categories.length === 0 && (
+              {filteredCategories.length === 0 && (
                 <tr>
-                  <td className="px-3 py-3 text-sm text-gray-500" colSpan={4}>
-                    No categories yet.
+                  <td className="px-2 sm:px-3 py-3 text-sm text-gray-500" colSpan={4}>
+                    {categories.length === 0 ? "No categories yet." : "No categories match the search."}
                   </td>
                 </tr>
               )}
@@ -593,53 +700,60 @@ export default function CatalogAdminPage() {
       </section>
 
       {/* Companies */}
-      <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <section className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Companies</h2>
-            <p className="text-sm text-gray-500">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Companies</h2>
+            <p className="text-xs sm:text-sm text-gray-500">
               Link companies to categories for better browsing.
             </p>
           </div>
           <span className="text-xs text-gray-500">
-            {companies.length} total
+            {filteredCompanies.length} of {companies.length}
           </span>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+          <input
+            type="text"
+            placeholder="Search companies..."
+            value={companySearch}
+            onChange={(e) => setCompanySearch(e.target.value)}
+            className="w-full sm:w-56 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400"
+          />
           <button
             onClick={() => openModalForAdd("company")}
-            className="flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800"
+            className="flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 w-full sm:w-auto"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 shrink-0" />
             Add Company
           </button>
         </div>
 
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-4 overflow-x-auto -mx-3 sm:mx-0">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-3 py-2 text-left font-semibold text-gray-600">Name</th>
-                <th className="px-3 py-2 text-left font-semibold text-gray-600">Categories</th>
-                <th className="px-3 py-2 text-left font-semibold text-gray-600">Products</th>
-                <th className="px-3 py-2 text-right font-semibold text-gray-600">Actions</th>
+                <th className="px-2 sm:px-3 py-2 text-left font-semibold text-gray-600">Name</th>
+                <th className="px-2 sm:px-3 py-2 text-left font-semibold text-gray-600 hidden md:table-cell">Categories</th>
+                <th className="px-2 sm:px-3 py-2 text-left font-semibold text-gray-600">Products</th>
+                <th className="px-2 sm:px-3 py-2 text-right font-semibold text-gray-600">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {companies.map((company) => (
+              {filteredCompanies.map((company) => (
                 <tr
                   key={company.id}
                   className={`hover:bg-gray-50 transition-colors ${
                     selectedCompany?.id === company.id ? "bg-blue-50" : ""
                   }`}
                 >
-                  <td className="px-3 py-2 font-medium text-gray-900">{company.name}</td>
-                  <td className="px-3 py-2 text-gray-600">
+                  <td className="px-2 sm:px-3 py-2 font-medium text-gray-900">{company.name}</td>
+                  <td className="px-2 sm:px-3 py-2 text-gray-600 hidden md:table-cell">
                     {(company.categories || []).join(", ") || "—"}
                   </td>
-                  <td className="px-3 py-2 text-gray-600">{company.productCount}</td>
-                  <td className="px-3 py-2 text-right">
+                  <td className="px-2 sm:px-3 py-2 text-gray-600">{company.productCount}</td>
+                  <td className="px-2 sm:px-3 py-2 text-right">
                     <button
                       className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
                       onClick={() => openModalForEdit("company", company)}
@@ -650,10 +764,10 @@ export default function CatalogAdminPage() {
                   </td>
                 </tr>
               ))}
-              {companies.length === 0 && (
+              {filteredCompanies.length === 0 && (
                 <tr>
-                  <td className="px-3 py-3 text-sm text-gray-500" colSpan={4}>
-                    No companies yet.
+                  <td className="px-2 sm:px-3 py-3 text-sm text-gray-500" colSpan={4}>
+                    {companies.length === 0 ? "No companies yet." : "No companies match the search."}
                   </td>
                 </tr>
               )}
@@ -663,49 +777,58 @@ export default function CatalogAdminPage() {
       </section>
 
       {/* Products */}
-      <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <section className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Products</h2>
-            <p className="text-sm text-gray-500">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Products</h2>
+            <p className="text-xs sm:text-sm text-gray-500">
               Add, edit, or remove products from your catalog.
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="Search products"
-              value={productSearch}
-              onChange={(e) => setProductSearch(e.target.value)}
-              className="w-48 rounded border border-gray-200 px-3 py-2 text-sm"
-            />
-            <span className="text-xs text-gray-500">
-              Showing {displayedProducts.length} of {filteredProducts.length} {productSearch ? 'results' : 'products'}
-            </span>
-          </div>
+          <span className="text-xs text-gray-500">
+            Showing {displayedProducts.length} of {filteredProducts.length} {productSearch || appliedProductFilters ? "results" : "products"}
+          </span>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={productSearch}
+            onChange={(e) => setProductSearch(e.target.value)}
+            className="w-full sm:flex-1 sm:min-w-0 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              setDraftProductFilters(appliedProductFilters ?? emptyProductFilters());
+              setFilterModalOpen(true);
+            }}
+            className="flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 w-full sm:w-auto shrink-0"
+          >
+            <Filter className="w-4 h-4 shrink-0" />
+            Filter
+          </button>
           <button
             onClick={() => openModalForAdd("product")}
-            className="flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800"
+            className="flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 w-full sm:w-auto shrink-0"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 shrink-0" />
             Add Product
           </button>
         </div>
 
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-4 overflow-x-auto -mx-3 sm:mx-0">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-3 py-2 text-left font-semibold text-gray-600">Product</th>
-                <th className="px-3 py-2 text-left font-semibold text-gray-600">Company</th>
-                <th className="px-3 py-2 text-left font-semibold text-gray-600">Category</th>
-                <th className="px-3 py-2 text-left font-semibold text-gray-600">Consumer</th>
-                <th className="px-3 py-2 text-left font-semibold text-gray-600">Retail</th>
-                <th className="px-3 py-2 text-left font-semibold text-gray-600">Bulk</th>
-                <th className="px-3 py-2 text-right font-semibold text-gray-600">Actions</th>
+                <th className="px-2 sm:px-3 py-2 text-left font-semibold text-gray-600">Product</th>
+                <th className="px-2 sm:px-3 py-2 text-left font-semibold text-gray-600 hidden sm:table-cell">Company</th>
+                <th className="px-2 sm:px-3 py-2 text-left font-semibold text-gray-600 hidden md:table-cell">Category</th>
+                <th className="px-2 sm:px-3 py-2 text-left font-semibold text-gray-600 hidden lg:table-cell">Consumer</th>
+                <th className="px-2 sm:px-3 py-2 text-left font-semibold text-gray-600 hidden lg:table-cell">Retail</th>
+                <th className="px-2 sm:px-3 py-2 text-left font-semibold text-gray-600 hidden lg:table-cell">Bulk</th>
+                <th className="px-2 sm:px-3 py-2 text-right font-semibold text-gray-600">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -716,13 +839,13 @@ export default function CatalogAdminPage() {
                     selectedProduct?.id === product.id ? "bg-blue-50" : ""
                   }`}
                 >
-                  <td className="px-3 py-2 font-medium text-gray-900">{product.name}</td>
-                  <td className="px-3 py-2 text-gray-700">{product.company}</td>
-                  <td className="px-3 py-2 text-gray-700">{product.category}</td>
-                  <td className="px-3 py-2 text-gray-700">Rs {product.consumerPrice}</td>
-                  <td className="px-3 py-2 text-gray-700">Rs {product.retailPrice}</td>
-                  <td className="px-3 py-2 text-gray-700">Rs {product.bulkPrice}</td>
-                  <td className="px-3 py-2 text-right">
+                  <td className="px-2 sm:px-3 py-2 font-medium text-gray-900">{product.name}</td>
+                  <td className="px-2 sm:px-3 py-2 text-gray-700 hidden sm:table-cell">{product.company}</td>
+                  <td className="px-2 sm:px-3 py-2 text-gray-700 hidden md:table-cell">{product.category}</td>
+                  <td className="px-2 sm:px-3 py-2 text-gray-700 hidden lg:table-cell">Rs {product.consumerPrice}</td>
+                  <td className="px-2 sm:px-3 py-2 text-gray-700 hidden lg:table-cell">Rs {product.retailPrice}</td>
+                  <td className="px-2 sm:px-3 py-2 text-gray-700 hidden lg:table-cell">Rs {product.bulkPrice}</td>
+                  <td className="px-2 sm:px-3 py-2 text-right">
                     <button
                       className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
                       onClick={() => openModalForEdit("product", product)}
@@ -735,7 +858,7 @@ export default function CatalogAdminPage() {
               ))}
               {displayedProducts.length === 0 && (
                 <tr>
-                  <td className="px-3 py-3 text-sm text-gray-500" colSpan={7}>
+                  <td className="px-2 sm:px-3 py-3 text-sm text-gray-500" colSpan={7}>
                     No products match this search.
                   </td>
                 </tr>
@@ -750,6 +873,155 @@ export default function CatalogAdminPage() {
           )}
         </div>
       </section>
+
+      {/* Inventory Filters Modal */}
+      {filterModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+          <div className="absolute inset-0 bg-black/50" aria-hidden onClick={() => setFilterModalOpen(false)} />
+          <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col rounded-xl border border-gray-200 bg-white shadow-xl">
+            <div className="shrink-0 border-b border-gray-200 px-4 py-3 sm:px-6">
+              <h3 className="text-lg font-semibold text-gray-900">Filter Products</h3>
+              <p className="mt-0.5 text-sm text-gray-500">
+                Select multiple companies/categories and optional price or quantity ranges.
+              </p>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                {/* Companies */}
+                <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-3 sm:p-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Companies</h4>
+                  <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1">
+                    {companyNames.map((name) => (
+                      <label key={name} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={draftProductFilters.companyNames.includes(name)}
+                          onChange={() => {
+                            setDraftProductFilters((prev) => ({
+                              ...prev,
+                              companyNames: prev.companyNames.includes(name)
+                                ? prev.companyNames.filter((n) => n !== name)
+                                : [...prev.companyNames, name],
+                            }));
+                          }}
+                          className="rounded border-gray-300 text-gray-900 focus:ring-gray-500"
+                        />
+                        <span className="text-sm text-gray-800">{name}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setDraftProductFilters((prev) => ({ ...prev, companyNames: [] }))}
+                    className="mt-3 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+                  >
+                    Clear Companies
+                  </button>
+                </div>
+                {/* Categories */}
+                <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-3 sm:p-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Categories</h4>
+                  <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1">
+                    {categoryNames.map((name) => (
+                      <label key={name} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={draftProductFilters.categoryNames.includes(name)}
+                          onChange={() => {
+                            setDraftProductFilters((prev) => ({
+                              ...prev,
+                              categoryNames: prev.categoryNames.includes(name)
+                                ? prev.categoryNames.filter((n) => n !== name)
+                                : [...prev.categoryNames, name],
+                            }));
+                          }}
+                          className="rounded border-gray-300 text-gray-900 focus:ring-gray-500"
+                        />
+                        <span className="text-sm text-gray-800">{name}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setDraftProductFilters((prev) => ({ ...prev, categoryNames: [] }))}
+                    className="mt-3 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+                  >
+                    Clear Categories
+                  </button>
+                </div>
+                {/* Ranges */}
+                <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-3 sm:p-4 space-y-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Ranges</h4>
+                  {[
+                    { label: "Retail Price", minKey: "retailMin" as const, maxKey: "retailMax" as const },
+                    { label: "Bulk Price", minKey: "bulkMin" as const, maxKey: "bulkMax" as const },
+                    { label: "Consumer Price", minKey: "consumerMin" as const, maxKey: "consumerMax" as const },
+                    { label: "Quantity", minKey: "quantityMin" as const, maxKey: "quantityMax" as const },
+                  ].map(({ label, minKey, maxKey }) => (
+                    <div key={label}>
+                      <p className="text-xs font-medium text-gray-600 mb-1">{label}</p>
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          placeholder="Min"
+                          min={0}
+                          step={minKey.includes("Price") ? 0.01 : 1}
+                          value={draftProductFilters[minKey] === "" ? "" : draftProductFilters[minKey]}
+                          onChange={(e) => {
+                            const v = e.target.value === "" ? "" : parseFloat(e.target.value);
+                            if (v !== "" && Number.isNaN(v)) return;
+                            setDraftProductFilters((prev) => ({ ...prev, [minKey]: v }));
+                          }}
+                          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400"
+                        />
+                        <input
+                          type="number"
+                          placeholder="Max"
+                          min={0}
+                          step={maxKey.includes("Price") ? 0.01 : 1}
+                          value={draftProductFilters[maxKey] === "" ? "" : draftProductFilters[maxKey]}
+                          onChange={(e) => {
+                            const v = e.target.value === "" ? "" : parseFloat(e.target.value);
+                            if (v !== "" && Number.isNaN(v)) return;
+                            setDraftProductFilters((prev) => ({ ...prev, [maxKey]: v }));
+                          }}
+                          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="shrink-0 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 border-t border-gray-200 px-4 py-3 sm:px-6">
+              <button
+                type="button"
+                onClick={() => setDraftProductFilters(emptyProductFilters())}
+                className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+              >
+                Reset All
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterModalOpen(false)}
+                className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAppliedProductFilters({ ...draftProductFilters });
+                  setFilterModalOpen(false);
+                }}
+                className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700"
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Edit Modal */}
       <CatalogEditModal
