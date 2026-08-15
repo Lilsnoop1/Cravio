@@ -24,11 +24,11 @@ const ProductCard = ({ product, dest }: { product: Product; dest: string }) => {
 
   return (
     <div
-      className={`group h-full ${isSlider ? "flex-shrink-0 snap-start min-w-[110px] sm:min-w-[160px] max-w-[170px]" : "w-full"}`}
+      className={`group h-full ${isSlider ? "flex-shrink-0 snap-start w-[140px] sm:w-[168px]" : "w-full"}`}
     >
       <div className={`bg-white rounded-lg ${isSlider ? 'p-1.5' : 'p-1.5 sm:p-2'} h-full shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col`}>
         <div className={`relative ${isSlider ? 'mb-2' : 'mb-1.5 sm:mb-2'}`}>
-          <div className="relative overflow-hidden rounded-md bg-slate-100 aspect-[5/4] md:aspect-square w-full">
+          <div className="relative overflow-hidden rounded-md bg-slate-100 aspect-square w-full">
             <CatalogImage
               src={product.image}
               alt={product.name}
@@ -50,7 +50,7 @@ const ProductCard = ({ product, dest }: { product: Product; dest: string }) => {
           </button>
         </div>
 
-        <div className={`space-y-0.5 sm:space-y-1 ${isSlider ? 'border-t border-slate-100 pt-1.5' : 'border-t border-slate-100 pt-1 sm:pt-1.5 sm:border-t-0'}`}>
+        <div className={`flex flex-1 flex-col space-y-0.5 sm:space-y-1 ${isSlider ? 'border-t border-slate-100 pt-1.5' : 'border-t border-slate-100 pt-1 sm:pt-1.5 sm:border-t-0'}`}>
           <div className="flex items-baseline gap-0.5 sm:gap-1">
             <span className={`font-sifonn ${isSlider ? 'text-xs' : 'text-sm'} font-bold text-red-600`}>
               Rs {displayPrice}
@@ -62,14 +62,12 @@ const ProductCard = ({ product, dest }: { product: Product; dest: string }) => {
             ) : null}
           </div>
 
-          <h3 className={`font-sifonn ${isSlider ? 'text-[11px]' : 'text-sm sm:text-[15px]'} font-semibold text-slate-800 line-clamp-2 min-h-[1.5rem] sm:min-h-[1.8rem]`}>
+          <h3 className={`font-sifonn ${isSlider ? 'text-[11px] leading-4 h-8' : 'text-sm sm:text-[15px] leading-5 h-10'} font-semibold text-slate-800 line-clamp-2`}>
             {product.name}
           </h3>
-          {product.bulkPrice && (
-            <p className={`font-sifonn ${isSlider ? 'text-sm' : 'text-base sm:text-lg'} font-bold text-green-700`}>
-              Bulk: Rs {product.bulkPrice}
-            </p>
-          )}
+          <p className={`font-sifonn ${isSlider ? 'text-sm' : 'text-base sm:text-lg'} font-bold text-green-700 ${product.bulkPrice ? "" : "invisible"}`}>
+            Bulk: Rs {product.bulkPrice ?? 0}
+          </p>
         </div>
       </div>
     </div>

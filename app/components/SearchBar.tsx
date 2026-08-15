@@ -90,7 +90,7 @@ const SearchBar = ({ onSearch, onSort }: SearchBarProps) => {
   };
 
   return (
-    <div className="hidden md:block sticky top-0 z-40 py-5 px-4 md:px-6 bg-white/80 backdrop-blur">
+    <div className="hidden md:block sticky z-20 py-5 px-4 md:px-6 bg-white/80 backdrop-blur top-[var(--storefront-header-height,0px)]">
       <form
         onSubmit={handleSearch}
         ref={dropdownRef as unknown as React.RefObject<HTMLFormElement>}

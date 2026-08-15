@@ -235,7 +235,7 @@ const Navbar: React.FC = () => {
 
       </div>
       {menuOpen && (
-        <div className="fixed inset-0 z-[9998] md:hidden">
+        <div className="fixed inset-x-0 top-0 bottom-[56px] z-[9998] md:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setMenuOpen(false)} />
           <div className="absolute left-0 top-0 bottom-0 w-5/6 max-w-sm bg-white shadow-2xl rounded-r-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between mb-2">
@@ -262,9 +262,6 @@ const Navbar: React.FC = () => {
               </Link>
                 </>
               )}
-              <Link href="/help" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-slate-800 font-medium">
-                <span>Help Center</span>
-              </Link>
             </div>
             <div className="mt-auto">
               {session ? (

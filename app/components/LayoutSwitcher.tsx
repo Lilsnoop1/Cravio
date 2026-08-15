@@ -24,7 +24,7 @@ import { CategoryProvider } from "../context/categoriesContext";
 import { CompaniesProvider } from "../context/fetchCompanies";
 import { VendorProvider } from "../context/VendorContext";
 import VendorModal from "./VendorModal";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -42,10 +42,29 @@ const ADMIN_LINKS = [
 function ContentLayout({ children }: LayoutProps) {
   const { CartOpen, cartItems } = useCartContext();
   const isCartOpenOnDesktop = CartOpen && cartItems.length > 0;
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const sync = () => {
+      document.documentElement.style.setProperty(
+        "--storefront-header-height",
+        `${el.offsetHeight}px`
+      );
+    };
+    sync();
+    const observer = new ResizeObserver(sync);
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      document.documentElement.style.removeProperty("--storefront-header-height");
+    };
+  }, []);
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <div className="sticky top-0 z-30 shrink-0 bg-slate-50 border-b border-slate-200 shadow-sm">
+      <div ref={headerRef} className="sticky top-0 z-40 shrink-0 bg-slate-50 border-b border-slate-200 shadow-sm">
         <Headband />
         <BulkToast />
         <Navbar />

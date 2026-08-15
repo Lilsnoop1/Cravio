@@ -124,7 +124,7 @@ export default function Deals({Name, range, index, filterCategory, products: pro
 
           <div
             id={"deals-container"+Name}
-            className="flex overflow-x-auto gap-3 sm:gap-4 pr-2 scrollbar-hide w-full max-w-full min-w-0"
+            className="flex items-stretch overflow-x-auto gap-3 sm:gap-4 pr-2 scrollbar-hide w-full max-w-full min-w-0"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {rangedProducts.map((deal: Product, index:number) => (

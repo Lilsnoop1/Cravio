@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import LocationSelector from "./LocationSelector";
 
@@ -9,9 +11,15 @@ type Props = {
 };
 
 export default function MobileLocationDrawer({ isOpen, onClose }: Props) {
-  if (!isOpen) return null;
+  const [mounted, setMounted] = useState(false);
 
-  return (
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
+
+  return createPortal(
     <div className="fixed inset-0 z-[10020] flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-[98%] sm:w-[94%] max-w-2xl bg-white rounded-2xl shadow-2xl p-4 md:p-5 overflow-visible">
@@ -29,7 +37,7 @@ export default function MobileLocationDrawer({ isOpen, onClose }: Props) {
           <LocationSelector allowChange />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
-

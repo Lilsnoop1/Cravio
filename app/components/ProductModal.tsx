@@ -1,5 +1,6 @@
 "use client";
 import { X, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { useMemo } from "react";
 import { useProductModal } from "@/app/context/ProductModalContext";
 import { useCartContext } from "../context/CartContext";
 import { Product } from "../Data/database";
@@ -7,12 +8,36 @@ import { useProduct } from "../context/ProductsContext";
 import { useSession } from "next-auth/react";
 import CatalogImage from "./CatalogImage";
 
+const RELATED_LIMIT = 6;
+
 export default function ProductModal() {
   const {isOpen, product, setIsOpen } = useProductModal();
   const { addItem } = useCartContext();
   const { ProductFetch } = useProduct();
   const { data: session } = useSession();
   const isEmployee = session?.user?.role === "EMPLOYEE";
+
+  const similarProducts = useMemo(() => {
+    if (!product || !ProductFetch) return [];
+    return ProductFetch.filter(
+      (item: Product) =>
+        item.id !== product.id && item.category === product.category && item.image
+    ).slice(0, RELATED_LIMIT);
+  }, [ProductFetch, product]);
+
+  const alsoBought = useMemo(() => {
+    if (!product || !ProductFetch) return [];
+    const used = new Set<number>([product.id, ...similarProducts.map((item) => item.id)]);
+    const sameCompany = ProductFetch.filter(
+      (item: Product) => !used.has(item.id) && item.company === product.company && item.image
+    );
+    if (sameCompany.length >= RELATED_LIMIT) return sameCompany.slice(0, RELATED_LIMIT);
+    const rest = ProductFetch.filter(
+      (item: Product) => !used.has(item.id) && item.company !== product.company && item.image
+    );
+    return [...sameCompany, ...rest].slice(0, RELATED_LIMIT);
+  }, [ProductFetch, product, similarProducts]);
+
   if (!isOpen || !product) return null;
 
   const consumer = product.consumerPrice ?? product.price;
@@ -134,14 +159,14 @@ export default function ProductModal() {
 
               <div
                 id="similar-products"
-                className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2"
+                className="flex items-stretch gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2"
               >
-                {ProductFetch?ProductFetch.map((item:Product, index:number) => (
+                {similarProducts.map((item: Product) => (
                   <div
-                    key={index}
-                    className="group flex-shrink-0 w-36 snap-start"
+                    key={item.id}
+                    className="group flex-shrink-0 w-36 snap-start h-full"
                   >
-                    <div className="bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div className="bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col">
                       <div className="relative mb-3">
                         <div className="relative overflow-hidden rounded-lg bg-slate-100 aspect-square">
                           <CatalogImage
@@ -163,15 +188,15 @@ export default function ProductModal() {
                       <p className="font-sifonn text-sm font-bold text-slate-800 mb-1">
                         Rs {item.price}
                       </p>
-                      <p className="font-sifonn text-xs text-slate-600 line-clamp-2">
+                      <p className="font-sifonn text-xs text-slate-600 line-clamp-2 h-8">
                         {item.name}
                       </p>
-                      <p className="font-sifonn text-xs text-slate-500 mt-1">
+                      <p className="font-sifonn text-xs text-slate-500 mt-1 line-clamp-1">
                         {item.company}
                       </p>
                     </div>
                   </div>
-                )):null}
+                ))}
               </div>
 
               <button
@@ -198,14 +223,14 @@ export default function ProductModal() {
 
               <div
                 id="also-bought"
-                className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2"
+                className="flex items-stretch gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2"
               >
-                {ProductFetch?ProductFetch.map((item:Product, index:number) => (
+                {alsoBought.map((item: Product) => (
                   <div
-                    key={index}
-                    className="group flex-shrink-0 w-36 snap-start"
+                    key={item.id}
+                    className="group flex-shrink-0 w-36 snap-start h-full"
                   >
-                    <div className="bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div className="bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col">
                       <div className="relative mb-3">
                         <div className="relative overflow-hidden rounded-lg bg-slate-100 aspect-square">
                           <CatalogImage
@@ -227,15 +252,15 @@ export default function ProductModal() {
                       <p className="font-sifonn text-sm font-bold text-slate-800 mb-1">
                         ${item.price}
                       </p>
-                      <p className="font-sifonn text-xs text-slate-600 line-clamp-2">
+                      <p className="font-sifonn text-xs text-slate-600 line-clamp-2 h-8">
                         {item.name}
                       </p>
-                      <p className="font-sifonn text-xs text-slate-500 mt-1">
+                      <p className="font-sifonn text-xs text-slate-500 mt-1 line-clamp-1">
                         {item.company}
                       </p>
                     </div>
                   </div>
-                )):null}
+                ))}
               </div>
 
               <button
