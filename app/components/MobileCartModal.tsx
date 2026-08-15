@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, X, Plus, Minus, CheckCircle, Truck, ShoppingBag } from "lucide-react";
 import type { MobileCartModalProps } from "../Data/database";
 import type { Vendor } from "../Data/database";
+import CatalogImage from "./CatalogImage";
 
 const MAX_QUANTITY = 5000;
 const MIN_QUANTITY = 1;
@@ -277,11 +278,13 @@ const MobileCartModal = ({ isOpen, onClose }: MobileCartModalProps) => {
                     className="flex items-center gap-3 px-4 py-4"
                   >
                     {/* Product image */}
-                    <div className="w-16 h-16 rounded-xl border border-slate-200 overflow-hidden flex-shrink-0 bg-white p-1">
-                      <img
+                    <div className="relative w-16 h-16 rounded-xl border border-slate-200 overflow-hidden flex-shrink-0 bg-white p-1">
+                      <CatalogImage
                         src={item.product.image}
                         alt={item.product.name}
-                        className="w-full h-full object-contain"
+                        fill
+                        sizes="64px"
+                        className="object-contain p-1"
                       />
                     </div>
 

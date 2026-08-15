@@ -3,7 +3,6 @@ import { useLoginModal } from "@/app/context/LoginModalContext";
 import Image from "next/image";
 import {signOut, useSession } from "next-auth/react"
 import AccountInfo from "./AccountInfo";
-import LocationSelector from "./LocationSelector";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu, X, ChevronDown, Search, MapPin } from "lucide-react";
@@ -180,7 +179,7 @@ const Navbar: React.FC = () => {
         <div className="hidden md:flex flex-row justify-between py-3 px-5 items-center gap-5 w-full">
           <Link href={"/"} scroll={false}>
             <div className="flex flex-row md:gap-5 gap-2 w-fit flex-none">
-              <img src="/images/Cravio_Logo.png" className="w-15 sm:w-20 h-auto rounded-sm md:rounded-lg lg:rounded-xl"/>
+              <Image src="/images/Cravio_Logo.png" alt="Cravio" width={80} height={80} className="w-15 sm:w-20 h-auto rounded-sm md:rounded-lg lg:rounded-xl"/>
               <p className="self-center font-brasika text-primary hidden sm:text-sm md:block md:text-lg lg:text-2xl">Cravio</p>
             </div>
           </Link>

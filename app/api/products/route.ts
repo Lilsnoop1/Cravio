@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import fs from "fs";
 import path from "path";
 import { ensureAdminOrPosApiKey } from "@/lib/pos-or-admin-auth";
+import { CATALOG_CACHE_CONTROL, getProducts, revalidateCatalog } from "@/lib/catalog";
 
 type ProductInput = {
   name?: string;
@@ -110,20 +111,15 @@ export async function GET(request: Request) {
       if (authError) includeHidden = false;
     }
 
-    const products = await prisma.product.findMany({
-      where: includeHidden
-        ? {}
-        : {
-            isHidden: false,
-            OR: [{ companyId: null }, { companyRel: { isHidden: false } }],
-            AND: [
-              {
-                OR: [{ categoryId: null }, { categoryRel: { isHidden: false } }],
-              },
-            ],
-          },
-    });
-    return NextResponse.json(products);
+    const products = includeHidden
+      ? await prisma.product.findMany()
+      : await getProducts();
+    return NextResponse.json(
+      products,
+      includeHidden
+        ? undefined
+        : { headers: { "Cache-Control": CATALOG_CACHE_CONTROL } }
+    );
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
@@ -256,6 +252,7 @@ export async function POST(request: Request) {
         await new Promise((resolve) => setTimeout(resolve, 200));
       }
 
+      revalidateCatalog();
       return NextResponse.json(
         {
           message: "Products seeded successfully",
@@ -284,6 +281,7 @@ export async function POST(request: Request) {
       })
     );
 
+    revalidateCatalog();
     return NextResponse.json(
       { message: "Products created successfully", count: products.length, products },
       { status: 201 }

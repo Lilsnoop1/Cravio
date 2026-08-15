@@ -4,7 +4,7 @@ import { GoogleMap, Marker } from "@react-google-maps/api"
 import usePlacesAutocomplete, {getGeocode, getLatLng} from "use-places-autocomplete";
 import {Combobox, ComboboxInput, ComboboxPopover, ComboboxList, ComboboxOption} from "@reach/combobox"
 import { useLocation } from "../context/LocationContext";
-import { useGoogleMaps } from "../context/GoogleMapsProvider";
+import { GoogleMapsProvider, useGoogleMaps } from "../context/GoogleMapsProvider";
 import "@reach/combobox/styles.css"
 import { useSession } from "next-auth/react";
 import { useUserInfo } from "../context/UserInfoContext";
@@ -40,6 +40,14 @@ function GoogleMapsError({ title, message }: { title: string; message: string })
 }
 
 export default function LocationSelector({ allowChange = false }: LocationSelectorProps = {}){
+  return (
+    <GoogleMapsProvider>
+      <LocationSelectorLoaded allowChange={allowChange} />
+    </GoogleMapsProvider>
+  );
+}
+
+function LocationSelectorLoaded({ allowChange = false }: LocationSelectorProps = {}){
   const { isLoaded, loadError, apiKeyMissing } = useGoogleMaps();
 
   if (apiKeyMissing) {

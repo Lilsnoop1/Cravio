@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useVendorContext } from "../context/VendorContext";
+import CatalogImage from "../components/CatalogImage";
 
 const CheckoutPage = () => {
   const { cartItems, clearCart } = useCartContext();
@@ -383,9 +384,11 @@ const CheckoutPage = () => {
                 {cartItems.map((item, index: number) => (
                   <div key={index} className="flex gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
                     <div className="relative overflow-hidden rounded-lg w-16 h-16 flex-shrink-0">
-                      <img
+                      <CatalogImage
                         src={item.product.image}
                         alt={item.product.name}
+                        fill
+                        sizes="64px"
                         className="object-cover"
                       />
                     </div>

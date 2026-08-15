@@ -1,5 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
 import Card from "./Card";
 import { useCartContext } from "../context/CartContext";
@@ -10,7 +11,7 @@ type BannerSlide = {
   linkUrl?: string | null;
 };
 
-const Carousel: React.FC = () => {
+const Carousel: React.FC<{ banners?: BannerSlide[] }> = ({ banners }) => {
   const { cartItems, CartOpen } = useCartContext();
   const isCartOpen = cartItems.length > 0 && CartOpen;
 
@@ -25,9 +26,13 @@ const Carousel: React.FC = () => {
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
-  const [cards, setCards] = useState<BannerSlide[]>([]);
+  const [cards, setCards] = useState<BannerSlide[]>(banners ?? []);
 
   useEffect(() => {
+    if (banners) {
+      setCards(banners);
+      return;
+    }
     let cancelled = false;
     (async () => {
       try {
@@ -55,7 +60,7 @@ const Carousel: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [banners]);
 
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
   const scrollTo = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi]);
@@ -100,7 +105,7 @@ const Carousel: React.FC = () => {
             <div className="overflow-hidden rounded-none h-full" ref={emblaRef}>
               <div className="flex h-full">
                 {cards.map((card, i) => (
-                  <Card key={`${card.image}-${i}`} {...card} />
+                  <Card key={`${card.image}-${i}`} {...card} priority={i === 0} />
                 ))}
               </div>
             </div>
@@ -109,7 +114,7 @@ const Carousel: React.FC = () => {
               onClick={scrollNext}
               className="hidden md:flex items-center justify-center absolute -right-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-3 shadow transition"
             >
-              <img src="./images/right-arrow.png" className="w-5" alt="Next" />
+              <Image src="/images/right-arrow.png" alt="Next" width={20} height={20} className="w-5 h-5" />
             </button>
 
             <div className=" hidden md:flex justify-center gap-2 mt-6">
@@ -130,11 +135,13 @@ const Carousel: React.FC = () => {
           <div
             className={`hidden w-full ${hasBanners ? "lg:w-1/3" : "lg:w-full max-w-md"} rounded-2xl bg-primary text-accents p-6 shadow-md md:flex flex-col ${bannerHeight}`}
           >
-            <div className="flex-1 flex items-center justify-center">
-              <img
+            <div className="relative flex-1 flex items-center justify-center min-h-0">
+              <Image
                 src="/images/snacksimagebanner.jpeg"
                 alt="Snacks"
-                className="h-full w-full object-contain drop-shadow-2xl rounded-2xl"
+                fill
+                sizes="(max-width: 1024px) 0px, 33vw"
+                className="object-contain drop-shadow-2xl rounded-2xl"
               />
             </div>
             <div className="mt-4 space-y-3">

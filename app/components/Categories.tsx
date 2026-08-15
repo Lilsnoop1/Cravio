@@ -1,5 +1,6 @@
 "use client"
 import Link from 'next/link';
+import CatalogImage from './CatalogImage';
 import { ArrowRight } from 'lucide-react';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { usePathname } from 'next/navigation';
@@ -8,7 +9,13 @@ import { useCategory } from '../context/categoriesContext';
 import { useCompanies } from '../context/fetchCompanies';
 import { CategoryFetch, Company } from '../Data/database';
 
-export default function Categories() {
+export default function Categories({
+  categories: categoriesProp,
+  companies: companiesProp,
+}: {
+  categories?: CategoryFetch[];
+  companies?: Company[];
+} = {}) {
   // Shared "show all" state for both categories and companies
   const [showAll, setShowAll] = useState(() => {
     if (typeof window !== "undefined") {
@@ -21,8 +28,10 @@ export default function Categories() {
   const [slidesToScroll, setSlidesToScroll] = useState(1);
   const [visibleCompanies,setVisibleCompanies] = useState<Company[]>([]);
   const [visibleCategories,setVisibleCategories] = useState<CategoryFetch[]>([]);
-  const {CategoryFetched} = useCategory();
-  const {CompaniesFetch: companies, loading: companiesLoading} = useCompanies();
+  const {CategoryFetched: contextCategories} = useCategory();
+  const {CompaniesFetch: contextCompanies} = useCompanies();
+  const CategoryFetched = categoriesProp ?? contextCategories;
+  const companies = companiesProp ?? contextCompanies;
   const categoriesSlideRef = useRef<HTMLDivElement>(null);
   const companiesSlideRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -506,10 +515,12 @@ export default function Categories() {
                       className="w-full flex flex-col items-center gap-2 group"
                     >
                       <div className="relative overflow-hidden w-24 h-24 md:w-28 md:h-28 rounded-2xl flex items-center justify-center">
-                          <img
+                          <CatalogImage
                             src={category.url}
                             alt={category.name}
-                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                            fill
+                            sizes="112px"
+                            className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                           />
                       </div>
                       <div className="text-center w-full px-0.5">
@@ -548,10 +559,12 @@ export default function Categories() {
                         className="flex-shrink-0"
                       >
                         <div className="relative overflow-hidden w-24 h-24 md:w-28 md:h-28 rounded-2xl flex-col items-center justify-center">
-                            <img
-                              src={company.image ?? "/images/dummyimage.png"}
+                            <CatalogImage
+                              src={company.image}
                               alt={company.name}
-                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                              fill
+                              sizes="112px"
+                              className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                             />
                         </div>
                       </Link>

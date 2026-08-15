@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureStaffOrPosApiKey } from "@/lib/pos-or-admin-auth";
+import { revalidateCatalog } from "@/lib/catalog";
 
 type BannerPatch = {
   imageUrl?: string;
@@ -78,6 +79,7 @@ export async function PATCH(
       data,
     });
 
+    revalidateCatalog();
     return NextResponse.json(banner);
   } catch (error: unknown) {
     console.error("Error updating banner:", error);
@@ -107,6 +109,7 @@ export async function DELETE(
     }
 
     await prisma.marketingBanner.delete({ where: { id } });
+    revalidateCatalog();
     return NextResponse.json({ ok: true });
   } catch (error: unknown) {
     console.error("Error deleting banner:", error);

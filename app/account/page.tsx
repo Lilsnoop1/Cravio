@@ -7,6 +7,7 @@ import { MapPin, Phone, ArrowLeft, User, Mail, Save, CheckCircle } from 'lucide-
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import LocationSelector from '../components/LocationSelector';
+import CatalogImage from '../components/CatalogImage';
 
 const AccountPage = () => {
   const { selectedAddress, coordinates, setSelectedAddress, setCoordinates } = useLocation();
@@ -217,11 +218,13 @@ const AccountPage = () => {
             
             <div className="flex items-center gap-6">
               {userData?.image && (
-                <div className="relative">
-                  <img
+                <div className="relative w-24 h-24 rounded-full border-4 border-slate-200 overflow-hidden">
+                  <CatalogImage
                     src={userData.image}
                     alt="Profile"
-                    className="w-24 h-24 rounded-full border-4 border-slate-200 object-cover"
+                    fill
+                    sizes="96px"
+                    className="object-cover"
                   />
                 </div>
               )}

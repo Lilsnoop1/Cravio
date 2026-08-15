@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Grid3x3, Package, ShoppingBag } from "lucide-react";
@@ -29,7 +30,7 @@ const Subnav: React.FC = () => {
         )}
         <Link href="/companies" scroll={false}>
           <div className="flex flex-row gap-2 px-2 py-2 items-center">
-              <img src="/images/brand.png" className="w-10 h-10"/>
+              <Image src="/images/brand.png" alt="" width={40} height={40} className="w-10 h-10"/>
               <p className="font-sifonn text-accents">Companies</p>
           </div>
         </Link>

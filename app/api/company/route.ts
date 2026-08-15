@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import { Prisma } from "@/generated/prisma/client";
 import { ensureAdminOrPosApiKey } from "@/lib/pos-or-admin-auth";
+import { CATALOG_CACHE_CONTROL, getCompanies, revalidateCatalog } from "@/lib/catalog";
 
 type CompanyInput = {
   name: string;
@@ -139,6 +140,7 @@ export async function POST(request: Request) {
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
 
+      revalidateCatalog();
       return NextResponse.json(
         {
           message: "Companies seeded successfully",
@@ -213,6 +215,7 @@ export async function POST(request: Request) {
       results.push(companyRecord);
     }
 
+    revalidateCatalog();
     return NextResponse.json(
       {
         message: "Companies created/updated successfully",
@@ -254,30 +257,29 @@ export async function GET(request: Request) {
       if (authError) includeHidden = false;
     }
 
-    const companies = await prisma.company.findMany({
-      where: includeHidden ? {} : { isHidden: false },
-      orderBy: {
-        name: "asc",
-      },
-      include: {
-        categories: {
-          where: includeHidden ? {} : { isHidden: false },
-        },
-      },
+    if (includeHidden) {
+      const companies = await prisma.company.findMany({
+        where: {},
+        orderBy: { name: "asc" },
+        include: { categories: true },
+      });
+      const shaped = companies.map((c) => ({
+        id: c.id,
+        name: c.name,
+        image: c.image,
+        productCount: c.productCount,
+        isHidden: c.isHidden,
+        categories: c.categories.map((cat) => cat.name),
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt,
+      }));
+      return NextResponse.json(shaped);
+    }
+
+    const shaped = await getCompanies();
+    return NextResponse.json(shaped, {
+      headers: { "Cache-Control": CATALOG_CACHE_CONTROL },
     });
-
-    const shaped = companies.map((c) => ({
-      id: c.id,
-      name: c.name,
-      image: c.image,
-      productCount: c.productCount,
-      isHidden: c.isHidden,
-      categories: c.categories.map((cat) => cat.name),
-      createdAt: c.createdAt,
-      updatedAt: c.updatedAt,
-    }));
-
-    return NextResponse.json(shaped);
   } catch (error) {
     console.error("Error fetching companies:", error);
     return NextResponse.json(

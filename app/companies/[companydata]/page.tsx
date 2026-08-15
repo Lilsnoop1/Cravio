@@ -1,13 +1,41 @@
-import type { CompanyPageProps } from '@/app/Data/database';
-import { CompanyProductsClient } from './CompanyProductsClient';
+import { CompanyProductsClient } from "./CompanyProductsClient";
+import { companySlug, getCompanies, getProducts, normalizeSlug } from "@/lib/catalog";
 
-const normalizeSlug = (slug: string) => slug.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+export const revalidate = 300;
 
-export default async function CompanyProductsPage({ params }: { params: Promise<{ companydata: string }> }) {
+export async function generateStaticParams() {
+  try {
+    const companies = await getCompanies();
+    return companies.map((company) => ({
+      companydata: companySlug(company.name),
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export default async function CompanyProductsPage({
+  params,
+}: {
+  params: Promise<{ companydata: string }>;
+}) {
   const { companydata } = await params;
-  const companyName = companydata;
+  const normalizedSlug = normalizeSlug(companydata);
+
+  const [products, companies] = await Promise.all([getProducts(), getCompanies()]);
+
+  const company =
+    companies.find((c) => normalizeSlug(c.name) === normalizedSlug) ?? null;
+
+  const companyProducts = products.filter(
+    (product) => normalizeSlug(product.company) === normalizedSlug
+  );
 
   return (
-    <CompanyProductsClient companyName={companyName} />
+    <CompanyProductsClient
+      companyName={companydata}
+      company={company}
+      products={companyProducts}
+    />
   );
 }

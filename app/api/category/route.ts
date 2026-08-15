@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import { Prisma } from "@/generated/prisma/client";
 import { ensureAdminOrPosApiKey } from "@/lib/pos-or-admin-auth";
+import { CATALOG_CACHE_CONTROL, getCategories, revalidateCatalog } from "@/lib/catalog";
 
 type CategoryInput = {
   name: string;
@@ -80,6 +81,7 @@ export async function POST(request: Request) {
         )
       );
 
+      revalidateCatalog();
       return NextResponse.json(
         {
           message: "Categories seeded successfully",
@@ -136,6 +138,7 @@ export async function POST(request: Request) {
       )
     );
 
+    revalidateCatalog();
     return NextResponse.json(
       {
         message: "Categories created/updated successfully",
@@ -177,14 +180,18 @@ export async function GET(request: Request) {
       if (authError) includeHidden = false;
     }
 
-    const categories = await prisma.category.findMany({
-      where: includeHidden ? {} : { isHidden: false },
-      orderBy: {
-        name: "asc",
-      },
-    });
+    const categories = includeHidden
+      ? await prisma.category.findMany({
+          orderBy: { name: "asc" },
+        })
+      : await getCategories();
 
-    return NextResponse.json(categories);
+    return NextResponse.json(
+      categories,
+      includeHidden
+        ? undefined
+        : { headers: { "Cache-Control": CATALOG_CACHE_CONTROL } }
+    );
   } catch (error) {
     console.error("Error fetching categories:", error);
     return NextResponse.json(

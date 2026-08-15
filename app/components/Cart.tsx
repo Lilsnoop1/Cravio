@@ -10,6 +10,7 @@ import { useUserInfo } from "../context/UserInfoContext";
 import { useSession } from "next-auth/react";
 import { useLoginModal } from "@/app/context/LoginModalContext";
 import { useVendorContext } from "../context/VendorContext";
+import CatalogImage from "./CatalogImage";
 
 const Cart: React.FC = () => {
   const { cartItems, updateQuantity, removeItem, CartOpen } = useCartContext();
@@ -128,7 +129,7 @@ const Cart: React.FC = () => {
     <aside
       className={`${
         cartItems.length === 0 || !CartOpen ? "hidden" : "hidden md:flex"
-      } md:flex-col md:h-full md:self-stretch w-[420px] shrink-0 bg-white shadow-2xl z-50`}
+      } md:flex-col md:sticky md:top-0 md:h-dvh md:self-start md:overflow-y-auto w-[420px] shrink-0 bg-white shadow-2xl z-50`}
     >
       {/* Header */}
       <div className="px-5 py-4 border-b border-slate-100 bg-white">
@@ -224,11 +225,13 @@ const Cart: React.FC = () => {
                     className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors"
                   >
                     {/* Product image */}
-                    <div className="w-18 h-18 rounded-xl border border-slate-200 overflow-hidden flex-shrink-0 bg-white p-1.5">
-                      <img
+                    <div className="relative w-18 h-18 rounded-xl border border-slate-200 overflow-hidden flex-shrink-0 bg-white p-1.5">
+                      <CatalogImage
                         src={item.product.image}
                         alt={item.product.name}
-                        className="w-full h-full object-contain"
+                        fill
+                        sizes="72px"
+                        className="object-contain p-1.5"
                       />
                     </div>
 

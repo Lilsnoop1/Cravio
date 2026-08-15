@@ -10,6 +10,7 @@ const Loading = () => {
         height={200}
         className="animate-bounce"
         priority
+        unoptimized
       />
     </div>
   );

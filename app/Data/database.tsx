@@ -53,6 +53,7 @@ export interface DealsCardProps {
   range?: [number, number];
   index?: number;
   filterCategory?: string;
+  products?: Product[];
 }
 
 export interface CardProps {
@@ -60,6 +61,7 @@ export interface CardProps {
   title?: string;
   /** Optional click-through URL for marketing banners. */
   linkUrl?: string | null;
+  priority?: boolean;
 }
 
 export interface SearchBarProps {
@@ -69,6 +71,8 @@ export interface SearchBarProps {
 
 export interface CompanyProductsClientProps {
   companyName: string;
+  company?: Company | null;
+  products?: Product[];
 }
 
 export interface CompanyPageProps {

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, Package, Clock, CheckCircle, MapPin, Phone, User } from 'lucide-react';
 import Loading from '../components/Loading';
 import type { OrderProductItem, UserOrder } from '../Data/database';
+import CatalogImage from '../components/CatalogImage';
 
 const OrdersPage = () => {
   const { data: session } = useSession();
@@ -205,11 +206,15 @@ const OrdersPage = () => {
                       <div className="space-y-2">
                         {order.orderProducts.map((item) => (
                           <div key={item.id} className="flex items-center gap-3 p-2 bg-slate-50 rounded-lg">
-                            <img
-                              src={item.product.image}
-                              alt={item.product.name}
-                              className="w-12 h-12 rounded-lg object-cover"
-                            />
+                            <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                              <CatalogImage
+                                src={item.product.image}
+                                alt={item.product.name}
+                                fill
+                                sizes="48px"
+                                className="object-cover"
+                              />
+                            </div>
                             <div className="flex-1">
                               <p className="text-sm font-medium text-slate-800">{item.product.name}</p>
                             <p className="text-xs text-slate-500">Qty: {item.quantity} × Rs {item.product.price}</p>
@@ -336,11 +341,15 @@ const OrdersPage = () => {
                       <div className="space-y-2">
                         {order.orderProducts.map((item) => (
                           <div key={item.id} className="flex items-center gap-3 p-2 bg-slate-50 rounded-lg">
-                            <img
-                              src={item.product.image}
-                              alt={item.product.name}
-                              className="w-12 h-12 rounded-lg object-cover"
-                            />
+                            <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                              <CatalogImage
+                                src={item.product.image}
+                                alt={item.product.name}
+                                fill
+                                sizes="48px"
+                                className="object-cover"
+                              />
+                            </div>
                             <div className="flex-1">
                               <p className="text-sm font-medium text-slate-800">{item.product.name}</p>
                               <p className="text-xs text-slate-500">Qty: {item.quantity} × Rs {item.product.price}</p>
@@ -408,11 +417,15 @@ const OrdersPage = () => {
                       <div className="space-y-2">
                         {order.orderProducts.map((item) => (
                           <div key={item.id} className="flex items-center gap-3 p-2 bg-slate-50 rounded-lg">
-                            <img
-                              src={item.product.image}
-                              alt={item.product.name}
-                              className="w-12 h-12 rounded-lg object-cover"
-                            />
+                            <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                              <CatalogImage
+                                src={item.product.image}
+                                alt={item.product.name}
+                                fill
+                                sizes="48px"
+                                className="object-cover"
+                              />
+                            </div>
                             <div className="flex-1">
                               <p className="text-sm font-medium text-slate-800">{item.product.name}</p>
                               <p className="text-xs text-slate-500">Qty: {item.quantity} × Rs {item.product.price}</p>

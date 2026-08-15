@@ -3,56 +3,40 @@
 import { useMemo, useState } from "react";
 import type { CompanyProductsClientProps, Product } from "@/app/Data/database";
 import ProductCard from "@/app/components/ProductCard";
-import Loading from "@/app/components/Loading";
-import { useProduct } from "@/app/context/ProductsContext";
-import { useCompanies } from "@/app/context/fetchCompanies";
+import CatalogImage from "@/app/components/CatalogImage";
 
-const normalizeSlug = (slug: string) => slug.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-
-export function CompanyProductsClient({ companyName }: CompanyProductsClientProps) {
-  const { products, loading: productsLoading } = useProduct();
-  const { companies, loading: companiesLoading } = useCompanies();
+export function CompanyProductsClient({
+  companyName,
+  company,
+  products = [],
+}: CompanyProductsClientProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-
-  const normalizedSlug = normalizeSlug(companyName);
-  const hasCachedProducts = Array.isArray(products) && products.length > 0;
-  const hasCachedCompanies = Array.isArray(companies) && companies.length > 0;
-  const showDataLoader =
-    (productsLoading && !hasCachedProducts) || (companiesLoading && !hasCachedCompanies);
-
-  const companyProducts = hasCachedProducts
-    ? products.filter(
-        (product: Product) => normalizeSlug(product.company) === normalizedSlug
-      )
-    : [];
-
-  const company = hasCachedCompanies
-    ? companies.find((c) => normalizeSlug(c.name) === normalizedSlug)
-    : null;
 
   const displayName = company?.name || companyName.replace(/-/g, " ");
 
   const categoriesForCompany = useMemo(() => {
     const cats = Array.from(
-      new Set(companyProducts.map((p: Product) => p.category))
+      new Set(products.map((p: Product) => p.category))
     ).filter(Boolean);
     return cats.sort((a, b) => a.localeCompare(b));
-  }, [companyProducts]);
+  }, [products]);
 
   const visibleProducts =
     selectedCategory === "All"
-      ? companyProducts
-      : companyProducts.filter((p: Product) => p.category === selectedCategory);
+      ? products
+      : products.filter((p: Product) => p.category === selectedCategory);
 
   return (
     <div className="w-full max-w-6xl mx-auto p-4">
       <div className="flex items-center gap-3 mb-4">
         {company?.image && (
-          <div className="w-14 h-14 border rounded-full p-2 flex items-center justify-center bg-white">
-            <img
+          <div className="relative w-14 h-14 border rounded-full p-2 flex items-center justify-center bg-white overflow-hidden">
+            <CatalogImage
               src={company.image}
               alt={`${company.name} Logo`}
-              className="object-contain w-full h-full"
+              fill
+              sizes="56px"
+              className="object-contain p-2"
             />
           </div>
         )}
@@ -66,9 +50,7 @@ export function CompanyProductsClient({ companyName }: CompanyProductsClientProp
         </div>
       </div>
 
-      {showDataLoader ? (
-        <Loading />
-      ) : companyProducts.length === 0 ? (
+      {products.length === 0 ? (
         <div className="container mx-auto p-8 text-center">
           <h2 className="text-2xl font-bold text-red-600">Company Not Found</h2>
           <p className="mt-4 text-gray-600">

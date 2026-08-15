@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureStaffOrPosApiKey } from "@/lib/pos-or-admin-auth";
+import { CATALOG_CACHE_CONTROL, revalidateCatalog } from "@/lib/catalog";
 
 type BannerInput = {
   imageUrl?: string;
@@ -30,7 +31,12 @@ export async function GET(request: Request) {
       orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
     });
 
-    return NextResponse.json(banners);
+    return NextResponse.json(
+      banners,
+      includeInactive
+        ? undefined
+        : { headers: { "Cache-Control": CATALOG_CACHE_CONTROL } }
+    );
   } catch (error) {
     console.error("Error fetching banners:", error);
     return NextResponse.json({ error: "Failed to fetch banners" }, { status: 500 });
@@ -70,6 +76,7 @@ export async function POST(request: Request) {
       },
     });
 
+    revalidateCatalog();
     return NextResponse.json(banner, { status: 201 });
   } catch (error) {
     console.error("Error creating banner:", error);

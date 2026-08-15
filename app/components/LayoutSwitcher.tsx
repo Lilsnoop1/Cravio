@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 
@@ -17,14 +18,12 @@ import { ProductModalProvider } from "../context/ProductModalContext";
 import { LoginModalProvider } from "../context/LoginModalContext";
 import { CartProvider, useCartContext } from "../context/CartContext";
 import { LocationProvider } from "../context/LocationContext";
-import { GoogleMapsProvider } from "../context/GoogleMapsProvider";
 import { UserInfoProvider } from "../context/UserInfoContext";
 import { ProductsProvider } from "../context/ProductsContext";
 import { CategoryProvider } from "../context/categoriesContext";
 import { CompaniesProvider } from "../context/fetchCompanies";
 import { VendorProvider } from "../context/VendorContext";
 import VendorModal from "./VendorModal";
-import KeepAliveOutlet from "./KeepAliveOutlet";
 import { useEffect } from "react";
 
 type LayoutProps = {
@@ -45,16 +44,16 @@ function ContentLayout({ children }: LayoutProps) {
   const isCartOpenOnDesktop = CartOpen && cartItems.length > 0;
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <div className="shrink-0 bg-slate-50 border-b border-slate-200 shadow-sm">
+    <div className="flex min-h-dvh flex-col">
+      <div className="sticky top-0 z-30 shrink-0 bg-slate-50 border-b border-slate-200 shadow-sm">
         <Headband />
         <BulkToast />
         <Navbar />
         <Subnav />
       </div>
-      <div className="flex min-h-0 flex-1 overflow-hidden">
+      <div className="flex flex-1">
         <div
-          className={`min-h-0 min-w-0 flex-1 pt-[56px] pb-[56px] md:pt-0 md:pb-0 ${
+          className={`min-w-0 flex-1 pt-[56px] pb-[56px] md:pt-0 md:pb-0 ${
             isCartOpenOnDesktop ? "md:max-w-5xl" : ""
           }`}
         >
@@ -68,39 +67,32 @@ function ContentLayout({ children }: LayoutProps) {
 
 function SiteShell({ children }: LayoutProps) {
   return (
-    <GoogleMapsProvider>
-      <ProductsProvider>
-        <CategoryProvider>
-          <CompaniesProvider>
-            <ProductModalProvider>
-              <LoginModalProvider>
-                <VendorProvider>
-                  <CartProvider>
-                    <LocationProvider>
-                      <UserInfoProvider>
-                        {/* Fixed viewport shell so keep-alive panes scroll internally */}
-                        <div className="flex h-dvh flex-col overflow-hidden">
-                          <div className="min-h-0 flex-1">
-                            <ContentLayout>
-                              <KeepAliveOutlet>{children}</KeepAliveOutlet>
-                            </ContentLayout>
-                          </div>
-                          <MobileBottomNav />
-                          <PendingOrdersBanner />
-                          <LoginModal />
-                          <VendorModal />
-                          <ProductModal />
-                        </div>
-                      </UserInfoProvider>
-                    </LocationProvider>
-                  </CartProvider>
-                </VendorProvider>
-              </LoginModalProvider>
-            </ProductModalProvider>
-          </CompaniesProvider>
-        </CategoryProvider>
-      </ProductsProvider>
-    </GoogleMapsProvider>
+    <ProductsProvider>
+      <CategoryProvider>
+        <CompaniesProvider>
+          <ProductModalProvider>
+            <LoginModalProvider>
+              <VendorProvider>
+                <CartProvider>
+                  <LocationProvider>
+                    <UserInfoProvider>
+                      <div className="flex min-h-dvh flex-col">
+                        <ContentLayout>{children}</ContentLayout>
+                        <MobileBottomNav />
+                        <PendingOrdersBanner />
+                        <LoginModal />
+                        <VendorModal />
+                        <ProductModal />
+                      </div>
+                    </UserInfoProvider>
+                  </LocationProvider>
+                </CartProvider>
+              </VendorProvider>
+            </LoginModalProvider>
+          </ProductModalProvider>
+        </CompaniesProvider>
+      </CategoryProvider>
+    </ProductsProvider>
   );
 }
 
@@ -119,9 +111,11 @@ function AdminShell({ children }: LayoutProps) {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <Link href="/admin/analytics" className="flex items-center gap-3">
-              <img
+              <Image
                 src="/images/Cravio_Logo.png"
                 alt="Cravio"
+                width={40}
+                height={40}
                 className="h-10 w-10 rounded-lg border border-gray-100 object-contain"
               />
               <div>

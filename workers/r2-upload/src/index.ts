@@ -14,27 +14,7 @@ function json(status: number, body: Record<string, unknown>) {
 
 const handler = {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url);
-
-    // Serve objects (GET /<key>)
-    if (request.method === "GET") {
-      const key = url.pathname.replace(/^\/+/, "");
-      if (!key) {
-        return json(400, { error: "Missing object key" });
-      }
-      const object = await env.BUCKET.get(key);
-      if (!object) {
-        return json(404, { error: "Not found" });
-      }
-      const headers = new Headers();
-      if (object.httpMetadata?.contentType) {
-        headers.set("content-type", object.httpMetadata.contentType);
-      }
-      headers.set("cache-control", "public, max-age=31536000, immutable");
-      return new Response(object.body as unknown as BodyInit, { headers });
-    }
-
-    // Upload (POST)
+    // Upload (POST). Public reads go through cdn.craviopk.com, not this Worker.
     if (request.method !== "POST") {
       return json(405, { error: "Method not allowed" });
     }

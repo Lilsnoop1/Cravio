@@ -4,6 +4,7 @@ import { ChevronDown, MapPin, Package, LogOut, Phone, User } from 'lucide-react'
 import { useLocation } from '@/app/context/LocationContext';
 import { useUserInfo } from '@/app/context/UserInfoContext';
 import { useRouter } from 'next/navigation';
+import CatalogImage from './CatalogImage';
 import type { AccountInfoProps } from '@/app/Data/database';
 
 export default function AccountInfo({ session, onSignOut }: AccountInfoProps) {
@@ -44,11 +45,17 @@ export default function AccountInfo({ session, onSignOut }: AccountInfoProps) {
           onClick={() => setIsOpen(!isOpen)}
           className="flex flex-row bg-[#c0c0c0] text-black font-brasika py-2 px-1 md:px-5 gap-1 md:gap-5 rounded-xl items-center hover:opacity-90 transition-opacity"
         >
-          <img
-            src={session?.user?.image || ""}
-            alt="avatar"
-            className="w-10 h-10 rounded-full"
-          />
+          {session?.user?.image ? (
+            <CatalogImage
+              src={session.user.image}
+              alt="avatar"
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-slate-400" />
+          )}
           <p className="text-xs md:text-lg">{session?.user?.name}</p>
           <ChevronDown
             className={`w-4 h-4 md:w-5 md:h-5 transition-transform duration-200 ${

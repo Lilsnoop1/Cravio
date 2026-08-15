@@ -5,6 +5,7 @@ import { useCartContext } from "../context/CartContext";
 import { Product } from "../Data/database";
 import { useProduct } from "../context/ProductsContext";
 import { useSession } from "next-auth/react";
+import CatalogImage from "./CatalogImage";
 
 export default function ProductModal() {
   const {isOpen, product, setIsOpen } = useProductModal();
@@ -49,10 +50,12 @@ export default function ProductModal() {
         <div className="p-4 md:p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mb-6 md:mb-8 items-start md:items-center">
             <div className="relative overflow-hidden rounded-2xl bg-slate-100 aspect-square max-h-[260px] md:max-h-none">
-              <img
+              <CatalogImage
                 src={product.image}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 90vw, 400px"
+                className="object-cover"
               />
                 {isDiscounted && (
                   <div className="absolute top-3 left-3 bg-primary text-accents font-sifonn font-bold px-3 py-1 rounded-lg text-xs shadow-md">
@@ -141,10 +144,12 @@ export default function ProductModal() {
                     <div className="bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-300">
                       <div className="relative mb-3">
                         <div className="relative overflow-hidden rounded-lg bg-slate-100 aspect-square">
-                          <img
+                          <CatalogImage
                             src={item.image}
                             alt={item.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            fill
+                            sizes="144px"
+                            className="object-cover group-hover:scale-110 transition-transform duration-500"
                           />
                         </div>
                         <button
@@ -203,10 +208,12 @@ export default function ProductModal() {
                     <div className="bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-300">
                       <div className="relative mb-3">
                         <div className="relative overflow-hidden rounded-lg bg-slate-100 aspect-square">
-                          <img
+                          <CatalogImage
                             src={item.image}
                             alt={item.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            fill
+                            sizes="144px"
+                            className="object-cover group-hover:scale-110 transition-transform duration-500"
                           />
                         </div>
                         <button

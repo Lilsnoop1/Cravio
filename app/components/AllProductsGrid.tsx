@@ -5,12 +5,14 @@ import type { Product } from '../Data/database';
 import Loading from './Loading';
 import { useProduct } from '../context/ProductsContext';
 
-export default function AllProductsGrid() {
+export default function AllProductsGrid({ products: productsProp }: { products?: Product[] }) {
   const { ProductFetch, loading } = useProduct();
+  const catalog = productsProp ?? ProductFetch;
+  const isLoading = productsProp ? false : loading;
 
   const grouped = useMemo(() => {
-    if (!ProductFetch) return [];
-    const withImage = ProductFetch.filter((p: Product) => p.image);
+    if (!catalog) return [];
+    const withImage = catalog.filter((p: Product) => p.image);
     const map = new Map<string, Product[]>();
     withImage.forEach((p) => {
       const key = p.category || "Other";
@@ -18,9 +20,9 @@ export default function AllProductsGrid() {
       map.get(key)!.push(p);
     });
     return Array.from(map.entries()).map(([category, items]) => ({ category, items }));
-  }, [ProductFetch]);
+  }, [catalog]);
 
-  if (loading && (!ProductFetch || ProductFetch.length === 0)) {
+  if (isLoading && (!catalog || catalog.length === 0)) {
     return <Loading />;
   }
 
@@ -40,7 +42,7 @@ export default function AllProductsGrid() {
     <section className="py-4 px-0 sm:px-4 md:px-8 pb-24">
       <div className="w-full max-w-screen-xl mx-auto space-y-8">
         {grouped.map(({ category }) => (
-          <Deals key={category} Name={category} filterCategory={category} />
+          <Deals key={category} Name={category} filterCategory={category} products={productsProp} />
         ))}
       </div>
     </section>

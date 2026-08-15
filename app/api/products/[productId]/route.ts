@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { ensureAdminOrPosApiKey } from "@/lib/pos-or-admin-auth";
+import { revalidateCatalog } from "@/lib/catalog";
 
 const parseNullableNumber = (value: unknown) => {
   if (value === undefined) return undefined;
@@ -181,6 +182,7 @@ export async function PATCH(
       data,
     });
 
+    revalidateCatalog();
     return NextResponse.json(updated);
   } catch (error: unknown) {
     console.error("Error updating product:", error);
@@ -235,6 +237,7 @@ export async function DELETE(
     }
 
     await prisma.product.delete({ where: { id: productId } });
+    revalidateCatalog();
     return NextResponse.json({ message: "Product deleted successfully" });
   } catch (error: unknown) {
     console.error("Error deleting product:", error);

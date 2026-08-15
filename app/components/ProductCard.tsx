@@ -4,6 +4,7 @@ import { useProductModal } from "@/app/context/ProductModalContext";
 import { Plus } from "lucide-react";
 import { Product } from "@/app/Data/database";
 import { useSession } from "next-auth/react";
+import CatalogImage from "./CatalogImage";
 
 const ProductCard = ({ product, dest }: { product: Product; dest: string }) => {
   // Client-side hooks live here
@@ -28,10 +29,12 @@ const ProductCard = ({ product, dest }: { product: Product; dest: string }) => {
       <div className={`bg-white rounded-lg ${isSlider ? 'p-1.5' : 'p-1.5 sm:p-2'} h-full shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col`}>
         <div className={`relative ${isSlider ? 'mb-2' : 'mb-1.5 sm:mb-2'}`}>
           <div className="relative overflow-hidden rounded-md bg-slate-100 aspect-[5/4] md:aspect-square w-full">
-            <img
+            <CatalogImage
               src={product.image}
               alt={product.name}
-              className="w-full h-full  object-cover group-hover:scale-105 transition-transform duration-300"
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
               onClick={() => {
                 setProduct(product);
                 setIsOpen(true);

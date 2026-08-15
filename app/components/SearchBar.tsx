@@ -6,6 +6,7 @@ import { useProduct } from "../context/ProductsContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useProductModal } from "../context/ProductModalContext";
+import CatalogImage from "./CatalogImage";
 
 const SearchBar = ({ onSearch, onSort }: SearchBarProps) => {
   const { isOpen, setProduct } = useProductModal();
@@ -116,9 +117,11 @@ const SearchBar = ({ onSearch, onSort }: SearchBarProps) => {
                 onClick={() => { setProduct(snack); setIsOpen(true); }}
                 className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b last:border-b-0"
               >
-                <img
+                <CatalogImage
                   src={snack.image}
                   alt={snack.name}
+                  width={56}
+                  height={56}
                   className="h-14 w-14 flex-shrink-0 rounded-md object-cover shadow-sm"
                 />
                 <div className="flex flex-col gap-1 flex-1">

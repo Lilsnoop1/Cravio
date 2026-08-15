@@ -1,21 +1,26 @@
 "use client"
-import { ArrowRight, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import ProductCard from './ProductCard';
 import type { DealsCardProps, Product } from '../Data/database';
 import Loading from './Loading';
 import { useProduct } from '../context/ProductsContext';
 import { useCartContext } from '../context/CartContext';
 
-export default function Deals({Name, range, index, filterCategory}:DealsCardProps) {
+const CATEGORY_ROW_LIMIT = 12;
+
+export default function Deals({Name, range, index, filterCategory, products: productsProp}:DealsCardProps) {
   const [scrollPosition, setScrollPosition] = useState(0);
   const {ProductFetch, loading} = useProduct();
+  const catalog = productsProp ?? ProductFetch;
+  const isLoading = productsProp ? false : loading;
   const { cartItems, CartOpen } = useCartContext();
   const isCartOpen = cartItems.length > 0 && CartOpen;
   
   const rangedProducts = useMemo(() => {
-    if (!ProductFetch) return [];
-    let source = ProductFetch.filter((p: Product) => p.image);
+    if (!catalog) return [];
+    let source = catalog.filter((p: Product) => p.image);
     if (filterCategory) {
       source = source.filter((p) => p.category === filterCategory);
     }
@@ -39,8 +44,11 @@ export default function Deals({Name, range, index, filterCategory}:DealsCardProp
     if (typeof index === "number") {
       return source.slice(index, index + 1);
     }
+    if (filterCategory) {
+      return source.slice(0, CATEGORY_ROW_LIMIT);
+    }
     return source;
-  }, [ProductFetch, range, index, Name]);
+  }, [catalog, range, index, Name, filterCategory]);
 
   const scroll = (direction: 'left' | 'right') => {
     const container = document.getElementById(`deals-container${Name}`);
@@ -55,7 +63,7 @@ export default function Deals({Name, range, index, filterCategory}:DealsCardProp
     }
   };
 
-  if (loading && (!ProductFetch || ProductFetch.length === 0)) {
+  if (isLoading && (!catalog || catalog.length === 0)) {
     return (
       <section className="py-4 px-5">
         <div className="max-w-md lg:max-w-4xl md:max-w-2xl mx-auto">
@@ -94,6 +102,15 @@ export default function Deals({Name, range, index, filterCategory}:DealsCardProp
           <h2 className="font-sifonn text-2xl md:text-3xl font-semibold text-slate-900">
             {Name}
           </h2>
+          {filterCategory ? (
+            <Link
+              href={`/category/${encodeURIComponent(filterCategory)}`}
+              className="group inline-flex items-center gap-1 text-sm md:text-base text-slate-700 hover:text-amber-600 font-sifonn font-semibold transition-colors"
+            >
+              See all
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          ) : null}
         </div>
 
         <div className="relative group/carousel overflow-hidden max-w-screen w-full px-1 py-5 sm:px-6 md:px-8">

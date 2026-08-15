@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CatalogImage from "./CatalogImage";
 import type { CardProps } from "../Data/database";
 
 function resolveHref(linkUrl?: string | null): string | null {
@@ -20,15 +21,17 @@ function isInternalHref(href: string): boolean {
   return href.startsWith("/") || href.startsWith("#");
 }
 
-const Card = ({ image, title, linkUrl }: CardProps) => {
+const Card = ({ image, title, linkUrl, priority }: CardProps) => {
   const href = resolveHref(linkUrl);
   const img = (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
+    <CatalogImage
       src={image}
       alt={title || "Banner"}
+      fill
+      priority={priority}
+      sizes="(max-width: 1024px) 100vw, 66vw"
       draggable={false}
-      className={`h-full w-full object-cover rounded-lg md:rounded-3xl pointer-events-none${href ? " cursor-pointer" : ""}`}
+      className={`object-cover rounded-lg md:rounded-3xl pointer-events-none${href ? " cursor-pointer" : ""}`}
     />
   );
 
@@ -36,7 +39,7 @@ const Card = ({ image, title, linkUrl }: CardProps) => {
   const label = title ? `Open ${title}` : "Open banner link";
 
   return (
-    <div className="flex-[0_0_92%] md:flex-[0_0_100%] h-full px-[1.25px] min-w-0 md:px-2">
+    <div className="relative flex-[0_0_92%] md:flex-[0_0_100%] h-full px-[1.25px] min-w-0 md:px-2">
       {href && isInternalHref(href) ? (
         <Link href={href} className={linkClass} aria-label={label}>
           {img}

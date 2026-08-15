@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { ensureAdminOrPosApiKey } from "@/lib/pos-or-admin-auth";
+import { revalidateCatalog } from "@/lib/catalog";
 
 export async function GET(
   _request: Request,
@@ -115,6 +116,7 @@ export async function PATCH(
       });
     }
 
+    revalidateCatalog();
     return NextResponse.json(updated);
   } catch (error: unknown) {
     console.error("Error updating company:", error);
@@ -159,6 +161,7 @@ export async function DELETE(
     }
 
     await prisma.company.delete({ where: { id: companyId } });
+    revalidateCatalog();
     return NextResponse.json({ message: "Company deleted successfully" });
   } catch (error: unknown) {
     console.error("Error deleting company:", error);

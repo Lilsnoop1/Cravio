@@ -1,5 +1,6 @@
 "use client"
 import Link from "next/link";
+import CatalogImage from "../components/CatalogImage";
 import { useCompanies } from "../context/fetchCompanies";
 import Loading from "../components/Loading";
 
@@ -29,12 +30,14 @@ export default function CompaniesPage() {
               scroll={false}
               className="group flex flex-col items-center"
             >
-              <div className="w-full aspect-square mb-2 flex items-center justify-center shadow-sm">
+              <div className="relative w-full aspect-square mb-2 flex items-center justify-center shadow-sm">
                 {company.image ? (
-                  <img
+                  <CatalogImage
                     src={company.image}
                     alt={`${company.name} Logo`}
-                    className="w-full h-full object-contain"
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 16vw, 10vw"
+                    className="object-contain"
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-200 flex items-center justify-center">
