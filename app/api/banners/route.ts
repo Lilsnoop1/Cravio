@@ -5,9 +5,16 @@ import { ensureStaffOrPosApiKey } from "@/lib/pos-or-admin-auth";
 type BannerInput = {
   imageUrl?: string;
   title?: string | null;
+  linkUrl?: string | null;
   sortOrder?: number | string;
   isActive?: boolean;
 };
+
+function normalizeOptionalUrl(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
+}
 
 export async function GET(request: Request) {
   try {
@@ -51,11 +58,13 @@ export async function POST(request: Request) {
 
     const title =
       typeof body.title === "string" && body.title.trim() ? body.title.trim() : null;
+    const linkUrl = normalizeOptionalUrl(body.linkUrl);
 
     const banner = await prisma.marketingBanner.create({
       data: {
         imageUrl,
         title,
+        linkUrl,
         sortOrder,
         isActive: body.isActive ?? true,
       },

@@ -3,11 +3,18 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import {
+  buildBannerLinkUrl,
+  describeBannerLink,
+  parseBannerLinkUrl,
+  type BannerLinkKind,
+} from "@/app/lib/bannerLink";
 
 type MarketingBanner = {
   id: number;
   imageUrl: string;
   title: string | null;
+  linkUrl: string | null;
   sortOrder: number;
   isActive: boolean;
   createdAt?: string;
@@ -21,10 +28,16 @@ export default function BannersAdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [banners, setBanners] = useState<MarketingBanner[]>([]);
+  const [categoryNames, setCategoryNames] = useState<string[]>([]);
+  const [companyNames, setCompanyNames] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [title, setTitle] = useState("");
+  const [linkKind, setLinkKind] = useState<BannerLinkKind>("none");
+  const [externalUrl, setExternalUrl] = useState("");
+  const [linkCategory, setLinkCategory] = useState("");
+  const [linkCompany, setLinkCompany] = useState("");
   const [sortOrder, setSortOrder] = useState("0");
   const [isActive, setIsActive] = useState(true);
   const [imageUrl, setImageUrl] = useState("");
@@ -34,6 +47,39 @@ export default function BannersAdminPage() {
 
   const role = (session?.user as { role?: string } | undefined)?.role;
   const allowed = role === "ADMIN" || role === "EMPLOYEE";
+
+  const loadCatalogOptions = useCallback(async () => {
+    try {
+      const [catRes, compRes] = await Promise.all([
+        fetch("/api/category"),
+        fetch("/api/company"),
+      ]);
+      if (catRes.ok) {
+        const cats = await catRes.json();
+        if (Array.isArray(cats)) {
+          setCategoryNames(
+            cats
+              .map((c: { name?: string }) => c.name)
+              .filter((n: string | undefined): n is string => !!n?.trim())
+              .sort((a: string, b: string) => a.localeCompare(b))
+          );
+        }
+      }
+      if (compRes.ok) {
+        const comps = await compRes.json();
+        if (Array.isArray(comps)) {
+          setCompanyNames(
+            comps
+              .map((c: { name?: string }) => c.name)
+              .filter((n: string | undefined): n is string => !!n?.trim())
+              .sort((a: string, b: string) => a.localeCompare(b))
+          );
+        }
+      }
+    } catch {
+      /* optional */
+    }
+  }, []);
 
   const loadBanners = useCallback(async () => {
     setLoading(true);
@@ -57,11 +103,24 @@ export default function BannersAdminPage() {
       return;
     }
     void loadBanners();
-  }, [status, session, allowed, router, loadBanners]);
+    void loadCatalogOptions();
+  }, [status, session, allowed, router, loadBanners, loadCatalogOptions]);
+
+  const applyLinkFromBanner = (linkUrl: string | null) => {
+    const parsed = parseBannerLinkUrl(linkUrl, categoryNames, companyNames);
+    setLinkKind(parsed.kind);
+    setExternalUrl(parsed.externalUrl);
+    setLinkCategory(parsed.categoryName);
+    setLinkCompany(parsed.companyName);
+  };
 
   const resetForm = () => {
     setEditingId(null);
     setTitle("");
+    setLinkKind("none");
+    setExternalUrl("");
+    setLinkCategory("");
+    setLinkCompany("");
     setSortOrder("0");
     setIsActive(true);
     setImageUrl("");
@@ -73,6 +132,7 @@ export default function BannersAdminPage() {
   const startEdit = (b: MarketingBanner) => {
     setEditingId(b.id);
     setTitle(b.title ?? "");
+    applyLinkFromBanner(b.linkUrl);
     setSortOrder(String(b.sortOrder ?? 0));
     setIsActive(b.isActive);
     setImageUrl(b.imageUrl);
@@ -125,9 +185,29 @@ export default function BannersAdminPage() {
         setError("Upload an image or paste an image URL.");
         return;
       }
+      const resolvedLink = buildBannerLinkUrl({
+        kind: linkKind,
+        externalUrl,
+        categoryName: linkCategory,
+        companyName: linkCompany,
+      });
+      if (linkKind === "category" && !resolvedLink) {
+        setError("Select a category for the banner link.");
+        return;
+      }
+      if (linkKind === "company" && !resolvedLink) {
+        setError("Select a company for the banner link.");
+        return;
+      }
+      if (linkKind === "external" && !resolvedLink) {
+        setError("Enter an external URL, or choose No link.");
+        return;
+      }
+
       const payload = {
         imageUrl: resolvedUrl,
         title: title.trim() || null,
+        linkUrl: resolvedLink,
         sortOrder: Number(sortOrder) || 0,
         isActive,
       };
@@ -235,6 +315,74 @@ export default function BannersAdminPage() {
             />
           </div>
         </div>
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Banner click target
+            </label>
+            <select
+              value={linkKind}
+              onChange={(e) => setLinkKind(e.target.value as BannerLinkKind)}
+              className="w-full border border-slate-300 rounded-lg px-3 py-2 bg-white"
+            >
+              <option value="none">No link</option>
+              <option value="category">Category page</option>
+              <option value="company">Company page</option>
+              <option value="external">External / custom URL</option>
+            </select>
+            <p className="mt-1 text-xs text-slate-500">
+              Choose where the homepage banner goes when tapped.
+            </p>
+          </div>
+
+          {linkKind === "category" && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+              <select
+                value={linkCategory}
+                onChange={(e) => setLinkCategory(e.target.value)}
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 bg-white"
+              >
+                <option value="">Select category…</option>
+                {categoryNames.map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {linkKind === "company" && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Company</label>
+              <select
+                value={linkCompany}
+                onChange={(e) => setLinkCompany(e.target.value)}
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 bg-white"
+              >
+                <option value="">Select company…</option>
+                {companyNames.map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {linkKind === "external" && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">URL</label>
+              <input
+                value={externalUrl}
+                onChange={(e) => setExternalUrl(e.target.value)}
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 bg-white"
+                placeholder="https://… or /deals"
+              />
+            </div>
+          )}
+        </div>
         <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
@@ -320,7 +468,8 @@ export default function BannersAdminPage() {
                   {b.title || `Banner #${b.id}`}
                 </p>
                 <p className="text-xs text-slate-500">
-                  Sort {b.sortOrder} · {b.isActive ? "Active" : "Inactive"}
+                  Sort {b.sortOrder} · {b.isActive ? "Active" : "Inactive"} ·{" "}
+                  {describeBannerLink(b.linkUrl)}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">

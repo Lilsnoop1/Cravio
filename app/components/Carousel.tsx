@@ -7,6 +7,7 @@ import { useCartContext } from "../context/CartContext";
 type BannerSlide = {
   image: string;
   title: string;
+  linkUrl?: string | null;
 };
 
 const Carousel: React.FC = () => {
@@ -17,6 +18,9 @@ const Carousel: React.FC = () => {
     loop: true,
     align: "center",
     slidesToScroll: 1,
+    // Mouse drag fights native clicks; keep swipe on touch.
+    watchDrag: (_, event) =>
+      !("pointerType" in event) || (event as PointerEvent).pointerType !== "mouse",
   });
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -32,6 +36,7 @@ const Carousel: React.FC = () => {
         const data = (await res.json()) as Array<{
           imageUrl?: string;
           title?: string | null;
+          linkUrl?: string | null;
         }>;
         if (cancelled || !Array.isArray(data)) return;
         setCards(
@@ -40,6 +45,7 @@ const Carousel: React.FC = () => {
             .map((b, i) => ({
               image: b.imageUrl!.trim(),
               title: (b.title && b.title.trim()) || `Banner ${i + 1}`,
+              linkUrl: b.linkUrl?.trim() || null,
             }))
         );
       } catch {

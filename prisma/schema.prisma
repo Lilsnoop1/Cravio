@@ -104,6 +104,8 @@ model MarketingBanner {
   id        Int      @id @default(autoincrement())
   imageUrl  String
   title     String?
+  /// Optional URL opened when the homepage banner is clicked.
+  linkUrl   String?
   sortOrder Int      @default(0)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -256,6 +258,11 @@ model LocalSale {
   discountTotal  Float            @default(0)
   grossTotal     Float            @default(0)
   netTotal       Float            @default(0)
+  cashPaid       Float            @default(0)
+  onlinePaid     Float            @default(0)
+  cashCollected  Float            @default(0)
+  changeGiven    Float            @default(0)
+  creditAmount   Float            @default(0)
   createdAt      DateTime         @default(now())
   items          LocalSaleItem[]
 }
@@ -289,14 +296,21 @@ model LedgerEntry {
 }
 
 model LocalPurchase {
-  id             Int                @id @default(autoincrement())
-  vendorId       Int?
-  vendorName     String?
-  ledgerEntryId Int?
-  ledgerEntry    LedgerEntry?       @relation(fields: [ledgerEntryId], references: [id], onDelete: SetNull)
-  totalAmount    Float              @default(0)
-  createdAt      DateTime          @default(now())
-  items          LocalPurchaseItem[]
+  id               Int                @id @default(autoincrement())
+  vendorId         Int?
+  vendorName       String?
+  ledgerEntryId    Int?
+  ledgerEntry      LedgerEntry?       @relation(fields: [ledgerEntryId], references: [id], onDelete: SetNull)
+  totalAmount      Float              @default(0)
+  cashPaid         Float              @default(0)
+  onlinePaid       Float              @default(0)
+  cashCollected    Float              @default(0)
+  changeGiven      Float              @default(0)
+  creditAmount     Float              @default(0)
+  /// Optional local or uploaded path/URL for payment proof image.
+  paymentProofPath String?
+  createdAt        DateTime           @default(now())
+  items            LocalPurchaseItem[]
 }
 
 model LocalPurchaseItem {

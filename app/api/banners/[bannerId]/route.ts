@@ -5,9 +5,17 @@ import { ensureStaffOrPosApiKey } from "@/lib/pos-or-admin-auth";
 type BannerPatch = {
   imageUrl?: string;
   title?: string | null;
+  linkUrl?: string | null;
   sortOrder?: number | string;
   isActive?: boolean;
 };
+
+function normalizeOptionalUrl(value: unknown): string | null {
+  if (value === null) return null;
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
+}
 
 export async function PATCH(
   request: Request,
@@ -27,6 +35,7 @@ export async function PATCH(
     const data: {
       imageUrl?: string;
       title?: string | null;
+      linkUrl?: string | null;
       sortOrder?: number;
       isActive?: boolean;
     } = {};
@@ -42,6 +51,10 @@ export async function PATCH(
     if (body.title !== undefined) {
       data.title =
         typeof body.title === "string" && body.title.trim() ? body.title.trim() : null;
+    }
+
+    if (body.linkUrl !== undefined) {
+      data.linkUrl = normalizeOptionalUrl(body.linkUrl);
     }
 
     if (body.sortOrder !== undefined && body.sortOrder !== null && body.sortOrder !== "") {

@@ -40,6 +40,7 @@ export type MarketingBannerMinAggregateOutputType = {
   id: number | null
   imageUrl: string | null
   title: string | null
+  linkUrl: string | null
   sortOrder: number | null
   isActive: boolean | null
   createdAt: Date | null
@@ -50,6 +51,7 @@ export type MarketingBannerMaxAggregateOutputType = {
   id: number | null
   imageUrl: string | null
   title: string | null
+  linkUrl: string | null
   sortOrder: number | null
   isActive: boolean | null
   createdAt: Date | null
@@ -60,6 +62,7 @@ export type MarketingBannerCountAggregateOutputType = {
   id: number
   imageUrl: number
   title: number
+  linkUrl: number
   sortOrder: number
   isActive: number
   createdAt: number
@@ -82,6 +85,7 @@ export type MarketingBannerMinAggregateInputType = {
   id?: true
   imageUrl?: true
   title?: true
+  linkUrl?: true
   sortOrder?: true
   isActive?: true
   createdAt?: true
@@ -92,6 +96,7 @@ export type MarketingBannerMaxAggregateInputType = {
   id?: true
   imageUrl?: true
   title?: true
+  linkUrl?: true
   sortOrder?: true
   isActive?: true
   createdAt?: true
@@ -102,6 +107,7 @@ export type MarketingBannerCountAggregateInputType = {
   id?: true
   imageUrl?: true
   title?: true
+  linkUrl?: true
   sortOrder?: true
   isActive?: true
   createdAt?: true
@@ -199,6 +205,7 @@ export type MarketingBannerGroupByOutputType = {
   id: number
   imageUrl: string
   title: string | null
+  linkUrl: string | null
   sortOrder: number
   isActive: boolean
   createdAt: Date
@@ -232,6 +239,7 @@ export type MarketingBannerWhereInput = {
   id?: Prisma.IntFilter<"MarketingBanner"> | number
   imageUrl?: Prisma.StringFilter<"MarketingBanner"> | string
   title?: Prisma.StringNullableFilter<"MarketingBanner"> | string | null
+  linkUrl?: Prisma.StringNullableFilter<"MarketingBanner"> | string | null
   sortOrder?: Prisma.IntFilter<"MarketingBanner"> | number
   isActive?: Prisma.BoolFilter<"MarketingBanner"> | boolean
   createdAt?: Prisma.DateTimeFilter<"MarketingBanner"> | Date | string
@@ -242,6 +250,7 @@ export type MarketingBannerOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
+  linkUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -255,6 +264,7 @@ export type MarketingBannerWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.MarketingBannerWhereInput | Prisma.MarketingBannerWhereInput[]
   imageUrl?: Prisma.StringFilter<"MarketingBanner"> | string
   title?: Prisma.StringNullableFilter<"MarketingBanner"> | string | null
+  linkUrl?: Prisma.StringNullableFilter<"MarketingBanner"> | string | null
   sortOrder?: Prisma.IntFilter<"MarketingBanner"> | number
   isActive?: Prisma.BoolFilter<"MarketingBanner"> | boolean
   createdAt?: Prisma.DateTimeFilter<"MarketingBanner"> | Date | string
@@ -265,6 +275,7 @@ export type MarketingBannerOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
+  linkUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -283,6 +294,7 @@ export type MarketingBannerScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"MarketingBanner"> | number
   imageUrl?: Prisma.StringWithAggregatesFilter<"MarketingBanner"> | string
   title?: Prisma.StringNullableWithAggregatesFilter<"MarketingBanner"> | string | null
+  linkUrl?: Prisma.StringNullableWithAggregatesFilter<"MarketingBanner"> | string | null
   sortOrder?: Prisma.IntWithAggregatesFilter<"MarketingBanner"> | number
   isActive?: Prisma.BoolWithAggregatesFilter<"MarketingBanner"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"MarketingBanner"> | Date | string
@@ -292,6 +304,7 @@ export type MarketingBannerScalarWhereWithAggregatesInput = {
 export type MarketingBannerCreateInput = {
   imageUrl: string
   title?: string | null
+  linkUrl?: string | null
   sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
@@ -302,6 +315,7 @@ export type MarketingBannerUncheckedCreateInput = {
   id?: number
   imageUrl: string
   title?: string | null
+  linkUrl?: string | null
   sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
@@ -311,6 +325,7 @@ export type MarketingBannerUncheckedCreateInput = {
 export type MarketingBannerUpdateInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -321,6 +336,7 @@ export type MarketingBannerUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -331,6 +347,7 @@ export type MarketingBannerCreateManyInput = {
   id?: number
   imageUrl: string
   title?: string | null
+  linkUrl?: string | null
   sortOrder?: number
   isActive?: boolean
   createdAt?: Date | string
@@ -340,6 +357,7 @@ export type MarketingBannerCreateManyInput = {
 export type MarketingBannerUpdateManyMutationInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -350,6 +368,7 @@ export type MarketingBannerUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -360,6 +379,7 @@ export type MarketingBannerCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  linkUrl?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -375,6 +395,7 @@ export type MarketingBannerMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  linkUrl?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -385,6 +406,7 @@ export type MarketingBannerMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  linkUrl?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -402,6 +424,7 @@ export type MarketingBannerSelect<ExtArgs extends runtime.Types.Extensions.Inter
   id?: boolean
   imageUrl?: boolean
   title?: boolean
+  linkUrl?: boolean
   sortOrder?: boolean
   isActive?: boolean
   createdAt?: boolean
@@ -412,6 +435,7 @@ export type MarketingBannerSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   id?: boolean
   imageUrl?: boolean
   title?: boolean
+  linkUrl?: boolean
   sortOrder?: boolean
   isActive?: boolean
   createdAt?: boolean
@@ -422,6 +446,7 @@ export type MarketingBannerSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   id?: boolean
   imageUrl?: boolean
   title?: boolean
+  linkUrl?: boolean
   sortOrder?: boolean
   isActive?: boolean
   createdAt?: boolean
@@ -432,13 +457,14 @@ export type MarketingBannerSelectScalar = {
   id?: boolean
   imageUrl?: boolean
   title?: boolean
+  linkUrl?: boolean
   sortOrder?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type MarketingBannerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "imageUrl" | "title" | "sortOrder" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["marketingBanner"]>
+export type MarketingBannerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "imageUrl" | "title" | "linkUrl" | "sortOrder" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["marketingBanner"]>
 
 export type $MarketingBannerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "MarketingBanner"
@@ -447,6 +473,10 @@ export type $MarketingBannerPayload<ExtArgs extends runtime.Types.Extensions.Int
     id: number
     imageUrl: string
     title: string | null
+    /**
+     * Optional URL opened when the homepage banner is clicked.
+     */
+    linkUrl: string | null
     sortOrder: number
     isActive: boolean
     createdAt: Date
@@ -877,6 +907,7 @@ export interface MarketingBannerFieldRefs {
   readonly id: Prisma.FieldRef<"MarketingBanner", 'Int'>
   readonly imageUrl: Prisma.FieldRef<"MarketingBanner", 'String'>
   readonly title: Prisma.FieldRef<"MarketingBanner", 'String'>
+  readonly linkUrl: Prisma.FieldRef<"MarketingBanner", 'String'>
   readonly sortOrder: Prisma.FieldRef<"MarketingBanner", 'Int'>
   readonly isActive: Prisma.FieldRef<"MarketingBanner", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"MarketingBanner", 'DateTime'>

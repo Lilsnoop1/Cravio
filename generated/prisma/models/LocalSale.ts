@@ -34,6 +34,11 @@ export type LocalSaleAvgAggregateOutputType = {
   discountTotal: number | null
   grossTotal: number | null
   netTotal: number | null
+  cashPaid: number | null
+  onlinePaid: number | null
+  cashCollected: number | null
+  changeGiven: number | null
+  creditAmount: number | null
 }
 
 export type LocalSaleSumAggregateOutputType = {
@@ -44,6 +49,11 @@ export type LocalSaleSumAggregateOutputType = {
   discountTotal: number | null
   grossTotal: number | null
   netTotal: number | null
+  cashPaid: number | null
+  onlinePaid: number | null
+  cashCollected: number | null
+  changeGiven: number | null
+  creditAmount: number | null
 }
 
 export type LocalSaleMinAggregateOutputType = {
@@ -56,6 +66,11 @@ export type LocalSaleMinAggregateOutputType = {
   discountTotal: number | null
   grossTotal: number | null
   netTotal: number | null
+  cashPaid: number | null
+  onlinePaid: number | null
+  cashCollected: number | null
+  changeGiven: number | null
+  creditAmount: number | null
   createdAt: Date | null
 }
 
@@ -69,6 +84,11 @@ export type LocalSaleMaxAggregateOutputType = {
   discountTotal: number | null
   grossTotal: number | null
   netTotal: number | null
+  cashPaid: number | null
+  onlinePaid: number | null
+  cashCollected: number | null
+  changeGiven: number | null
+  creditAmount: number | null
   createdAt: Date | null
 }
 
@@ -82,6 +102,11 @@ export type LocalSaleCountAggregateOutputType = {
   discountTotal: number
   grossTotal: number
   netTotal: number
+  cashPaid: number
+  onlinePaid: number
+  cashCollected: number
+  changeGiven: number
+  creditAmount: number
   createdAt: number
   _all: number
 }
@@ -95,6 +120,11 @@ export type LocalSaleAvgAggregateInputType = {
   discountTotal?: true
   grossTotal?: true
   netTotal?: true
+  cashPaid?: true
+  onlinePaid?: true
+  cashCollected?: true
+  changeGiven?: true
+  creditAmount?: true
 }
 
 export type LocalSaleSumAggregateInputType = {
@@ -105,6 +135,11 @@ export type LocalSaleSumAggregateInputType = {
   discountTotal?: true
   grossTotal?: true
   netTotal?: true
+  cashPaid?: true
+  onlinePaid?: true
+  cashCollected?: true
+  changeGiven?: true
+  creditAmount?: true
 }
 
 export type LocalSaleMinAggregateInputType = {
@@ -117,6 +152,11 @@ export type LocalSaleMinAggregateInputType = {
   discountTotal?: true
   grossTotal?: true
   netTotal?: true
+  cashPaid?: true
+  onlinePaid?: true
+  cashCollected?: true
+  changeGiven?: true
+  creditAmount?: true
   createdAt?: true
 }
 
@@ -130,6 +170,11 @@ export type LocalSaleMaxAggregateInputType = {
   discountTotal?: true
   grossTotal?: true
   netTotal?: true
+  cashPaid?: true
+  onlinePaid?: true
+  cashCollected?: true
+  changeGiven?: true
+  creditAmount?: true
   createdAt?: true
 }
 
@@ -143,6 +188,11 @@ export type LocalSaleCountAggregateInputType = {
   discountTotal?: true
   grossTotal?: true
   netTotal?: true
+  cashPaid?: true
+  onlinePaid?: true
+  cashCollected?: true
+  changeGiven?: true
+  creditAmount?: true
   createdAt?: true
   _all?: true
 }
@@ -243,6 +293,11 @@ export type LocalSaleGroupByOutputType = {
   discountTotal: number
   grossTotal: number
   netTotal: number
+  cashPaid: number
+  onlinePaid: number
+  cashCollected: number
+  changeGiven: number
+  creditAmount: number
   createdAt: Date
   _count: LocalSaleCountAggregateOutputType | null
   _avg: LocalSaleAvgAggregateOutputType | null
@@ -279,6 +334,11 @@ export type LocalSaleWhereInput = {
   discountTotal?: Prisma.FloatFilter<"LocalSale"> | number
   grossTotal?: Prisma.FloatFilter<"LocalSale"> | number
   netTotal?: Prisma.FloatFilter<"LocalSale"> | number
+  cashPaid?: Prisma.FloatFilter<"LocalSale"> | number
+  onlinePaid?: Prisma.FloatFilter<"LocalSale"> | number
+  cashCollected?: Prisma.FloatFilter<"LocalSale"> | number
+  changeGiven?: Prisma.FloatFilter<"LocalSale"> | number
+  creditAmount?: Prisma.FloatFilter<"LocalSale"> | number
   createdAt?: Prisma.DateTimeFilter<"LocalSale"> | Date | string
   ledgerEntry?: Prisma.XOR<Prisma.LedgerEntryNullableScalarRelationFilter, Prisma.LedgerEntryWhereInput> | null
   receipt?: Prisma.XOR<Prisma.ReceiptNullableScalarRelationFilter, Prisma.ReceiptWhereInput> | null
@@ -296,6 +356,11 @@ export type LocalSaleOrderByWithRelationInput = {
   discountTotal?: Prisma.SortOrder
   grossTotal?: Prisma.SortOrder
   netTotal?: Prisma.SortOrder
+  cashPaid?: Prisma.SortOrder
+  onlinePaid?: Prisma.SortOrder
+  cashCollected?: Prisma.SortOrder
+  changeGiven?: Prisma.SortOrder
+  creditAmount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   ledgerEntry?: Prisma.LedgerEntryOrderByWithRelationInput
   receipt?: Prisma.ReceiptOrderByWithRelationInput
@@ -316,6 +381,11 @@ export type LocalSaleWhereUniqueInput = Prisma.AtLeast<{
   discountTotal?: Prisma.FloatFilter<"LocalSale"> | number
   grossTotal?: Prisma.FloatFilter<"LocalSale"> | number
   netTotal?: Prisma.FloatFilter<"LocalSale"> | number
+  cashPaid?: Prisma.FloatFilter<"LocalSale"> | number
+  onlinePaid?: Prisma.FloatFilter<"LocalSale"> | number
+  cashCollected?: Prisma.FloatFilter<"LocalSale"> | number
+  changeGiven?: Prisma.FloatFilter<"LocalSale"> | number
+  creditAmount?: Prisma.FloatFilter<"LocalSale"> | number
   createdAt?: Prisma.DateTimeFilter<"LocalSale"> | Date | string
   ledgerEntry?: Prisma.XOR<Prisma.LedgerEntryNullableScalarRelationFilter, Prisma.LedgerEntryWhereInput> | null
   receipt?: Prisma.XOR<Prisma.ReceiptNullableScalarRelationFilter, Prisma.ReceiptWhereInput> | null
@@ -333,6 +403,11 @@ export type LocalSaleOrderByWithAggregationInput = {
   discountTotal?: Prisma.SortOrder
   grossTotal?: Prisma.SortOrder
   netTotal?: Prisma.SortOrder
+  cashPaid?: Prisma.SortOrder
+  onlinePaid?: Prisma.SortOrder
+  cashCollected?: Prisma.SortOrder
+  changeGiven?: Prisma.SortOrder
+  creditAmount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.LocalSaleCountOrderByAggregateInput
   _avg?: Prisma.LocalSaleAvgOrderByAggregateInput
@@ -354,6 +429,11 @@ export type LocalSaleScalarWhereWithAggregatesInput = {
   discountTotal?: Prisma.FloatWithAggregatesFilter<"LocalSale"> | number
   grossTotal?: Prisma.FloatWithAggregatesFilter<"LocalSale"> | number
   netTotal?: Prisma.FloatWithAggregatesFilter<"LocalSale"> | number
+  cashPaid?: Prisma.FloatWithAggregatesFilter<"LocalSale"> | number
+  onlinePaid?: Prisma.FloatWithAggregatesFilter<"LocalSale"> | number
+  cashCollected?: Prisma.FloatWithAggregatesFilter<"LocalSale"> | number
+  changeGiven?: Prisma.FloatWithAggregatesFilter<"LocalSale"> | number
+  creditAmount?: Prisma.FloatWithAggregatesFilter<"LocalSale"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"LocalSale"> | Date | string
 }
 
@@ -364,6 +444,11 @@ export type LocalSaleCreateInput = {
   discountTotal?: number
   grossTotal?: number
   netTotal?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
   createdAt?: Date | string
   ledgerEntry?: Prisma.LedgerEntryCreateNestedOneWithoutLocalSalesInput
   receipt?: Prisma.ReceiptCreateNestedOneWithoutSaleReferencingReceiptInput
@@ -381,6 +466,11 @@ export type LocalSaleUncheckedCreateInput = {
   discountTotal?: number
   grossTotal?: number
   netTotal?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
   createdAt?: Date | string
   receiptForSale?: Prisma.ReceiptUncheckedCreateNestedOneWithoutLocalSaleInput
   items?: Prisma.LocalSaleItemUncheckedCreateNestedManyWithoutLocalSaleInput
@@ -393,6 +483,11 @@ export type LocalSaleUpdateInput = {
   discountTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   grossTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   netTotal?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ledgerEntry?: Prisma.LedgerEntryUpdateOneWithoutLocalSalesNestedInput
   receipt?: Prisma.ReceiptUpdateOneWithoutSaleReferencingReceiptNestedInput
@@ -410,6 +505,11 @@ export type LocalSaleUncheckedUpdateInput = {
   discountTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   grossTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   netTotal?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   receiptForSale?: Prisma.ReceiptUncheckedUpdateOneWithoutLocalSaleNestedInput
   items?: Prisma.LocalSaleItemUncheckedUpdateManyWithoutLocalSaleNestedInput
@@ -425,6 +525,11 @@ export type LocalSaleCreateManyInput = {
   discountTotal?: number
   grossTotal?: number
   netTotal?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
   createdAt?: Date | string
 }
 
@@ -435,6 +540,11 @@ export type LocalSaleUpdateManyMutationInput = {
   discountTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   grossTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   netTotal?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -448,6 +558,11 @@ export type LocalSaleUncheckedUpdateManyInput = {
   discountTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   grossTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   netTotal?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -471,6 +586,11 @@ export type LocalSaleCountOrderByAggregateInput = {
   discountTotal?: Prisma.SortOrder
   grossTotal?: Prisma.SortOrder
   netTotal?: Prisma.SortOrder
+  cashPaid?: Prisma.SortOrder
+  onlinePaid?: Prisma.SortOrder
+  cashCollected?: Prisma.SortOrder
+  changeGiven?: Prisma.SortOrder
+  creditAmount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -482,6 +602,11 @@ export type LocalSaleAvgOrderByAggregateInput = {
   discountTotal?: Prisma.SortOrder
   grossTotal?: Prisma.SortOrder
   netTotal?: Prisma.SortOrder
+  cashPaid?: Prisma.SortOrder
+  onlinePaid?: Prisma.SortOrder
+  cashCollected?: Prisma.SortOrder
+  changeGiven?: Prisma.SortOrder
+  creditAmount?: Prisma.SortOrder
 }
 
 export type LocalSaleMaxOrderByAggregateInput = {
@@ -494,6 +619,11 @@ export type LocalSaleMaxOrderByAggregateInput = {
   discountTotal?: Prisma.SortOrder
   grossTotal?: Prisma.SortOrder
   netTotal?: Prisma.SortOrder
+  cashPaid?: Prisma.SortOrder
+  onlinePaid?: Prisma.SortOrder
+  cashCollected?: Prisma.SortOrder
+  changeGiven?: Prisma.SortOrder
+  creditAmount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -507,6 +637,11 @@ export type LocalSaleMinOrderByAggregateInput = {
   discountTotal?: Prisma.SortOrder
   grossTotal?: Prisma.SortOrder
   netTotal?: Prisma.SortOrder
+  cashPaid?: Prisma.SortOrder
+  onlinePaid?: Prisma.SortOrder
+  cashCollected?: Prisma.SortOrder
+  changeGiven?: Prisma.SortOrder
+  creditAmount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -518,6 +653,11 @@ export type LocalSaleSumOrderByAggregateInput = {
   discountTotal?: Prisma.SortOrder
   grossTotal?: Prisma.SortOrder
   netTotal?: Prisma.SortOrder
+  cashPaid?: Prisma.SortOrder
+  onlinePaid?: Prisma.SortOrder
+  cashCollected?: Prisma.SortOrder
+  changeGiven?: Prisma.SortOrder
+  creditAmount?: Prisma.SortOrder
 }
 
 export type LocalSaleListRelationFilter = {
@@ -639,6 +779,11 @@ export type LocalSaleCreateWithoutReceiptForSaleInput = {
   discountTotal?: number
   grossTotal?: number
   netTotal?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
   createdAt?: Date | string
   ledgerEntry?: Prisma.LedgerEntryCreateNestedOneWithoutLocalSalesInput
   receipt?: Prisma.ReceiptCreateNestedOneWithoutSaleReferencingReceiptInput
@@ -655,6 +800,11 @@ export type LocalSaleUncheckedCreateWithoutReceiptForSaleInput = {
   discountTotal?: number
   grossTotal?: number
   netTotal?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
   createdAt?: Date | string
   items?: Prisma.LocalSaleItemUncheckedCreateNestedManyWithoutLocalSaleInput
 }
@@ -671,6 +821,11 @@ export type LocalSaleCreateWithoutReceiptInput = {
   discountTotal?: number
   grossTotal?: number
   netTotal?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
   createdAt?: Date | string
   ledgerEntry?: Prisma.LedgerEntryCreateNestedOneWithoutLocalSalesInput
   receiptForSale?: Prisma.ReceiptCreateNestedOneWithoutLocalSaleInput
@@ -686,6 +841,11 @@ export type LocalSaleUncheckedCreateWithoutReceiptInput = {
   discountTotal?: number
   grossTotal?: number
   netTotal?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
   createdAt?: Date | string
   receiptForSale?: Prisma.ReceiptUncheckedCreateNestedOneWithoutLocalSaleInput
   items?: Prisma.LocalSaleItemUncheckedCreateNestedManyWithoutLocalSaleInput
@@ -714,6 +874,11 @@ export type LocalSaleUpdateWithoutReceiptForSaleInput = {
   discountTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   grossTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   netTotal?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ledgerEntry?: Prisma.LedgerEntryUpdateOneWithoutLocalSalesNestedInput
   receipt?: Prisma.ReceiptUpdateOneWithoutSaleReferencingReceiptNestedInput
@@ -730,6 +895,11 @@ export type LocalSaleUncheckedUpdateWithoutReceiptForSaleInput = {
   discountTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   grossTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   netTotal?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.LocalSaleItemUncheckedUpdateManyWithoutLocalSaleNestedInput
 }
@@ -752,6 +922,11 @@ export type LocalSaleUpdateWithoutReceiptInput = {
   discountTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   grossTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   netTotal?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ledgerEntry?: Prisma.LedgerEntryUpdateOneWithoutLocalSalesNestedInput
   receiptForSale?: Prisma.ReceiptUpdateOneWithoutLocalSaleNestedInput
@@ -767,6 +942,11 @@ export type LocalSaleUncheckedUpdateWithoutReceiptInput = {
   discountTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   grossTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   netTotal?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   receiptForSale?: Prisma.ReceiptUncheckedUpdateOneWithoutLocalSaleNestedInput
   items?: Prisma.LocalSaleItemUncheckedUpdateManyWithoutLocalSaleNestedInput
@@ -779,6 +959,11 @@ export type LocalSaleCreateWithoutItemsInput = {
   discountTotal?: number
   grossTotal?: number
   netTotal?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
   createdAt?: Date | string
   ledgerEntry?: Prisma.LedgerEntryCreateNestedOneWithoutLocalSalesInput
   receipt?: Prisma.ReceiptCreateNestedOneWithoutSaleReferencingReceiptInput
@@ -795,6 +980,11 @@ export type LocalSaleUncheckedCreateWithoutItemsInput = {
   discountTotal?: number
   grossTotal?: number
   netTotal?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
   createdAt?: Date | string
   receiptForSale?: Prisma.ReceiptUncheckedCreateNestedOneWithoutLocalSaleInput
 }
@@ -822,6 +1012,11 @@ export type LocalSaleUpdateWithoutItemsInput = {
   discountTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   grossTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   netTotal?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ledgerEntry?: Prisma.LedgerEntryUpdateOneWithoutLocalSalesNestedInput
   receipt?: Prisma.ReceiptUpdateOneWithoutSaleReferencingReceiptNestedInput
@@ -838,6 +1033,11 @@ export type LocalSaleUncheckedUpdateWithoutItemsInput = {
   discountTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   grossTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   netTotal?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   receiptForSale?: Prisma.ReceiptUncheckedUpdateOneWithoutLocalSaleNestedInput
 }
@@ -849,6 +1049,11 @@ export type LocalSaleCreateWithoutLedgerEntryInput = {
   discountTotal?: number
   grossTotal?: number
   netTotal?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
   createdAt?: Date | string
   receipt?: Prisma.ReceiptCreateNestedOneWithoutSaleReferencingReceiptInput
   receiptForSale?: Prisma.ReceiptCreateNestedOneWithoutLocalSaleInput
@@ -864,6 +1069,11 @@ export type LocalSaleUncheckedCreateWithoutLedgerEntryInput = {
   discountTotal?: number
   grossTotal?: number
   netTotal?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
   createdAt?: Date | string
   receiptForSale?: Prisma.ReceiptUncheckedCreateNestedOneWithoutLocalSaleInput
   items?: Prisma.LocalSaleItemUncheckedCreateNestedManyWithoutLocalSaleInput
@@ -908,6 +1118,11 @@ export type LocalSaleScalarWhereInput = {
   discountTotal?: Prisma.FloatFilter<"LocalSale"> | number
   grossTotal?: Prisma.FloatFilter<"LocalSale"> | number
   netTotal?: Prisma.FloatFilter<"LocalSale"> | number
+  cashPaid?: Prisma.FloatFilter<"LocalSale"> | number
+  onlinePaid?: Prisma.FloatFilter<"LocalSale"> | number
+  cashCollected?: Prisma.FloatFilter<"LocalSale"> | number
+  changeGiven?: Prisma.FloatFilter<"LocalSale"> | number
+  creditAmount?: Prisma.FloatFilter<"LocalSale"> | number
   createdAt?: Prisma.DateTimeFilter<"LocalSale"> | Date | string
 }
 
@@ -920,6 +1135,11 @@ export type LocalSaleCreateManyLedgerEntryInput = {
   discountTotal?: number
   grossTotal?: number
   netTotal?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
   createdAt?: Date | string
 }
 
@@ -930,6 +1150,11 @@ export type LocalSaleUpdateWithoutLedgerEntryInput = {
   discountTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   grossTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   netTotal?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   receipt?: Prisma.ReceiptUpdateOneWithoutSaleReferencingReceiptNestedInput
   receiptForSale?: Prisma.ReceiptUpdateOneWithoutLocalSaleNestedInput
@@ -945,6 +1170,11 @@ export type LocalSaleUncheckedUpdateWithoutLedgerEntryInput = {
   discountTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   grossTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   netTotal?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   receiptForSale?: Prisma.ReceiptUncheckedUpdateOneWithoutLocalSaleNestedInput
   items?: Prisma.LocalSaleItemUncheckedUpdateManyWithoutLocalSaleNestedInput
@@ -959,6 +1189,11 @@ export type LocalSaleUncheckedUpdateManyWithoutLedgerEntryInput = {
   discountTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   grossTotal?: Prisma.FloatFieldUpdateOperationsInput | number
   netTotal?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1003,6 +1238,11 @@ export type LocalSaleSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   discountTotal?: boolean
   grossTotal?: boolean
   netTotal?: boolean
+  cashPaid?: boolean
+  onlinePaid?: boolean
+  cashCollected?: boolean
+  changeGiven?: boolean
+  creditAmount?: boolean
   createdAt?: boolean
   ledgerEntry?: boolean | Prisma.LocalSale$ledgerEntryArgs<ExtArgs>
   receipt?: boolean | Prisma.LocalSale$receiptArgs<ExtArgs>
@@ -1021,6 +1261,11 @@ export type LocalSaleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   discountTotal?: boolean
   grossTotal?: boolean
   netTotal?: boolean
+  cashPaid?: boolean
+  onlinePaid?: boolean
+  cashCollected?: boolean
+  changeGiven?: boolean
+  creditAmount?: boolean
   createdAt?: boolean
   ledgerEntry?: boolean | Prisma.LocalSale$ledgerEntryArgs<ExtArgs>
   receipt?: boolean | Prisma.LocalSale$receiptArgs<ExtArgs>
@@ -1036,6 +1281,11 @@ export type LocalSaleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   discountTotal?: boolean
   grossTotal?: boolean
   netTotal?: boolean
+  cashPaid?: boolean
+  onlinePaid?: boolean
+  cashCollected?: boolean
+  changeGiven?: boolean
+  creditAmount?: boolean
   createdAt?: boolean
   ledgerEntry?: boolean | Prisma.LocalSale$ledgerEntryArgs<ExtArgs>
   receipt?: boolean | Prisma.LocalSale$receiptArgs<ExtArgs>
@@ -1051,10 +1301,15 @@ export type LocalSaleSelectScalar = {
   discountTotal?: boolean
   grossTotal?: boolean
   netTotal?: boolean
+  cashPaid?: boolean
+  onlinePaid?: boolean
+  cashCollected?: boolean
+  changeGiven?: boolean
+  creditAmount?: boolean
   createdAt?: boolean
 }
 
-export type LocalSaleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "vendorName" | "ledgerEntryId" | "receiptId" | "saleType" | "discountTotal" | "grossTotal" | "netTotal" | "createdAt", ExtArgs["result"]["localSale"]>
+export type LocalSaleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "vendorName" | "ledgerEntryId" | "receiptId" | "saleType" | "discountTotal" | "grossTotal" | "netTotal" | "cashPaid" | "onlinePaid" | "cashCollected" | "changeGiven" | "creditAmount" | "createdAt", ExtArgs["result"]["localSale"]>
 export type LocalSaleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ledgerEntry?: boolean | Prisma.LocalSale$ledgerEntryArgs<ExtArgs>
   receipt?: boolean | Prisma.LocalSale$receiptArgs<ExtArgs>
@@ -1089,6 +1344,11 @@ export type $LocalSalePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     discountTotal: number
     grossTotal: number
     netTotal: number
+    cashPaid: number
+    onlinePaid: number
+    cashCollected: number
+    changeGiven: number
+    creditAmount: number
     createdAt: Date
   }, ExtArgs["result"]["localSale"]>
   composites: {}
@@ -1526,6 +1786,11 @@ export interface LocalSaleFieldRefs {
   readonly discountTotal: Prisma.FieldRef<"LocalSale", 'Float'>
   readonly grossTotal: Prisma.FieldRef<"LocalSale", 'Float'>
   readonly netTotal: Prisma.FieldRef<"LocalSale", 'Float'>
+  readonly cashPaid: Prisma.FieldRef<"LocalSale", 'Float'>
+  readonly onlinePaid: Prisma.FieldRef<"LocalSale", 'Float'>
+  readonly cashCollected: Prisma.FieldRef<"LocalSale", 'Float'>
+  readonly changeGiven: Prisma.FieldRef<"LocalSale", 'Float'>
+  readonly creditAmount: Prisma.FieldRef<"LocalSale", 'Float'>
   readonly createdAt: Prisma.FieldRef<"LocalSale", 'DateTime'>
 }
     

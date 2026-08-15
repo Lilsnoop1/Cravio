@@ -72,6 +72,7 @@ const handler = {
         await env.BUCKET.put(key, buffer, {
           httpMetadata: {
             contentType,
+            cacheControl: "public, max-age=31536000, immutable",
           },
         });
 

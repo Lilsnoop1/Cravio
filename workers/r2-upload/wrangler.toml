@@ -6,7 +6,7 @@ account_id = "26dc307587c029d1917fdfd5f929e6e9"
 workers_dev = true
 
 [vars]
-PUBLIC_BASE_URL = "https://cravio-r2-upload.zulfiqarammar8.workers.dev"
+PUBLIC_BASE_URL = "https://cdn.craviopk.com"
 
 [[r2_buckets]]
 binding = "BUCKET"

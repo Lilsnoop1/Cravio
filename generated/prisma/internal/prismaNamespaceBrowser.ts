@@ -177,6 +177,7 @@ export const MarketingBannerScalarFieldEnum = {
   id: 'id',
   imageUrl: 'imageUrl',
   title: 'title',
+  linkUrl: 'linkUrl',
   sortOrder: 'sortOrder',
   isActive: 'isActive',
   createdAt: 'createdAt',
@@ -328,6 +329,11 @@ export const LocalSaleScalarFieldEnum = {
   discountTotal: 'discountTotal',
   grossTotal: 'grossTotal',
   netTotal: 'netTotal',
+  cashPaid: 'cashPaid',
+  onlinePaid: 'onlinePaid',
+  cashCollected: 'cashCollected',
+  changeGiven: 'changeGiven',
+  creditAmount: 'creditAmount',
   createdAt: 'createdAt'
 } as const
 
@@ -369,6 +375,12 @@ export const LocalPurchaseScalarFieldEnum = {
   vendorName: 'vendorName',
   ledgerEntryId: 'ledgerEntryId',
   totalAmount: 'totalAmount',
+  cashPaid: 'cashPaid',
+  onlinePaid: 'onlinePaid',
+  cashCollected: 'cashCollected',
+  changeGiven: 'changeGiven',
+  creditAmount: 'creditAmount',
+  paymentProofPath: 'paymentProofPath',
   createdAt: 'createdAt'
 } as const
 

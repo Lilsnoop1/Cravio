@@ -58,6 +58,8 @@ export interface DealsCardProps {
 export interface CardProps {
   image: string;
   title?: string;
+  /** Optional click-through URL for marketing banners. */
+  linkUrl?: string | null;
 }
 
 export interface SearchBarProps {

@@ -31,6 +31,11 @@ export type LocalPurchaseAvgAggregateOutputType = {
   vendorId: number | null
   ledgerEntryId: number | null
   totalAmount: number | null
+  cashPaid: number | null
+  onlinePaid: number | null
+  cashCollected: number | null
+  changeGiven: number | null
+  creditAmount: number | null
 }
 
 export type LocalPurchaseSumAggregateOutputType = {
@@ -38,6 +43,11 @@ export type LocalPurchaseSumAggregateOutputType = {
   vendorId: number | null
   ledgerEntryId: number | null
   totalAmount: number | null
+  cashPaid: number | null
+  onlinePaid: number | null
+  cashCollected: number | null
+  changeGiven: number | null
+  creditAmount: number | null
 }
 
 export type LocalPurchaseMinAggregateOutputType = {
@@ -46,6 +56,12 @@ export type LocalPurchaseMinAggregateOutputType = {
   vendorName: string | null
   ledgerEntryId: number | null
   totalAmount: number | null
+  cashPaid: number | null
+  onlinePaid: number | null
+  cashCollected: number | null
+  changeGiven: number | null
+  creditAmount: number | null
+  paymentProofPath: string | null
   createdAt: Date | null
 }
 
@@ -55,6 +71,12 @@ export type LocalPurchaseMaxAggregateOutputType = {
   vendorName: string | null
   ledgerEntryId: number | null
   totalAmount: number | null
+  cashPaid: number | null
+  onlinePaid: number | null
+  cashCollected: number | null
+  changeGiven: number | null
+  creditAmount: number | null
+  paymentProofPath: string | null
   createdAt: Date | null
 }
 
@@ -64,6 +86,12 @@ export type LocalPurchaseCountAggregateOutputType = {
   vendorName: number
   ledgerEntryId: number
   totalAmount: number
+  cashPaid: number
+  onlinePaid: number
+  cashCollected: number
+  changeGiven: number
+  creditAmount: number
+  paymentProofPath: number
   createdAt: number
   _all: number
 }
@@ -74,6 +102,11 @@ export type LocalPurchaseAvgAggregateInputType = {
   vendorId?: true
   ledgerEntryId?: true
   totalAmount?: true
+  cashPaid?: true
+  onlinePaid?: true
+  cashCollected?: true
+  changeGiven?: true
+  creditAmount?: true
 }
 
 export type LocalPurchaseSumAggregateInputType = {
@@ -81,6 +114,11 @@ export type LocalPurchaseSumAggregateInputType = {
   vendorId?: true
   ledgerEntryId?: true
   totalAmount?: true
+  cashPaid?: true
+  onlinePaid?: true
+  cashCollected?: true
+  changeGiven?: true
+  creditAmount?: true
 }
 
 export type LocalPurchaseMinAggregateInputType = {
@@ -89,6 +127,12 @@ export type LocalPurchaseMinAggregateInputType = {
   vendorName?: true
   ledgerEntryId?: true
   totalAmount?: true
+  cashPaid?: true
+  onlinePaid?: true
+  cashCollected?: true
+  changeGiven?: true
+  creditAmount?: true
+  paymentProofPath?: true
   createdAt?: true
 }
 
@@ -98,6 +142,12 @@ export type LocalPurchaseMaxAggregateInputType = {
   vendorName?: true
   ledgerEntryId?: true
   totalAmount?: true
+  cashPaid?: true
+  onlinePaid?: true
+  cashCollected?: true
+  changeGiven?: true
+  creditAmount?: true
+  paymentProofPath?: true
   createdAt?: true
 }
 
@@ -107,6 +157,12 @@ export type LocalPurchaseCountAggregateInputType = {
   vendorName?: true
   ledgerEntryId?: true
   totalAmount?: true
+  cashPaid?: true
+  onlinePaid?: true
+  cashCollected?: true
+  changeGiven?: true
+  creditAmount?: true
+  paymentProofPath?: true
   createdAt?: true
   _all?: true
 }
@@ -203,6 +259,12 @@ export type LocalPurchaseGroupByOutputType = {
   vendorName: string | null
   ledgerEntryId: number | null
   totalAmount: number
+  cashPaid: number
+  onlinePaid: number
+  cashCollected: number
+  changeGiven: number
+  creditAmount: number
+  paymentProofPath: string | null
   createdAt: Date
   _count: LocalPurchaseCountAggregateOutputType | null
   _avg: LocalPurchaseAvgAggregateOutputType | null
@@ -235,6 +297,12 @@ export type LocalPurchaseWhereInput = {
   vendorName?: Prisma.StringNullableFilter<"LocalPurchase"> | string | null
   ledgerEntryId?: Prisma.IntNullableFilter<"LocalPurchase"> | number | null
   totalAmount?: Prisma.FloatFilter<"LocalPurchase"> | number
+  cashPaid?: Prisma.FloatFilter<"LocalPurchase"> | number
+  onlinePaid?: Prisma.FloatFilter<"LocalPurchase"> | number
+  cashCollected?: Prisma.FloatFilter<"LocalPurchase"> | number
+  changeGiven?: Prisma.FloatFilter<"LocalPurchase"> | number
+  creditAmount?: Prisma.FloatFilter<"LocalPurchase"> | number
+  paymentProofPath?: Prisma.StringNullableFilter<"LocalPurchase"> | string | null
   createdAt?: Prisma.DateTimeFilter<"LocalPurchase"> | Date | string
   ledgerEntry?: Prisma.XOR<Prisma.LedgerEntryNullableScalarRelationFilter, Prisma.LedgerEntryWhereInput> | null
   items?: Prisma.LocalPurchaseItemListRelationFilter
@@ -246,6 +314,12 @@ export type LocalPurchaseOrderByWithRelationInput = {
   vendorName?: Prisma.SortOrderInput | Prisma.SortOrder
   ledgerEntryId?: Prisma.SortOrderInput | Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  cashPaid?: Prisma.SortOrder
+  onlinePaid?: Prisma.SortOrder
+  cashCollected?: Prisma.SortOrder
+  changeGiven?: Prisma.SortOrder
+  creditAmount?: Prisma.SortOrder
+  paymentProofPath?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   ledgerEntry?: Prisma.LedgerEntryOrderByWithRelationInput
   items?: Prisma.LocalPurchaseItemOrderByRelationAggregateInput
@@ -260,6 +334,12 @@ export type LocalPurchaseWhereUniqueInput = Prisma.AtLeast<{
   vendorName?: Prisma.StringNullableFilter<"LocalPurchase"> | string | null
   ledgerEntryId?: Prisma.IntNullableFilter<"LocalPurchase"> | number | null
   totalAmount?: Prisma.FloatFilter<"LocalPurchase"> | number
+  cashPaid?: Prisma.FloatFilter<"LocalPurchase"> | number
+  onlinePaid?: Prisma.FloatFilter<"LocalPurchase"> | number
+  cashCollected?: Prisma.FloatFilter<"LocalPurchase"> | number
+  changeGiven?: Prisma.FloatFilter<"LocalPurchase"> | number
+  creditAmount?: Prisma.FloatFilter<"LocalPurchase"> | number
+  paymentProofPath?: Prisma.StringNullableFilter<"LocalPurchase"> | string | null
   createdAt?: Prisma.DateTimeFilter<"LocalPurchase"> | Date | string
   ledgerEntry?: Prisma.XOR<Prisma.LedgerEntryNullableScalarRelationFilter, Prisma.LedgerEntryWhereInput> | null
   items?: Prisma.LocalPurchaseItemListRelationFilter
@@ -271,6 +351,12 @@ export type LocalPurchaseOrderByWithAggregationInput = {
   vendorName?: Prisma.SortOrderInput | Prisma.SortOrder
   ledgerEntryId?: Prisma.SortOrderInput | Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  cashPaid?: Prisma.SortOrder
+  onlinePaid?: Prisma.SortOrder
+  cashCollected?: Prisma.SortOrder
+  changeGiven?: Prisma.SortOrder
+  creditAmount?: Prisma.SortOrder
+  paymentProofPath?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.LocalPurchaseCountOrderByAggregateInput
   _avg?: Prisma.LocalPurchaseAvgOrderByAggregateInput
@@ -288,6 +374,12 @@ export type LocalPurchaseScalarWhereWithAggregatesInput = {
   vendorName?: Prisma.StringNullableWithAggregatesFilter<"LocalPurchase"> | string | null
   ledgerEntryId?: Prisma.IntNullableWithAggregatesFilter<"LocalPurchase"> | number | null
   totalAmount?: Prisma.FloatWithAggregatesFilter<"LocalPurchase"> | number
+  cashPaid?: Prisma.FloatWithAggregatesFilter<"LocalPurchase"> | number
+  onlinePaid?: Prisma.FloatWithAggregatesFilter<"LocalPurchase"> | number
+  cashCollected?: Prisma.FloatWithAggregatesFilter<"LocalPurchase"> | number
+  changeGiven?: Prisma.FloatWithAggregatesFilter<"LocalPurchase"> | number
+  creditAmount?: Prisma.FloatWithAggregatesFilter<"LocalPurchase"> | number
+  paymentProofPath?: Prisma.StringNullableWithAggregatesFilter<"LocalPurchase"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"LocalPurchase"> | Date | string
 }
 
@@ -295,6 +387,12 @@ export type LocalPurchaseCreateInput = {
   vendorId?: number | null
   vendorName?: string | null
   totalAmount?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
+  paymentProofPath?: string | null
   createdAt?: Date | string
   ledgerEntry?: Prisma.LedgerEntryCreateNestedOneWithoutLocalPurchasesInput
   items?: Prisma.LocalPurchaseItemCreateNestedManyWithoutLocalPurchaseInput
@@ -306,6 +404,12 @@ export type LocalPurchaseUncheckedCreateInput = {
   vendorName?: string | null
   ledgerEntryId?: number | null
   totalAmount?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
+  paymentProofPath?: string | null
   createdAt?: Date | string
   items?: Prisma.LocalPurchaseItemUncheckedCreateNestedManyWithoutLocalPurchaseInput
 }
@@ -314,6 +418,12 @@ export type LocalPurchaseUpdateInput = {
   vendorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   vendorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  paymentProofPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ledgerEntry?: Prisma.LedgerEntryUpdateOneWithoutLocalPurchasesNestedInput
   items?: Prisma.LocalPurchaseItemUpdateManyWithoutLocalPurchaseNestedInput
@@ -325,6 +435,12 @@ export type LocalPurchaseUncheckedUpdateInput = {
   vendorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ledgerEntryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  paymentProofPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.LocalPurchaseItemUncheckedUpdateManyWithoutLocalPurchaseNestedInput
 }
@@ -335,6 +451,12 @@ export type LocalPurchaseCreateManyInput = {
   vendorName?: string | null
   ledgerEntryId?: number | null
   totalAmount?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
+  paymentProofPath?: string | null
   createdAt?: Date | string
 }
 
@@ -342,6 +464,12 @@ export type LocalPurchaseUpdateManyMutationInput = {
   vendorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   vendorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  paymentProofPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -351,6 +479,12 @@ export type LocalPurchaseUncheckedUpdateManyInput = {
   vendorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ledgerEntryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  paymentProofPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -370,6 +504,12 @@ export type LocalPurchaseCountOrderByAggregateInput = {
   vendorName?: Prisma.SortOrder
   ledgerEntryId?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  cashPaid?: Prisma.SortOrder
+  onlinePaid?: Prisma.SortOrder
+  cashCollected?: Prisma.SortOrder
+  changeGiven?: Prisma.SortOrder
+  creditAmount?: Prisma.SortOrder
+  paymentProofPath?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -378,6 +518,11 @@ export type LocalPurchaseAvgOrderByAggregateInput = {
   vendorId?: Prisma.SortOrder
   ledgerEntryId?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  cashPaid?: Prisma.SortOrder
+  onlinePaid?: Prisma.SortOrder
+  cashCollected?: Prisma.SortOrder
+  changeGiven?: Prisma.SortOrder
+  creditAmount?: Prisma.SortOrder
 }
 
 export type LocalPurchaseMaxOrderByAggregateInput = {
@@ -386,6 +531,12 @@ export type LocalPurchaseMaxOrderByAggregateInput = {
   vendorName?: Prisma.SortOrder
   ledgerEntryId?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  cashPaid?: Prisma.SortOrder
+  onlinePaid?: Prisma.SortOrder
+  cashCollected?: Prisma.SortOrder
+  changeGiven?: Prisma.SortOrder
+  creditAmount?: Prisma.SortOrder
+  paymentProofPath?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -395,6 +546,12 @@ export type LocalPurchaseMinOrderByAggregateInput = {
   vendorName?: Prisma.SortOrder
   ledgerEntryId?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  cashPaid?: Prisma.SortOrder
+  onlinePaid?: Prisma.SortOrder
+  cashCollected?: Prisma.SortOrder
+  changeGiven?: Prisma.SortOrder
+  creditAmount?: Prisma.SortOrder
+  paymentProofPath?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -403,6 +560,11 @@ export type LocalPurchaseSumOrderByAggregateInput = {
   vendorId?: Prisma.SortOrder
   ledgerEntryId?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  cashPaid?: Prisma.SortOrder
+  onlinePaid?: Prisma.SortOrder
+  cashCollected?: Prisma.SortOrder
+  changeGiven?: Prisma.SortOrder
+  creditAmount?: Prisma.SortOrder
 }
 
 export type LocalPurchaseScalarRelationFilter = {
@@ -470,6 +632,12 @@ export type LocalPurchaseCreateWithoutLedgerEntryInput = {
   vendorId?: number | null
   vendorName?: string | null
   totalAmount?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
+  paymentProofPath?: string | null
   createdAt?: Date | string
   items?: Prisma.LocalPurchaseItemCreateNestedManyWithoutLocalPurchaseInput
 }
@@ -479,6 +647,12 @@ export type LocalPurchaseUncheckedCreateWithoutLedgerEntryInput = {
   vendorId?: number | null
   vendorName?: string | null
   totalAmount?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
+  paymentProofPath?: string | null
   createdAt?: Date | string
   items?: Prisma.LocalPurchaseItemUncheckedCreateNestedManyWithoutLocalPurchaseInput
 }
@@ -518,6 +692,12 @@ export type LocalPurchaseScalarWhereInput = {
   vendorName?: Prisma.StringNullableFilter<"LocalPurchase"> | string | null
   ledgerEntryId?: Prisma.IntNullableFilter<"LocalPurchase"> | number | null
   totalAmount?: Prisma.FloatFilter<"LocalPurchase"> | number
+  cashPaid?: Prisma.FloatFilter<"LocalPurchase"> | number
+  onlinePaid?: Prisma.FloatFilter<"LocalPurchase"> | number
+  cashCollected?: Prisma.FloatFilter<"LocalPurchase"> | number
+  changeGiven?: Prisma.FloatFilter<"LocalPurchase"> | number
+  creditAmount?: Prisma.FloatFilter<"LocalPurchase"> | number
+  paymentProofPath?: Prisma.StringNullableFilter<"LocalPurchase"> | string | null
   createdAt?: Prisma.DateTimeFilter<"LocalPurchase"> | Date | string
 }
 
@@ -525,6 +705,12 @@ export type LocalPurchaseCreateWithoutItemsInput = {
   vendorId?: number | null
   vendorName?: string | null
   totalAmount?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
+  paymentProofPath?: string | null
   createdAt?: Date | string
   ledgerEntry?: Prisma.LedgerEntryCreateNestedOneWithoutLocalPurchasesInput
 }
@@ -535,6 +721,12 @@ export type LocalPurchaseUncheckedCreateWithoutItemsInput = {
   vendorName?: string | null
   ledgerEntryId?: number | null
   totalAmount?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
+  paymentProofPath?: string | null
   createdAt?: Date | string
 }
 
@@ -558,6 +750,12 @@ export type LocalPurchaseUpdateWithoutItemsInput = {
   vendorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   vendorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  paymentProofPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ledgerEntry?: Prisma.LedgerEntryUpdateOneWithoutLocalPurchasesNestedInput
 }
@@ -568,6 +766,12 @@ export type LocalPurchaseUncheckedUpdateWithoutItemsInput = {
   vendorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ledgerEntryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  paymentProofPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -576,6 +780,12 @@ export type LocalPurchaseCreateManyLedgerEntryInput = {
   vendorId?: number | null
   vendorName?: string | null
   totalAmount?: number
+  cashPaid?: number
+  onlinePaid?: number
+  cashCollected?: number
+  changeGiven?: number
+  creditAmount?: number
+  paymentProofPath?: string | null
   createdAt?: Date | string
 }
 
@@ -583,6 +793,12 @@ export type LocalPurchaseUpdateWithoutLedgerEntryInput = {
   vendorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   vendorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  paymentProofPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.LocalPurchaseItemUpdateManyWithoutLocalPurchaseNestedInput
 }
@@ -592,6 +808,12 @@ export type LocalPurchaseUncheckedUpdateWithoutLedgerEntryInput = {
   vendorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   vendorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  paymentProofPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.LocalPurchaseItemUncheckedUpdateManyWithoutLocalPurchaseNestedInput
 }
@@ -601,6 +823,12 @@ export type LocalPurchaseUncheckedUpdateManyWithoutLedgerEntryInput = {
   vendorId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   vendorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashPaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  onlinePaid?: Prisma.FloatFieldUpdateOperationsInput | number
+  cashCollected?: Prisma.FloatFieldUpdateOperationsInput | number
+  changeGiven?: Prisma.FloatFieldUpdateOperationsInput | number
+  creditAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  paymentProofPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -641,6 +869,12 @@ export type LocalPurchaseSelect<ExtArgs extends runtime.Types.Extensions.Interna
   vendorName?: boolean
   ledgerEntryId?: boolean
   totalAmount?: boolean
+  cashPaid?: boolean
+  onlinePaid?: boolean
+  cashCollected?: boolean
+  changeGiven?: boolean
+  creditAmount?: boolean
+  paymentProofPath?: boolean
   createdAt?: boolean
   ledgerEntry?: boolean | Prisma.LocalPurchase$ledgerEntryArgs<ExtArgs>
   items?: boolean | Prisma.LocalPurchase$itemsArgs<ExtArgs>
@@ -653,6 +887,12 @@ export type LocalPurchaseSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   vendorName?: boolean
   ledgerEntryId?: boolean
   totalAmount?: boolean
+  cashPaid?: boolean
+  onlinePaid?: boolean
+  cashCollected?: boolean
+  changeGiven?: boolean
+  creditAmount?: boolean
+  paymentProofPath?: boolean
   createdAt?: boolean
   ledgerEntry?: boolean | Prisma.LocalPurchase$ledgerEntryArgs<ExtArgs>
 }, ExtArgs["result"]["localPurchase"]>
@@ -663,6 +903,12 @@ export type LocalPurchaseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   vendorName?: boolean
   ledgerEntryId?: boolean
   totalAmount?: boolean
+  cashPaid?: boolean
+  onlinePaid?: boolean
+  cashCollected?: boolean
+  changeGiven?: boolean
+  creditAmount?: boolean
+  paymentProofPath?: boolean
   createdAt?: boolean
   ledgerEntry?: boolean | Prisma.LocalPurchase$ledgerEntryArgs<ExtArgs>
 }, ExtArgs["result"]["localPurchase"]>
@@ -673,10 +919,16 @@ export type LocalPurchaseSelectScalar = {
   vendorName?: boolean
   ledgerEntryId?: boolean
   totalAmount?: boolean
+  cashPaid?: boolean
+  onlinePaid?: boolean
+  cashCollected?: boolean
+  changeGiven?: boolean
+  creditAmount?: boolean
+  paymentProofPath?: boolean
   createdAt?: boolean
 }
 
-export type LocalPurchaseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "vendorName" | "ledgerEntryId" | "totalAmount" | "createdAt", ExtArgs["result"]["localPurchase"]>
+export type LocalPurchaseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "vendorId" | "vendorName" | "ledgerEntryId" | "totalAmount" | "cashPaid" | "onlinePaid" | "cashCollected" | "changeGiven" | "creditAmount" | "paymentProofPath" | "createdAt", ExtArgs["result"]["localPurchase"]>
 export type LocalPurchaseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ledgerEntry?: boolean | Prisma.LocalPurchase$ledgerEntryArgs<ExtArgs>
   items?: boolean | Prisma.LocalPurchase$itemsArgs<ExtArgs>
@@ -701,6 +953,15 @@ export type $LocalPurchasePayload<ExtArgs extends runtime.Types.Extensions.Inter
     vendorName: string | null
     ledgerEntryId: number | null
     totalAmount: number
+    cashPaid: number
+    onlinePaid: number
+    cashCollected: number
+    changeGiven: number
+    creditAmount: number
+    /**
+     * Optional local or uploaded path/URL for payment proof image.
+     */
+    paymentProofPath: string | null
     createdAt: Date
   }, ExtArgs["result"]["localPurchase"]>
   composites: {}
@@ -1132,6 +1393,12 @@ export interface LocalPurchaseFieldRefs {
   readonly vendorName: Prisma.FieldRef<"LocalPurchase", 'String'>
   readonly ledgerEntryId: Prisma.FieldRef<"LocalPurchase", 'Int'>
   readonly totalAmount: Prisma.FieldRef<"LocalPurchase", 'Float'>
+  readonly cashPaid: Prisma.FieldRef<"LocalPurchase", 'Float'>
+  readonly onlinePaid: Prisma.FieldRef<"LocalPurchase", 'Float'>
+  readonly cashCollected: Prisma.FieldRef<"LocalPurchase", 'Float'>
+  readonly changeGiven: Prisma.FieldRef<"LocalPurchase", 'Float'>
+  readonly creditAmount: Prisma.FieldRef<"LocalPurchase", 'Float'>
+  readonly paymentProofPath: Prisma.FieldRef<"LocalPurchase", 'String'>
   readonly createdAt: Prisma.FieldRef<"LocalPurchase", 'DateTime'>
 }
     
