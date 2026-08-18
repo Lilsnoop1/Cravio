@@ -48,7 +48,7 @@ export default function LocationSelector({ allowChange = false }: LocationSelect
 }
 
 function LocationSelectorLoaded({ allowChange = false }: LocationSelectorProps = {}){
-  const { isLoaded, loadError, apiKeyMissing } = useGoogleMaps();
+  const { isLoaded, loadError, apiKeyMissing, authFailed } = useGoogleMaps();
 
   if (apiKeyMissing) {
     return (
@@ -59,11 +59,11 @@ function LocationSelectorLoaded({ allowChange = false }: LocationSelectorProps =
     );
   }
 
-  if (loadError) {
+  if (loadError || authFailed) {
     return (
       <GoogleMapsError
-        title="Google Maps failed to load"
-        message="Enable billing on your Google Cloud project and turn on Maps JavaScript API, Places API, and Geocoding API for this key."
+        title="Google Maps is blocked for this page"
+        message="In Google Cloud Console, enable billing, turn on Maps JavaScript API, Places API, and Geocoding API, then add this site to the key's Website restrictions: http://localhost:3000/* and your production domain (https://craviopk.com/*)."
       />
     );
   }

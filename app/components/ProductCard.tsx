@@ -28,17 +28,19 @@ const ProductCard = ({ product, dest }: { product: Product; dest: string }) => {
     >
       <div className={`bg-white rounded-lg ${isSlider ? 'p-1.5' : 'p-1.5 sm:p-2'} h-full shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col`}>
         <div className={`relative ${isSlider ? 'mb-2' : 'mb-1.5 sm:mb-2'}`}>
-          <div className="relative overflow-hidden rounded-md bg-slate-100 aspect-square w-full">
+          <div
+            className="relative overflow-hidden rounded-md bg-slate-100 aspect-square w-full cursor-pointer"
+            onClick={() => {
+              setProduct(product);
+              setIsOpen(true);
+            }}
+          >
             <CatalogImage
               src={product.image}
               alt={product.name}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
               className="object-cover group-hover:scale-105 transition-transform duration-300"
-              onClick={() => {
-                setProduct(product);
-                setIsOpen(true);
-              }}
             />
           </div>
           <button

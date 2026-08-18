@@ -41,23 +41,35 @@ export default function CatalogImage({
   src,
   alt,
   onError,
+  unoptimized,
   ...rest
 }: CatalogImageProps) {
   const incoming = resolveSrc(src?.trim() ? src.trim() : FALLBACK);
   const [current, setCurrent] = useState(incoming);
+  const [skipOptimizer, setSkipOptimizer] = useState(false);
 
   useEffect(() => {
     setCurrent(incoming);
+    setSkipOptimizer(false);
   }, [incoming]);
+
+  const optimize = Boolean(unoptimized) ? false : canOptimize(current) && !skipOptimizer;
 
   return (
     <Image
       {...rest}
+      key={`${current}:${optimize ? "opt" : "raw"}`}
       src={current}
       alt={alt}
-      unoptimized={!canOptimize(current)}
+      unoptimized={!optimize}
       onError={(event) => {
-        if (current !== FALLBACK) setCurrent(FALLBACK);
+        if (current === FALLBACK) return;
+        // Optimizer (or a cancelled first load) failed — retry the original file next.
+        if (optimize) {
+          setSkipOptimizer(true);
+          return;
+        }
+        setCurrent(FALLBACK);
         onError?.(event);
       }}
     />

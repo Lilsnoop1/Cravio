@@ -74,7 +74,7 @@ export default function ProductModal() {
 
         <div className="p-4 md:p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mb-6 md:mb-8 items-start md:items-center">
-            <div className="relative overflow-hidden rounded-2xl bg-slate-100 aspect-square max-h-[260px] md:max-h-none">
+            <div className="relative w-full max-w-[260px] md:max-w-none mx-auto overflow-hidden rounded-2xl bg-slate-100 aspect-square">
               <CatalogImage
                 src={product.image}
                 alt={product.name}
