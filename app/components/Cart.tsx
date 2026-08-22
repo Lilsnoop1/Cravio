@@ -129,41 +129,35 @@ const Cart: React.FC = () => {
     <aside
       className={`${
         cartItems.length === 0 || !CartOpen ? "hidden" : "hidden md:flex"
-      } md:flex-col md:sticky md:top-0 md:h-dvh md:self-start md:overflow-y-auto w-[420px] shrink-0 bg-white shadow-2xl z-50`}
+      } md:flex-col md:sticky md:top-[var(--storefront-header-height,0px)] md:h-[calc(100dvh-var(--storefront-header-height,0px))] md:self-start md:overflow-hidden w-[420px] shrink-0 bg-white shadow-2xl z-30`}
     >
-      {/* Header */}
-      <div className="px-5 py-4 border-b border-slate-100 bg-white">
-        <h2 className="text-xl font-bold text-slate-900 font-sifonn">Cart</h2>
-      </div>
-
-      {/* Fulfillment bar */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100">
-        <div className="flex items-center gap-2">
-          <CheckCircle className="w-5 h-5 text-primary" />
-          <div>
-            <p className="text-sm font-semibold text-slate-800">Cravio Grocery</p>
-            <p className="text-xs text-slate-500">Fulfilled by Cravio</p>
-          </div>
+      <div className="shrink-0 flex items-center justify-between gap-3 px-5 py-3 border-b border-slate-100 bg-white">
+        <div className="flex items-center gap-2 min-w-0">
+          <h2 className="text-xl font-bold text-slate-900 font-sifonn">Cart</h2>
+          {itemCount > 0 && (
+            <span className="text-sm text-slate-500">
+              {itemCount} {itemCount === 1 ? "item" : "items"}
+            </span>
+          )}
         </div>
-        <div className="text-right">
-          <p className="text-xs font-semibold text-slate-700">Standard delivery</p>
-          <p className="text-xs text-slate-500">
+        <div className="flex items-center gap-1.5 text-right shrink-0">
+          <CheckCircle className="w-4 h-4 text-primary" />
+          <p className="text-xs font-semibold text-slate-700">
+            Delivery{" "}
             {new Date(Date.now() + 86400000).toLocaleDateString("en-GB", {
               day: "numeric",
-              month: "long",
-              year: "numeric",
+              month: "short",
             })}
           </p>
         </div>
       </div>
 
-      {/* Progress bars */}
       {cartItems.length > 0 && (
-        <div className="border-b border-slate-100 divide-y divide-slate-100">
-          {/* Minimum order bar */}
-          <div className="flex items-center gap-3 px-5 py-3">
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-slate-800 mb-1.5">
+        <div className="shrink-0 border-b border-slate-100 px-5 py-3 space-y-2.5">
+          <div className="flex items-center gap-3">
+            <Truck className="w-5 h-5 text-primary shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-slate-800 mb-1">
                 {subTotal >= 3000 || isEmployee
                   ? "Yay! You can now place your order"
                   : `Add Rs ${(3000 - subTotal).toFixed(0)} more for minimum order`}
@@ -171,20 +165,18 @@ const Cart: React.FC = () => {
               <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-primary rounded-full transition-all duration-500"
-                  style={{
-                    width: `${Math.min(100, (subTotal / 3000) * 100)}%`,
-                  }}
+                  style={{ width: `${Math.min(100, (subTotal / 3000) * 100)}%` }}
                 />
               </div>
             </div>
-            <Truck className="w-6 h-6 text-primary shrink-0" />
           </div>
-
-          {/* Bulk pricing bar */}
           {!isEmployee && (
-            <div className="flex items-center gap-3 px-5 py-3">
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-slate-800 mb-1.5">
+            <div className="flex items-center gap-3">
+              <span className="w-5 text-center text-base shrink-0" aria-hidden>
+                💰
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-slate-800 mb-1">
                   {consumerSubtotal >= 20000
                     ? "Bulk pricing unlocked!"
                     : `Add Rs ${(20000 - consumerSubtotal).toLocaleString()} more for bulk pricing`}
@@ -198,7 +190,6 @@ const Cart: React.FC = () => {
                   />
                 </div>
               </div>
-              <span className="text-lg shrink-0">💰</span>
             </div>
           )}
         </div>
@@ -222,20 +213,18 @@ const Cart: React.FC = () => {
                 return (
                   <div
                     key={`${item.product.id}-${index}`}
-                    className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors"
                   >
-                    {/* Product image */}
-                    <div className="relative w-18 h-18 rounded-xl border border-slate-200 overflow-hidden flex-shrink-0 bg-white p-1.5">
+                    <div className="relative w-16 h-16 rounded-xl border border-slate-200 overflow-hidden flex-shrink-0 bg-white">
                       <CatalogImage
                         src={item.product.image}
                         alt={item.product.name}
                         fill
-                        sizes="72px"
-                        className="object-contain p-1.5"
+                        sizes="64px"
+                        className="object-contain p-1"
                       />
                     </div>
 
-                    {/* Name + Price */}
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 leading-tight">
                         {item.product.name}
@@ -250,12 +239,6 @@ const Cart: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      {!isEmployee && (
-                        <p className="text-xs text-slate-400 mt-0.5">
-                          {bulkEligible ? "Bulk" : "Consumer"} · Line: Rs.{" "}
-                          {(salePrice * item.quantity).toLocaleString()}
-                        </p>
-                      )}
                     </div>
 
                     {/* Discount badge + Quantity controls */}
@@ -298,7 +281,7 @@ const Cart: React.FC = () => {
 
       {/* Vendor selector for employees */}
       {isEmployee && cartItems.length > 0 && (
-        <div className="px-5 py-3 border-t border-slate-100 bg-white">
+        <div className="shrink-0 px-5 py-3 border-t border-slate-100 bg-white">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-slate-700 font-semibold">Vendor</span>
             <button
@@ -330,28 +313,18 @@ const Cart: React.FC = () => {
 
       {/* Footer */}
       {cartItems.length > 0 && (
-        <div className="border-t border-slate-200 bg-white px-5 py-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-xl font-bold text-slate-900">
-                  Rs. {subTotal.toLocaleString()}
-                </span>
-                <span className="text-sm text-slate-500">
-                  {itemCount} {itemCount === 1 ? "Item" : "Items"}
-                </span>
-              </div>
-              {savings > 0 && (
-                <p className="text-xs text-primary font-semibold mt-0.5">
-                  You&apos;ve saved Rs. {savings.toLocaleString()}
-                </p>
-              )}
-              <p className="text-xs text-slate-400 mt-0.5">
-                {bulkEligible
-                  ? "Bulk pricing applied (order ≥ Rs 20,000)"
-                  : "Consumer pricing. Bulk at Rs 20,000+"}
-              </p>
+        <div className="shrink-0 border-t border-slate-200 bg-white px-5 py-3 space-y-3">
+          <div className="flex items-baseline justify-between gap-2">
+            <div className="flex items-baseline gap-2">
+              <span className="text-xl font-bold text-slate-900">
+                Rs. {subTotal.toLocaleString()}
+              </span>
             </div>
+            {savings > 0 && (
+              <p className="text-xs text-primary font-semibold">
+                You&apos;ve saved Rs. {savings.toLocaleString()}
+              </p>
+            )}
           </div>
           <button
             disabled={cartItems.length === 0}
