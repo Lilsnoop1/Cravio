@@ -1,27 +1,27 @@
 "use client"
 import { useState, useEffect, useRef } from "react";
 import { Search } from "lucide-react";
-import type { Product, SearchBarProps, SortBy, SortOrder } from "../Data/database";
+import type { Product, SearchBarProps } from "../Data/database";
 import { useProduct } from "../context/ProductsContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useProductModal } from "../context/ProductModalContext";
 import CatalogImage from "./CatalogImage";
 
-const SearchBar = ({ onSearch, onSort }: SearchBarProps) => {
-  const { isOpen, setProduct } = useProductModal();
+const RESULT_LIMIT = 8;
+
+const SearchBar = ({ onSearch }: SearchBarProps) => {
+  const { setProduct, setIsOpen: setModalOpen } = useProductModal();
   const { ProductFetch } = useProduct();
   const [query, setQuery] = useState("");
-  const [isOpening, setIsOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [filteredResults, setFilteredResults] = useState<Product[]>([]);
-  const [sortBy, setSortBy] = useState<SortBy>("none");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        setDropdownOpen(false);
       }
     };
 
@@ -31,121 +31,121 @@ const SearchBar = ({ onSearch, onSort }: SearchBarProps) => {
 
   useEffect(() => {
     if (query.trim().length > 0) {
-      const results = ProductFetch?ProductFetch.filter((snack:Product) => {
-        const searchTerm = query.toLowerCase();
-        return (
-          snack.name.toLowerCase().includes(searchTerm) ||
-          snack.company.toLowerCase().includes(searchTerm) ||
-          snack.category.toLowerCase().includes(searchTerm)
-        );
-      }):[];
-        setFilteredResults(results);
-        setIsOpen(results.length > 0);
-      } else {
-        setFilteredResults([]);
-        setIsOpen(false);
-      }
-    }, [query, ProductFetch]);
+      const results = ProductFetch
+        ? ProductFetch.filter((snack: Product) => {
+            const searchTerm = query.toLowerCase();
+            return (
+              snack.name.toLowerCase().includes(searchTerm) ||
+              snack.company.toLowerCase().includes(searchTerm) ||
+              snack.category.toLowerCase().includes(searchTerm)
+            );
+          })
+        : [];
+      setFilteredResults(results);
+      setDropdownOpen(results.length > 0);
+    } else {
+      setFilteredResults([]);
+      setDropdownOpen(false);
+    }
+  }, [query, ProductFetch]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (onSearch) {
       onSearch(filteredResults);
     }
-    setIsOpen(false);
-  };
-
-  const handleSelectSnack = (snack: Product) => {
-    setQuery(snack.name);
-    setIsOpen(false);
-    if (onSearch) {
-      onSearch([snack]);
-    }
+    setDropdownOpen(false);
   };
 
   const handleReset = () => {
     setQuery("");
     setFilteredResults([]);
-    setIsOpen(false);
+    setDropdownOpen(false);
     if (onSearch) {
       onSearch([]);
     }
   };
 
-  const handleSortChange = (newSortBy: SortBy) => {
-    let newSortOrder = sortOrder;
-
-    if (sortBy === newSortBy) {
-      newSortOrder = sortOrder === "asc" ? "desc" : "asc";
-    } else {
-      newSortOrder = "asc";
-    }
-
-    setSortBy(newSortBy);
-    setSortOrder(newSortOrder);
-
-    if (onSort) {
-      onSort(newSortBy, newSortOrder);
-    }
+  const openProduct = (snack: Product) => {
+    setProduct(snack);
+    setModalOpen(true);
+    setDropdownOpen(false);
   };
 
-  return (
-    <div className="hidden md:block sticky z-20 py-5 px-4 md:px-6 bg-white/80 backdrop-blur top-[var(--storefront-header-height,0px)]">
-      <form
-        onSubmit={handleSearch}
-        ref={dropdownRef as unknown as React.RefObject<HTMLFormElement>}
-        className="relative mx-auto flex w-full max-w-5xl items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-md"
-      >
-        <Search className="h-5 w-5 text-gray-500" />
-        <Input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search snacks, confectioneries and companies"
-          className="border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-        />
-        {query && (
-          <Button type="button" variant="ghost" size="sm" onClick={handleReset} className="text-gray-500">
-            Clear
-          </Button>
-        )}
+  const visibleResults = filteredResults.slice(0, RESULT_LIMIT);
+  const extraCount = filteredResults.length - visibleResults.length;
 
-        {isOpening && filteredResults.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-2 max-h-80 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-xl z-50">
-            {filteredResults.map((snack) => (
-              <button
-                key={snack.id}
-                onClick={() => { setProduct(snack); setIsOpen(true); }}
-                className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b last:border-b-0"
-              >
-                <CatalogImage
-                  src={snack.image}
-                  alt={snack.name}
-                  width={56}
-                  height={56}
-                  className="h-14 w-14 flex-shrink-0 rounded-md object-cover shadow-sm"
-                />
-                <div className="flex flex-col gap-1 flex-1">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{snack.name}</h3>
-                      <div className="mt-1 flex gap-2 text-[11px] text-gray-600">
-                        <span className="rounded-full bg-gray-100 px-2 py-0.5">Company: {snack.company}</span>
-                        <span className="rounded-full bg-gray-100 px-2 py-0.5">Category: {snack.category}</span>
-                      </div>
-                    </div>
-                    <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
-                      ${snack.price.toFixed(2)}
-                    </span>
-                  </div>
-                  {snack.description && (
-                    <p className="text-xs text-gray-500 line-clamp-2">{snack.description}</p>
-                  )}
-                </div>
-              </button>
-            ))}
+  return (
+    <div className="hidden md:block sticky z-30 py-5 px-4 md:px-6 bg-white/80 backdrop-blur top-[var(--storefront-header-height,0px)]">
+      <div ref={dropdownRef} className="relative mx-auto w-full max-w-5xl">
+        <form
+          onSubmit={handleSearch}
+          className="flex w-full items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm"
+        >
+          <Search className="h-5 w-5 shrink-0 text-slate-400" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search snacks, confectioneries and companies"
+            className="border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+          />
+          {query && (
+            <Button type="button" variant="ghost" size="sm" onClick={handleReset} className="text-slate-500">
+              Clear
+            </Button>
+          )}
+        </form>
+
+        {dropdownOpen && visibleResults.length > 0 && (
+          <div className="absolute top-full left-0 right-0 z-50 mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+            <ul className="max-h-96 overflow-y-auto py-1">
+              {visibleResults.map((snack) => {
+                const price = snack.consumerPrice ?? snack.price;
+                return (
+                  <li key={snack.id}>
+                    <button
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openProduct(snack);
+                      }}
+                      className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-amber-50/80 transition-colors"
+                    >
+                      <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                        <CatalogImage
+                          src={snack.image}
+                          alt={snack.name}
+                          fill
+                          sizes="48px"
+                          className="object-cover"
+                        />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-sifonn text-sm font-semibold text-slate-900">
+                          {snack.name}
+                        </span>
+                        <span className="mt-0.5 block truncate text-xs text-slate-500">
+                          {snack.company}
+                          {snack.category ? ` · ${snack.category}` : ""}
+                        </span>
+                      </span>
+                      <span className="shrink-0 font-sifonn text-sm font-bold text-red-600">
+                        Rs {price}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            {extraCount > 0 && (
+              <p className="border-t border-slate-100 px-3 py-2 text-xs text-slate-500">
+                +{extraCount} more matches. Refine your search to narrow results.
+              </p>
+            )}
           </div>
         )}
-      </form>
+      </div>
     </div>
   );
 };
